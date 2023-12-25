@@ -1,1 +1,11 @@
+name: OSeMOSYS
 
+dependencies:
+  - python
+  - pyomo
+  - openpyxl
+  - numpy
+  - pandas
+  - vincent
+  - plottly
+  
