@@ -26,8 +26,9 @@ for i in range(len(new_df.index)):
 #%%
 """Load Sets"""
 
-def read_excel(DataExcel):
+def read_excel(filename,results_folder='.'):
 
+    DataExcel = pd.ExcelFile(filename)
     REGION =  (list(pd.read_excel(DataExcel, sheet_name = 'R')['REGION']))
     initialyear = (pd.read_excel(DataExcel, sheet_name = 'Y')['START_YEAR'])
     finalyear = (pd.read_excel(DataExcel, sheet_name = 'Y')['FINAL_YEAR'])
@@ -418,7 +419,7 @@ def read_excel(DataExcel):
     OsemosysDict.update(ParamDict)
 
 
-    with open('Data.json', 'w') as json_file:
+    with open(results_folder+'/Data.json', 'w') as json_file:
         json.dump(OsemosysDict, json_file)
     #%%
     # json.loads(json.dumps(OsemosysDict))
@@ -483,7 +484,7 @@ def read_defaults(filename):
 
 
 if __name__ == "__main__":
-    filename = pd.ExcelFile('../data/OsemosysNew.xlsx')
+    filename = '../data/OsemosysNew.xlsx'
     ParamDict, OsemosysDict = read_excel(filename)
     Default = read_defaults(filename)
     a= 1

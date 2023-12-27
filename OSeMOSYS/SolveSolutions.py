@@ -6,8 +6,17 @@ from MainModel import *
 #%%
 from vincent.colors import brews
 from readXlsData import read_excel
-instance = model.create_instance('Data.json')
+
 from highspy import *
+
+
+results_folder = '../results'
+input_file = '../data/OsemosysNew.xlsx'
+
+ParamDict, OsemosysDict = read_excel(input_file,results_folder=results_folder)
+
+instance = model.create_instance(results_folder + '/Data.json')
+
 #%%
 "Solvers used - cbc, ***scip*** or highs"
 #opt = SolverFactory("appsi_highs")
@@ -165,7 +174,7 @@ for v in instance.component_objects(Var, active=True):
         print(v)
 
         # Export the DataFrame to a CSV file
-        df.to_csv(f"./solutions/{v}.csv", index=False)
+        df.to_csv(f"./{results_folder}/{v}.csv", index=False)
 
         # Store the DataFrame in the datas dictionary
         datas[str(v)] = df
