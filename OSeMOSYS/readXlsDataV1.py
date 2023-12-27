@@ -25,7 +25,7 @@ for i in range(len(new_df.index)):
 """
 #%%
 """Load Sets"""
-DataExcel = pd.ExcelFile('../data/OsemosysNew.xlsx')
+
 def read_excel(DataExcel):
 
     REGION =  (list(pd.read_excel(DataExcel, sheet_name = 'R')['REGION']))
