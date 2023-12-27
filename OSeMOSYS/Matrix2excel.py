@@ -213,11 +213,8 @@ def process_excel(DataExcel):
     VidaUtilRecuperada = RT
 
     # %%
-<<<<<<< HEAD
-    with pd.ExcelWriter('../data/OsemosysNew.xlsx',
-=======
+
     with pd.ExcelWriter("../data/OsemosysNew.xlsx",
->>>>>>> 46658a75c082827ac4048b878d6a51cc66c1d3c2
                         mode="a",
                         engine="openpyxl",
                         if_sheet_exists= "replace"
