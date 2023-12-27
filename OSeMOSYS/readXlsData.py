@@ -24,16 +24,17 @@ for i in range(len(new_df.index)):
 
 """
 #%%
+"""Load Sets"""
 
 def read_excel(DataExcel):
-    #Load Sets
+
     REGION =  (list(pd.read_excel(DataExcel, sheet_name = 'R')['REGION']))
     initialyear = (pd.read_excel(DataExcel, sheet_name = 'Y')['START_YEAR'])
     finalyear = (pd.read_excel(DataExcel, sheet_name = 'Y')['FINAL_YEAR'])
     YEAR = []
     for years in range(int(initialyear[0]),int(finalyear[0])+1):
         YEAR.append(years)
-
+        
     #%%
     # YEAR = (list(pd.read_excel(DataExcel, sheet_name = 'Y')['YEAR']))
     # YEAR = [x for x in YEAR if pd.isnull(x) == False]  # YEAR = [x for x in YEAR if x != 'nan']
@@ -91,7 +92,7 @@ def read_excel(DataExcel):
         pd.read_excel(DataExcel,index_col = [0,1], sheet_name = "AAD")
         .stack().reset_index().rename(columns={"level_2": "YEAR",0:"value"})
         .set_index(RFY).to_dict('index')
-                             )
+                            )
     #%%
     """Performance"""
     CapacityToActivityUnit = (
@@ -200,57 +201,57 @@ def read_excel(DataExcel):
     TotalAnnualMinCapacity = (
         pd.read_excel(DataExcel,index_col = [0,1], sheet_name = "TAMinC")
         .stack().reset_index().rename(columns={"level_2": "YEAR",0:"value"})
-        .set_index(RTY).to_dict('index')
+        .set_index(RTY).to_dict('index')    
     )
     TotalAnnualMaxCapacityInvestment = TotalAnnualMinCapacity = (
         pd.read_excel(DataExcel,index_col = [0,1], sheet_name = "TAMaxCI")
         .stack().reset_index().rename(columns={"level_2": "YEAR",0:"value"})
-        .set_index(RTY).to_dict('index')
+        .set_index(RTY).to_dict('index')    
     )
     TotalAnnualMinCapacityInvestment = (
         pd.read_excel(DataExcel,index_col = [0,1], sheet_name = "TAMinCI")
         .stack().reset_index().rename(columns={"level_2": "YEAR",0:"value"})
-        .set_index(RTY).to_dict('index')
+        .set_index(RTY).to_dict('index')    
     )
     #%%
     """Activity constraints"""
     TotalTechnologyAnnualActivityUpperLimit = (
         pd.read_excel(DataExcel,index_col = [0,1], sheet_name = "TTAAUL")
         .stack().reset_index().rename(columns={"level_2": "YEAR",0:"value"})
-        .set_index(RTY).to_dict('index')
+        .set_index(RTY).to_dict('index')    
     )
     TotalTechnologyAnnualActivityLowerLimit= (
         pd.read_excel(DataExcel,index_col = [0,1], sheet_name = "TTAALL")
         .stack().reset_index().rename(columns={"level_2": "YEAR",0:"value"})
-        .set_index(RTY).to_dict('index')
+        .set_index(RTY).to_dict('index')    
     )
     TotalTechnologyModelPeriodActivityUpperLimit = (
         pd.read_excel(DataExcel,index_col = [0], sheet_name = "TTMPAUL")
         .stack().reset_index().rename(columns={"level_1": "TECHNOLOGY",0:"value"})
-        .set_index(RT).to_dict('index')
+        .set_index(RT).to_dict('index')    
     )
     TotalTechnologyModelPeriodActivityLowerLimit= (
         pd.read_excel(DataExcel,index_col = [0], sheet_name = "TTMPALL")
         .stack().reset_index().rename(columns={"level_1": "TECHNOLOGY",0:"value"})
-        .set_index(RT).to_dict('index')
+        .set_index(RT).to_dict('index')    
     )
     #%%
     """Reserve Margin"""
     ReserveMarginTagTechnology = (
         pd.read_excel(DataExcel,index_col = [0,1], sheet_name = "RMTT")
         .stack().reset_index().rename(columns={"level_2": "YEAR",0:"value"})
-        .set_index(RTY).to_dict('index')
+        .set_index(RTY).to_dict('index')    
     )
     ReserveMarginTagFuel = (
         pd.read_excel(DataExcel,index_col = [0,1], sheet_name = "RMTF")
         .stack().reset_index().rename(columns={"level_2": "YEAR",0:"value"})
-        .set_index(RFY).to_dict('index')
+        .set_index(RFY).to_dict('index')    
     )
 
     ReserveMargin = (
         pd.read_excel(DataExcel,index_col = [0], sheet_name = "RM")
         .stack().reset_index().rename(columns={"level_1": "YEAR",0:"value"})
-        .set_index(RY).to_dict('index')
+        .set_index(RY).to_dict('index')    
     )
 
 
@@ -313,9 +314,9 @@ def read_excel(DataExcel):
             # iterar sobre las posiciones del dataframe
                 # print(row[1]['value']) #diccionario
                 # print(row[0][0]) #lista
-            new_row = {"index":row[0], "value":row[1]["value"]}
+            new_row = {"index":row[0], "value":row[1]["value"]} 
             my_list.append(new_row)
-        # return {name:my_list}
+        # return {name:my_list}    
         return {name: json.loads(json.dumps(my_list))}
     #%%
     """Create dictionary lists"""
@@ -376,26 +377,26 @@ def read_excel(DataExcel):
     ParamDict = {}
     for d in (
         YearSplit, DaySplit, DaysInDayType, Conversionls,
-
+        
         SpecifiedAnnualDemand,SpecifiedDemandProfile,AccumulatedAnnualDemand,
-
+        
         CapacityToActivityUnit,CapacityFactor,AvailabilityFactor,OperationalLife,
         ResidualCapacity,InputActivityRatio,OutputActivityRatio, MinimumOperatingLoad,
-
+        
         CapitalCost,VariableCost,FixedCost, CostoNoAsociado,
-
+        
         CapacityOfOneTechnologyUnit, TotalAnnualMaxCapacity, TotalAnnualMinCapacity,
         TotalAnnualMaxCapacityInvestment, TotalAnnualMinCapacityInvestment,
-
+        
         TotalTechnologyAnnualActivityUpperLimit, TotalTechnologyAnnualActivityLowerLimit,
         TotalTechnologyModelPeriodActivityUpperLimit, TotalTechnologyModelPeriodActivityLowerLimit,
-
+        
         ReserveMarginTagTechnology, ReserveMarginTagFuel, ReserveMargin,
-
+        
         RETagTechnology, RETagFuel, REMinProductionTarget,
-
+        
         Availability, NumberOfExistingUnits, VidaUtilRecuperada, CostoRecuperacion
-        # EmissionActivityRatio, EmissionsPenalty, AnnualExogenousEmission,
+        # EmissionActivityRatio, EmissionsPenalty, AnnualExogenousEmission, 
         # AnnualEmissionLimit, ModelPeriodExogenousEmission, ModelPeriodEmissionLimit
     ):ParamDict.update(d)
 
@@ -417,12 +418,12 @@ def read_excel(DataExcel):
     OsemosysDict.update(ParamDict)
 
 
-    with open('Cuba.json', 'w') as json_file:
-      json.dump(OsemosysDict, json_file)
+    with open('Data.json', 'w') as json_file:
+        json.dump(OsemosysDict, json_file)
     #%%
     # json.loads(json.dumps(OsemosysDict))
     # OsemosysDict.to_json('Datap.json')
-
+        
     # EmissionActivityRatio = ListDict('EmissionActivityRatio', EmissionActivityRatio)
     # EmissionsPenalty = ListDict('EmissionsPenalty', EmissionsPenalty)
     # AnnualExogenousEmission = ListDict('AnnualExogenousEmission', AnnualExogenousEmission)
@@ -431,18 +432,15 @@ def read_excel(DataExcel):
     # ModelPeriodEmissionLimit = ListDict('ModelPeriodEmissionLimit', ModelPeriodEmissionLimit)
 
 
-
-
+            
+        
     # OsemosysJson = json.loads(json.dumps(my_list))
 
     # %%
     DataExcel.close()
-
-    return ParamDict, OsemosysDict
-
-
-
-
+    return ParamDict, OsemosysDict    
+    
+    """Leer todo en el excel"""
     # sheet_to_df_map = {}
     # for sheet_name in DataExcel.sheet_names:
     #     sheet_to_df_map[sheet_name] = DataExcel.parse(sheet_name)
@@ -450,7 +448,7 @@ def read_excel(DataExcel):
 
     # SpecifiedAnnualDemand = SpecifiedAnnualDemand.reset_index().rename(columns={"level_2": "YEAR",0:"value"})
     # SpecifiedAnnualDemand = SpecifiedAnnualDemand.set_index(['REGION', 'FUEL', 'YEAR'])
-    # Osemosysjson = json.loads(json.dumps(my_list))
+    # Osemosysjson = json.loads(json.dumps(my_list))        
     #
     # indexing = []
     # for i in range(len(SpecifiedAnnualDemand.index)):
@@ -472,12 +470,10 @@ def read_excel(DataExcel):
     # SpecifiedAnnualDemand = pd.read_excel(DataExcel,index_col=[0,1],  sheet_name = 'SAD',skiprows=1).stack()
 
     # SpecifiedAnnualDemand = SpecifiedAnnualDemand.set_index(['REGION','FUEL' ], inplace=False).stack()#.to_frame('Values')
-    # table = pd.pivot_table(SpecifiedAnnualDemand,
+    # table = pd.pivot_table(SpecifiedAnnualDemand, 
     #                        index=['REGION', 'FUEL'])
 
-    # %%
-
-
+# %%
 def read_defaults(filename):
     DataExcel = pd.ExcelFile(filename)
     Default = (pd.read_excel(DataExcel, sheet_name = 'Default Parameters', index_col=0))
@@ -491,4 +487,3 @@ if __name__ == "__main__":
     ParamDict, OsemosysDict = read_excel(filename)
     Default = read_defaults(filename)
     a= 1
-
