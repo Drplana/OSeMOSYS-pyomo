@@ -478,8 +478,17 @@ def read_excel(DataExcel):
     # %%
 
 
+def read_defaults(filename):
+    DataExcel = pd.ExcelFile(filename)
+    Default = (pd.read_excel(DataExcel, sheet_name = 'Default Parameters', index_col=0))
+
+    DataExcel.close()
+    return Default
+
+
 if __name__ == "__main__":
     filename = pd.ExcelFile('../data/OsemosysNew.xlsx')
     ParamDict, OsemosysDict = read_excel(filename)
+    Default = read_defaults(filename)
     a= 1
 
