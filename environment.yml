@@ -1,0 +1,26 @@
+name: osemosys
+channels:
+- conda-forge
+dependencies:
+  - python ==3.10
+  - ipykernel
+  - pyomo
+  - openpyxl
+  - numpy
+  - pandas
+  - vincent
+  - plotly
+  - highs
+
+# installing the scip solver:
+  - gcg 
+  - papilo
+  - scip
+  - soplex
+  - zimpl
+
+# pip dependencies:
+  - pip >= 9.0.1
+  - pip:
+    - highspy
+
