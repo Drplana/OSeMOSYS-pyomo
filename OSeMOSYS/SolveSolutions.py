@@ -2,7 +2,7 @@
 import pandas as pd
 from pyomo.environ import value
 from itertools import count
-from OsemosysV3 import *
+from MainModel import *
 #%%
 from vincent.colors import brews
 from readXlsData import read_excel
