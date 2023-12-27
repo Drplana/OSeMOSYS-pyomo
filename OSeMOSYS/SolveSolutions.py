@@ -5,11 +5,7 @@ from itertools import count
 from MainModel import *
 #%%
 from vincent.colors import brews
-<<<<<<< HEAD
-from readXlsData import read_excel
-=======
 from readXlsDataV1 import read_excel
->>>>>>> 46658a75c082827ac4048b878d6a51cc66c1d3c2
 instance = model.create_instance('Data.json')
 from highspy import *
 #%%
