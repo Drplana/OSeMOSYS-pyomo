@@ -1,7 +1,6 @@
 #%%
 from pyomo.environ import AbstractModel,DataPortal,Set,Param,Var,NonNegativeReals,NonNegativeIntegers,Objective,Constraint
-from pyomo.environ import *
-from readXlsDataV1 import read_defaults
+from readXlsData import read_defaults
 from pyomo.opt import SolverFactory
 import json
 
