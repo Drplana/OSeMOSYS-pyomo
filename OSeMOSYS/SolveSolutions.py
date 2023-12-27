@@ -5,7 +5,7 @@ from itertools import count
 from OsemosysV3 import *
 #%%
 from vincent.colors import brews
-from readXlsDataV1 import *
+from readXlsData import read_excel
 instance = model.create_instance('Cuba.json')
 from highspy import *
 #%%
