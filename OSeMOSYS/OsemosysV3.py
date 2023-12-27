@@ -608,7 +608,7 @@ model.p_Mantenimiento = Param(model.REGION, model.TECHNOLOGY,model.TIMESLICE, mo
 
 # data.load(filename='Data.json')
 
-from ObjectiveFunction import *
+from constraints.ObjectiveFunction import *
 model.objectivefunction = Objective(rule = ObjectiveFunction)
 #%%
 def SpecifiedDemand_EQ (model, r, l, f, y ):
@@ -616,7 +616,7 @@ def SpecifiedDemand_EQ (model, r, l, f, y ):
     model.p_SpecifiedAnnualDemand[r,f,y]*model.p_SpecifiedDemandProfile[r,f,l,y]/model.p_YearSplit[l,y])
 model.SpecifiedDemand_EQ = Constraint(model.REGION,model.TIMESLICE,model.FUEL,model.YEAR, rule = SpecifiedDemand_EQ)
 #%%
-from CapacityAdequacyAB import *
+from constraints.CapacityAdequacyAB import *
 model.CAa1_TotalNewCapacity = Constraint(
     model.REGION,
     model.TECHNOLOGY, 
@@ -712,7 +712,7 @@ model.CAb1_PlannedMaintenance = Constraint(
 
 
 #%%
-from EnergyBalance import *
+from constraints.EnergyBalance import *
 model.EBa1_RateOfFuelProduction1 = Constraint(
     model.REGION,
     model.TIMESLICE, 
@@ -815,7 +815,7 @@ model.EBb4_EnergyBalanceEachYear4 = Constraint(
     model.YEAR, 
     rule = EBb4_EnergyBalanceEachYear4)
 #%%
-from AccountingTechnologyProductionUse import *
+from constraints.AccountingTechnologyProductionUse import *
 model.Acc1_FuelProductionByTechnology = Constraint(
     model.REGION,
     model.TIMESLICE,
@@ -840,7 +840,7 @@ model.Acc4_ModelPeriodCostByRegion= Constraint(
     model.REGION,
     rule = Acc4_ModelPeriodCostByRegion)
 #%%
-from StorageEq import *
+from constraints.StorageEq import *
 model.S1_RateOfStorageCharge = Constraint(
         model.REGION,
         model.STORAGE,
@@ -913,7 +913,7 @@ model.S13_and_S14_and_S15_StorageLevelDayTypeFinish = Constraint(
         rule= S13_and_S14_and_S15_StorageLevelDayTypeFinish
         )
 #%%
-from StorageConst import * 
+from constraints.StorageConst import *
 model.SC1_LowerLimit_BeginningOfDailyTimeBracketOfFirstInstanceOfDayTypeInFirstWeekConstraint = Constraint(
     model.REGION,
     model.STORAGE,
@@ -1005,7 +1005,7 @@ model.SC6_MaxDischargeConstraint = Constraint(
     rule = SC6_MaxDischargeConstraint
 )
 #%%
-from StorageInv import *
+from constraints.StorageInv import *
 model.SI1_StorageUpperLimit = Constraint(
     model.REGION,
     model.STORAGE,
@@ -1071,7 +1071,7 @@ model.SI10_TotalDiscountedCostByStorage = Constraint(
 
 
 #%%
-from CapitalCost import *
+from constraints.CapitalCost import *
 model.CC1_UndiscountedCapitalInvestment = Constraint(
     model.REGION,
     model.TECHNOLOGY,
@@ -1083,7 +1083,7 @@ model.CC2_DiscountingCapitalInvestment = Constraint(
     model.YEAR,
     rule = CC2_DiscountingCapitalInvestment)
 #%%
-from SalvageValue import * 
+from constraints.SalvageValue import *
 model.SV123_SalvageValueAtEndOfPeriod1 = Constraint(
     model.REGION,
     model.TECHNOLOGY,
@@ -1095,7 +1095,7 @@ model.SV4_SalvageValueDiscountedToStarYear = Constraint(
     model.YEAR,
     rule = SV4_SalvageValueDiscountedToStarYear)
 #%%
-from OperatingCosts import *
+from constraints.OperatingCosts import *
 model.OC1_OperatingCostVariable = Constraint(
     model.REGION,
     model.TECHNOLOGY,
@@ -1117,7 +1117,7 @@ model.OC4_DiscountedOperatingCostsTotalAnnual = Constraint(
     model.YEAR,
     rule = OC4_DiscountedOperatingCostsTotalAnnual)    
 #%%
-from TotalDiscountedCosts import *
+from constraints.TotalDiscountedCosts import *
 model.TDC1_TotalDiscountedCostByTechnology = Constraint(
     model.REGION,
     model.TECHNOLOGY,
@@ -1128,7 +1128,7 @@ model.TDC2_TotalDiscountedCost = Constraint(
     model.YEAR,
     rule = TDC2_TotalDiscountedCost)
 #%%
-from MinMaxCapacity import *
+from constraints.MinMaxCapacity import *
 model.TCC1_TotalAnnualMaxCapacityConstraint = Constraint(
     model.REGION,
     model.TECHNOLOGY,
@@ -1150,7 +1150,7 @@ model.NCC2_TotalAnnualMinNewCapacityConstraint = Constraint(
     model.YEAR,
     rule = NCC2_TotalAnnualMinNewCapacityConstraint)
 #%%
-from ActivityConstrains import *
+from constraints.ActivityConstrains import *
 model.AAC1_TotalAnnualTechnologyActivity = Constraint(
     model.REGION,
     model.TECHNOLOGY,
@@ -1179,7 +1179,7 @@ model.TAC3_TotalModelHorizenTechnologyActivityLowerLimit = Constraint(
     model.TECHNOLOGY,
     rule = TAC3_TotalModelHorizenTechnologyActivityLowerLimit)
 #%%
-from ReserveMargin import *
+from constraints.ReserveMargin import *
 model.RM1_ReserveMargin_TechnologiesIncluded_In_Activity_Units = Constraint(
     model.REGION,
     # model.TIMESLICE,
@@ -1197,7 +1197,7 @@ model.RM3_ReserveMargin_Constraint = Constraint(
     model.YEAR,
     rule = RM3_ReserveMargin_Constraint)
 #%%
-from ReTagTech import *
+from constraints.ReTagTech import *
 model.RE1_FuelProductionByTechnologyAnnual = Constraint(
     model.REGION,
     model.TECHNOLOGY,
@@ -1229,7 +1229,7 @@ model.RE5_FuelUseByTechnologyAnnual = Constraint(
     )
 
 #%%
-from Emission import * 
+from constraints.Emission import *
 model.E1_AnnualEmissionProductionByMode = Constraint(
     model.REGION,
     model.TECHNOLOGY,

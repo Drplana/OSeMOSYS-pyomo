@@ -1,9 +1,6 @@
 #################################
 #########Capacity Adequacy A ####
 from pyomo.environ import *
-from readXlsDataV1 import finalyear, initialyear
-finalyear = finalyear[0]
-initialyear = initialyear[0]
 
 def CAa1_TotalNewCapacity(model, r, t, y ):
     return (
