@@ -1,5 +1,6 @@
 #%%
-from pyomo.environ import *
+from pyomo.environ import AbstractModel,DataPortal,Set,Param,Var,NonNegativeReals,NonNegativeIntegers,Objective,Constraint
+from readXlsData import read_defaults
 from pyomo.opt import SolverFactory
 import json
 
@@ -18,77 +19,61 @@ model.SEASON = Set()               # ls
 model.DAYTYPE = Set()              # ld
 model.DAILYTIMEBRACKET = Set()     # lh
 model.STORAGE = Set()  
+
 #%%
 """Reading excel Default parameter values  """
-
-import pandas as pd
-DataExcel = pd.ExcelFile('OsemosysNew.xlsx')
-Default = (pd.read_excel(DataExcel, sheet_name = 'Default Parameters', index_col=0))
-discountrate =  Default.loc['DiscountRate','Defaul value']
-daysplit = Default.loc['DaySplit','Defaul value']
-conversionls = Default.loc['Conversionls','Defaul value']
-conversionld = Default.loc['Conversionld','Defaul value']
-conversionlh = Default.loc['Conversionlh','Defaul value']
-daysindaytype = Default.loc['DaysInDayType','Defaul value']
-traderoute = Default.loc['TradeRoute','Defaul value']
+Default = read_defaults('../data/OsemosysNew.xlsx')
+discountrate = Default.loc['DiscountRate', 'Defaul value']
+daysplit = Default.loc['DaySplit', 'Defaul value']
+conversionls = Default.loc['Conversionls', 'Defaul value']
+conversionld = Default.loc['Conversionld', 'Defaul value']
+conversionlh = Default.loc['Conversionlh', 'Defaul value']
+daysindaytype = Default.loc['DaysInDayType', 'Defaul value']
+traderoute = Default.loc['TradeRoute', 'Defaul value']
 depreciation = Default.loc['DepreciationMethod', 'Defaul value']
-
 sad = Default.loc['SpecifiedAnnualDemand', 'Defaul value']
 sdp = Default.loc['SpecifiedDemandProfile', 'Defaul value']
 acd = Default.loc['AccumulatedAnnualDemand', 'Defaul value']
-
 c2au = Default.loc['CapacityToActivityUnit', 'Defaul value']
 cf = Default.loc['CapacityFactor', 'Defaul value']
 af = Default.loc['AvailabilityFactor', 'Defaul value']
 ol = Default.loc['OperationalLife', 'Defaul value']
 rc = Default.loc['ResidualCapacity', 'Defaul value']
 iar = Default.loc['InputActivityRatio', 'Defaul value']
-oar = Default.loc['OutputActivityRatio', 'Defaul value'] 
-
-cc = Default.loc['CapitalCost', 'Defaul value'] 
-vc = Default.loc['VariableCost', 'Defaul value'] 
+oar = Default.loc['OutputActivityRatio', 'Defaul value']
+cc = Default.loc['CapitalCost', 'Defaul value']
+vc = Default.loc['VariableCost', 'Defaul value']
 fc = Default.loc['FixedCost', 'Defaul value']
-
 t2s = Default.loc['TechnologyToStorage', 'Defaul value']
 tfs = Default.loc['TechnologyFromStorage', 'Defaul value']
-sls = Default.loc['StorageLevelStart', 'Defaul value'] 
+sls = Default.loc['StorageLevelStart', 'Defaul value']
 smcr = Default.loc['StorageMaxChargeRate', 'Defaul value']
 smdr = Default.loc['StorageMaxDischargeRate', 'Defaul value']
 msc = Default.loc['MinStorageCharge', 'Defaul value']
 ols = Default.loc['OperationalLifeStorage', 'Defaul value']
 ccs = Default.loc['CapitalCostStorage', 'Defaul value']
 rsc = Default.loc['ResidualStorageCapacity', 'Defaul value']
-
 co1tu = Default.loc['CapacityOfOneTechnologyUnit', 'Defaul value']
 tamaxc = Default.loc['TotalAnnualMaxCapacity', 'Defaul value']
-taminc= Default.loc['TotalAnnualMinCapacity', 'Defaul value']
+taminc = Default.loc['TotalAnnualMinCapacity', 'Defaul value']
 tamaxci = Default.loc['TotalAnnualMaxCapacityInvestment', 'Defaul value']
 taminci = Default.loc['TotalAnnualMinCapacityInvestment', 'Defaul value']
-
 ttaaul = Default.loc['TotalTechnologyAnnualActivityUpperLimit', 'Defaul value']
 ttaall = Default.loc['TotalTechnologyAnnualActivityLowerLimit', 'Defaul value']
 ttmpaul = Default.loc['TotalTechnologyModelPeriodActivityUpperLimit', 'Defaul value']
 ttmpall = Default.loc['TotalTechnologyModelPeriodActivityLowerLimit', 'Defaul value']
-
-rmtt =  Default.loc['ReserveMarginTagTechnology', 'Defaul value']
-rmtf =  Default.loc['ReserveMarginTagFuel', 'Defaul value']
+rmtt = Default.loc['ReserveMarginTagTechnology', 'Defaul value']
+rmtf = Default.loc['ReserveMarginTagFuel', 'Defaul value']
 rm = Default.loc['ReserveMargin', 'Defaul value']
-
 rtt = Default.loc['RETagTechnology', 'Defaul value']
 rtf = Default.loc['RETagFuel', 'Defaul value']
 rmpt = Default.loc['REMinProductionTarget', 'Defaul value']
-
 ear = Default.loc['EmissionActivityRatio', 'Defaul value']
 ep = Default.loc['EmissionsPenalty', 'Defaul value']
 aee = Default.loc['AnnualExogenousEmission', 'Defaul value']
 ael = Default.loc['AnnualEmissionLimit', 'Defaul value']
 mpee = Default.loc['ModelPeriodExogenousEmission', 'Defaul value']
 mpel = Default.loc['ModelPeriodEmissionLimit', 'Defaul value']
-
-
-
-
-DataExcel.close()
 #%%
 
 ###### Global Parameters ####
