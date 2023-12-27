@@ -25,7 +25,7 @@ for i in range(len(new_df.index)):
 """
 #%%
 """Load Sets"""
-DataExcel = pd.ExcelFile('../data/OsemosysNew.xlsx')
+
 def read_excel(DataExcel):
 
     REGION =  (list(pd.read_excel(DataExcel, sheet_name = 'R')['REGION']))
@@ -418,7 +418,7 @@ def read_excel(DataExcel):
     OsemosysDict.update(ParamDict)
 
 
-    with open('Cuba.json', 'w') as json_file:
+    with open('Data.json', 'w') as json_file:
         json.dump(OsemosysDict, json_file)
     #%%
     # json.loads(json.dumps(OsemosysDict))
@@ -438,6 +438,8 @@ def read_excel(DataExcel):
 
     # %%
     DataExcel.close()
+    return ParamDict, OsemosysDict    
+    
     """Leer todo en el excel"""
     # sheet_to_df_map = {}
     # for sheet_name in DataExcel.sheet_names:

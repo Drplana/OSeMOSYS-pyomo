@@ -6,7 +6,7 @@ from MainModel import *
 #%%
 from vincent.colors import brews
 from readXlsData import read_excel
-instance = model.create_instance('Cuba.json')
+instance = model.create_instance('Data.json')
 from highspy import *
 #%%
 "Solvers used - cbc, ***scip*** or highs"
