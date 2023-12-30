@@ -9,10 +9,10 @@ import os,sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 
 #Two solution to import the library
-# as a package (defined in __init__.py) => function calls are
+# (1) as a package (defined in __init__.py) => function calls are done through the lpackage (eg om.solve_model)
 import OSeMOSYS as om
 
-# as separate functions:
+# (2) as separate functions:
 from OSeMOSYS.SolveSolutions import solve_model
 from OSeMOSYS.postprocessing.plots import plot_activity
 
