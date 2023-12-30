@@ -52,93 +52,94 @@ def process_excel(DataExcel):
     # %%
     """General Data Frames """
     #REION FUEL YEAR
-    RFY = pd.MultiIndex.from_product([REGION,
-                                        FUEL],
-                                       names=['REGION', 'FUEL'])
-    RFY = (pd.DataFrame('',index= RFY, columns=YEAR))
+    RFY = pd.MultiIndex.from_product([REGION, 
+                                        FUEL], 
+                                    names=['REGION', 'FUEL'])
+    RFY = (pd.DataFrame('',index= RFY, columns=YEAR, )).reset_index()
+
     #REGION FUEL TIMESLICE YEAR
-    RFLY = pd.MultiIndex.from_product([REGION,
-                                        FUEL,
-                                        TIMESLICE],
-                                       names=['REGION',
-                                              'FUEL',
-                                              'TIMESLICE'])
-    RFLY = (pd.DataFrame('',index= RFLY, columns=YEAR))
+    RFLY = pd.MultiIndex.from_product([REGION, 
+                                        FUEL, 
+                                        TIMESLICE], 
+                                    names=['REGION', 
+                                            'FUEL', 
+                                            'TIMESLICE'])
+    RFLY = (pd.DataFrame('',index= RFLY, columns=YEAR)).reset_index()
     # REGION TECHNOLOGY
     RT = pd.MultiIndex.from_product([REGION], names=['REGION'])
-    RT = pd.DataFrame('', index = RT, columns = TECHNOLOGY)
+    RT = pd.DataFrame('', index = RT, columns = TECHNOLOGY).reset_index()
     #REGION TECHNOLOGY TIMESLICE YEAR
     RTLY = pd.MultiIndex.from_product([REGION,TECHNOLOGY,TIMESLICE],names=['REGION','TECHNOLOGY','TIMESLICE'])
-    RTLY = pd.DataFrame('', index = RTLY, columns= YEAR)
+    RTLY = pd.DataFrame('', index = RTLY, columns= YEAR).reset_index()
     #REGION TECHNOLOGY YEAR
     RTY = pd.MultiIndex.from_product([REGION, TECHNOLOGY], names= ['REGION', 'TECHNOLOGY'])
-    RTY = pd.DataFrame('', index = RTY, columns= YEAR)
+    RTY = pd.DataFrame('', index = RTY, columns= YEAR).reset_index()
     # REGION TECHNOLOGY FUEL MODE_OF_OPERATION YEAR
-    RTFMY = pd.MultiIndex.from_product([REGION,
-                                        TECHNOLOGY,
-                                        FUEL,
-                                        MODE_OF_OPERATION],
-                                       names = ['REGION',
-                                                'TECHNOLOGY',
-                                                'FUEL',
+    RTFMY = pd.MultiIndex.from_product([REGION, 
+                                        TECHNOLOGY, 
+                                        FUEL, 
+                                        MODE_OF_OPERATION], 
+                                    names = ['REGION', 
+                                                'TECHNOLOGY', 
+                                                'FUEL', 
                                                 'MODE_OF_OPERATION'])
-    RTFMY = pd.DataFrame('',index= RTFMY, columns=YEAR)
+    RTFMY = pd.DataFrame('',index= RTFMY, columns=YEAR).reset_index()
     # REGION TECHNOLOGY MODE_OF_OPERATION YEAR
-    RTMY = pd.MultiIndex.from_product([REGION,
-                                        TECHNOLOGY,
+    RTMY = pd.MultiIndex.from_product([REGION, 
+                                        TECHNOLOGY, 
                                         MODE_OF_OPERATION,
-                                        ],
-                                       names = ['REGION',
-                                                'TECHNOLOGY',
+                                        ], 
+                                    names = ['REGION', 
+                                                'TECHNOLOGY', 
                                                 'MODE_OF_OPERATION'])
     #REGION TECHNOLOGY MODE_OF_OPERATION YEAR
-    RTMY = pd.DataFrame('',index= RTMY, columns=YEAR)
+    RTMY = pd.DataFrame('',index= RTMY, columns=YEAR).reset_index()
     RTSM = pd.MultiIndex.from_product([REGION,
-                                       TECHNOLOGY,
-                                       STORAGE,
-                                       ], names=['REGION',
-                                       'TECHNOLOGY',
-                                       'STORAGE'] )
-    RTSM = pd.DataFrame('', index = RTSM, columns= MODE_OF_OPERATION)
+                                    TECHNOLOGY,
+                                    STORAGE,
+                                    ], names=['REGION',
+                                    'TECHNOLOGY',
+                                    'STORAGE'] )
+    RTSM = pd.DataFrame('', index = RTSM, columns= MODE_OF_OPERATION).reset_index()
     #REGION STORAGE
     RS = pd.MultiIndex.from_product([REGION], names=['REGION'])
-    RS = pd.DataFrame('', index= RS, columns= STORAGE)
+    RS = pd.DataFrame('', index= RS, columns= STORAGE).reset_index()
     #REGION STORAGE YEAR
-    RSY = pd.MultiIndex.from_product([REGION, STORAGE],
-                                     names=['REGION', 'STORAGE'])
-    RSY = pd.DataFrame('', index= RSY, columns=YEAR)
+    RSY = pd.MultiIndex.from_product([REGION, STORAGE], 
+                                    names=['REGION', 'STORAGE'])
+    RSY = pd.DataFrame('', index= RSY, columns=YEAR).reset_index()
 
     RY = pd.MultiIndex.from_product([REGION], names=['REGION'])
-    RY = pd.DataFrame('', index= RY, columns= YEAR)
+    RY = pd.DataFrame('', index= RY, columns= YEAR).reset_index()
     RTEMY = pd.MultiIndex.from_product([REGION,
                                         TECHNOLOGY,
                                         EMISSION,
                                         MODE_OF_OPERATION],
-                                       names= ['REGION',
+                                    names= ['REGION',
                                         'TECHNOLOGY',
                                         'EMISSION',
                                         'MODE_OF_OPERATION'])
-    RTEMY = pd.DataFrame('', index = RTEMY, columns= YEAR)
+    RTEMY = pd.DataFrame('', index = RTEMY, columns= YEAR).reset_index()
     REY = pd.MultiIndex.from_product([REGION,
-                                      EMISSION],
-                                     names=['REGION',
-                                      'EMISSION'])
-    REY = pd.DataFrame('',index= REY, columns= YEAR)
+                                    EMISSION], 
+                                    names=['REGION',
+                                    'EMISSION'])
+    REY = pd.DataFrame('',index= REY, columns= YEAR).reset_index()
     RE = pd.MultiIndex.from_product([REGION], names=['REGION'])
-    RE = pd.DataFrame('', index= RE, columns= EMISSION)
+    RE = pd.DataFrame('', index= RE, columns= EMISSION).reset_index()
     LY = pd.MultiIndex.from_product([TIMESLICE], names=['TIMESLICE'])
-    LY = pd.DataFrame('', index = LY, columns = YEAR)
+    LY = pd.DataFrame('', index = LY, columns = YEAR).reset_index()
     LLS = pd.MultiIndex.from_product([TIMESLICE], names=['TIMESLICE'])
-    LLS = pd.DataFrame('', index = LLS, columns = SEASON)
+    LLS = pd.DataFrame('', index = LLS, columns = SEASON).reset_index()
     LLD = pd.MultiIndex.from_product([TIMESLICE], names=['TIMESLICE'])
-    LLD = pd.DataFrame('', index = LLD, columns = DAYTYPE)
+    LLD = pd.DataFrame('', index = LLD, columns = DAYTYPE).reset_index()
     LLH = pd.MultiIndex.from_product([TIMESLICE], names=['TIMESLICE'])
-    LLH = pd.DataFrame('', index = LLH, columns = DAILYTIMEBRACKET)
+    LLH = pd.DataFrame('', index = LLH, columns = DAILYTIMEBRACKET).reset_index()
 
     LHY = pd.MultiIndex.from_product([DAILYTIMEBRACKET], names=['DAILYTIMEBRACKET'])
-    LHY = pd.DataFrame('', index = LHY, columns = YEAR)
+    LHY = pd.DataFrame('', index = LHY, columns = YEAR).reset_index()
     LSLDY = pd.MultiIndex.from_product([SEASON, DAYTYPE], names=['SEASON', 'DAYTYPE'])
-    LSLDY = pd.DataFrame('', index = LSLDY, columns = YEAR)
+    LSLDY = pd.DataFrame('', index = LSLDY, columns = YEAR).reset_index()
 
     #%%
 
@@ -150,7 +151,7 @@ def process_excel(DataExcel):
     Conversionlh = LLH
     DaySplit = LHY
     DaysInDayType = LSLDY
-    ##### Demands 3
+    ##### Demands 3                     
     SpecifiedAnnualDemand = RFY
     SpecifiedDemandProfile = RFLY
     AccumulatedAnnualDemand = RFY
@@ -189,11 +190,11 @@ def process_excel(DataExcel):
     TotalTechnologyAnnualActivityLowerLimit = RTY
     TotalTechnologyModelPeriodActivityUpperLimit = RT
     TotalTechnologyModelPeriodActivityLowerLimit = RT
-    ####### Reserve Margin 3
+    ####### Reserve Margin 3 
     ReserveMarginTagTechnology = RTY
     ReserveMarginTagFuel = RFY
     ReserveMargin = RY
-    ####### RE Generation Target 3
+    ####### RE Generation Target 3 
     RETagTechnology = RTY
     RETagFuel = RFY
     REMinProductionTarget = RY
@@ -211,7 +212,31 @@ def process_excel(DataExcel):
     NumberOfExistingUnits = RTY
     CostoRecuperacion = RTY
     VidaUtilRecuperada = RT
-
+    dataframe_names = ["YearSplit", "Conversionls", "Conversionld",
+                    "DaySplit", "DaysInDayType", "SpecifiedAnnualDemand", 
+                    "SpecifiedDemandProfile", "AccumulatedAnnualDemand", 
+                    "CapacityToActivityUnit", "CapacityFactor", "AvailabilityFactor", 
+                    "OperationalLife", "ResidualCapacity", "InputActivityRatio", 
+                    "OutputActivityRatio", "CapitalCost", "VariableCost", "FixedCost", 
+                    "TechnologyToStorage", "TechnologyFromStorage", "StorageLevelStart", 
+                    "StorageMaxChargeRate", "StorageMaxDischargeRate", "MinStorageCharge", 
+                    "OperationalLifeStorage", "CapitalCostStorage", "ResidualStorageCapacity", 
+                    "CapacityOfOneTechnologyUnit", "TotalAnnualMaxCapacity", "TotalAnnualMinCapacity", 
+                    "TotalAnnualMaxCapacityInvestment", "TotalAnnualMinCapacityInvestment", 
+                    "TotalTechnologyAnnualActivityUpperLimit", "TotalTechnologyAnnualActivityLowerLimit",
+                    "TotalTechnologyModelPeriodActivityUpperLimit", 
+                    "TotalTechnologyModelPeriodActivityLowerLimit", 
+                    "ReserveMarginTagTechnology", "ReserveMarginTagFuel", 
+                    "ReserveMargin", "RETagTechnology", "RETagFuel", "REMinProductionTarget",
+                    "EmissionActivityRatio", "EmissionsPenalty", "AnnualExogenousEmission", 
+                    "AnnualEmissionLimit", "ModelPeriodExogenousEmission", "ModelPeriodEmissionLimit", 
+                    "CostoNoAsociado", "MinimumOperatingLoad", "Availability", 
+                    "NumberOfExistingUnits", "CostoRecuperacion", "VidaUtilRecuperada"]
+    dataframes = [globals()[name] for name in dataframe_names if name in globals() and isinstance(globals()[name], pd.DataFrame)]
+    sheet_names = ["YS", "LLS", "LLD", "DS", "DIDT", "SAD", "SDP", "AAD", "C2AU", "CF", "AF", "OL", "RC", "IAR", "OAR", "CC", "VC", "FC", "TTS", "TFS", "StLS",
+               "StMxChR", "StMxDCh", "MinStCh", "OpLiSt", "CCSt", "ReStCap", "C1TU", "TAMaxC", "TAMinC", "TAMaxCI", "TAMinCI", "TTAAUL", "TTAALL", "TTMPAUL",
+               "TTMPALL", "RMTT", "RMTF", "RM", "ReTagT", "ReTagF", "REMinPT", "EmAR", "EmP", "AExEm", "AEmLim", "MPExEm", "MPEmLim", "CNA", "MOL", "Avail",
+               "NOEU", "CostoRec", "VUR"]  
     # %%
 
     with pd.ExcelWriter("../data/OsemosysNew.xlsx",
@@ -219,81 +244,13 @@ def process_excel(DataExcel):
                         engine="openpyxl",
                         if_sheet_exists= "replace"
                         ) as writer:
-        ####  Global Parameters:  ###
-        YearSplit.to_excel(writer, sheet_name = "YS")
-        Conversionls.to_excel(writer, sheet_name = "LLS")
-        Conversionld.to_excel(writer, sheet_name = "LLD")
-        Conversionlh.to_excel(writer, sheet_name = "LLH")
-        DaySplit.to_excel(writer, sheet_name = "DS")
-        DaysInDayType.to_excel(writer, sheet_name = "DIDT")
-        # # # Demands 3
-        SpecifiedAnnualDemand.to_excel(writer, sheet_name="SAD", startrow = 1)
-        SpecifiedDemandProfile.to_excel(writer, sheet_name="SDP", startrow = 1)
-        AccumulatedAnnualDemand.to_excel(writer, sheet_name = "AAD", startrow = 0)
+        for df, sheet_name in zip(dataframes, sheet_names):
+            df.to_excel(writer, sheet_name=sheet_name, index=False)
 
-        ### performance 7
-        CapacityToActivityUnit.to_excel(writer, sheet_name = "C2AU", startrow = 0)
-        CapacityFactor.to_excel(writer, sheet_name = "CF")
-        AvailabilityFactor.to_excel(writer, sheet_name = "AF")
-        OperationalLife.to_excel(writer, sheet_name= "OL")
-        ResidualCapacity.to_excel(writer, sheet_name = "RC")
-        InputActivityRatio.to_excel(writer, sheet_name = "IAR")
-        OutputActivityRatio.to_excel(writer, sheet_name = "OAR")
-
-        ##TEchnology Cost 3
-        CapitalCost.to_excel(writer, sheet_name = "CC")
-        VariableCost.to_excel(writer, sheet_name = "VC")
-        FixedCost.to_excel(writer,sheet_name = "FC")
-
-        ###storage
-        # TechnologyToStorage.to_excel(writer,sheet_name = "TTS")
-        # TechnologyFromStorage.to_excel(writer,sheet_name = "TFS")
-        # StorageLevelStart.to_excel(writer,sheet_name = "StLS")
-        # StorageMaxChargeRate.to_excel(writer,sheet_name = "StMxChR")
-        # StorageMaxDischargeRate.to_excel(writer, sheet_name = "StMxDCh")
-        # MinStorageCharge.to_excel(writer, sheet_name = "MinStCh")
-        # OperationalLifeStorage.to_excel(writer, sheet_name = "OpLiSt")
-        # CapitalCostStorage.to_excel(writer, sheet_name = "CCSt")
-        # ResidualStorageCapacity.to_excel(writer, sheet_name = "ReStCap")
-
-        ###Capacity Constraint
-        CapacityOfOneTechnologyUnit.to_excel(writer, sheet_name = "C1TU")
-        TotalAnnualMaxCapacity.to_excel(writer, sheet_name = "TAMaxC")
-        TotalAnnualMinCapacity.to_excel(writer, sheet_name = "TAMinC")
-        TotalAnnualMaxCapacityInvestment.to_excel(writer, sheet_name = "TAMaxCI")
-        TotalAnnualMinCapacityInvestment.to_excel(writer, sheet_name = "TAMinCI")
-
-        # # Activity constraints
-        TotalTechnologyAnnualActivityUpperLimit.to_excel(writer, sheet_name = "TTAAUL")
-        TotalTechnologyAnnualActivityLowerLimit.to_excel(writer, sheet_name = "TTAALL")
-        TotalTechnologyModelPeriodActivityUpperLimit.to_excel(writer, sheet_name = "TTMPAUL")
-        TotalTechnologyModelPeriodActivityLowerLimit.to_excel(writer, sheet_name = "TTMPALL")
-
-        ## REserve Margin
-        ReserveMarginTagTechnology.to_excel(writer, sheet_name = "RMTT")
-        ReserveMarginTagFuel.to_excel(writer, sheet_name = "RMTF")
-        ReserveMargin.to_excel(writer, sheet_name = "RM")
-
-        ##RE Generation Targeet
-        RETagTechnology.to_excel(writer, sheet_name = "ReTagT")
-        RETagFuel.to_excel(writer, sheet_name = "ReTagF")
-        REMinProductionTarget.to_excel(writer, sheet_name = "REMinPT")
-
-        # Emissions
-        # EmissionActivityRatio.to_excel(writer, sheet_name = "EmAR")
-        # EmissionsPenalty.to_excel(writer, sheet_name = "EmP")
-        # AnnualExogenousEmission.to_excel(writer, sheet_name = "AExEm")
-        # AnnualEmissionLimit.to_excel(writer, sheet_name = "AEmLim")
-        # ModelPeriodExogenousEmission.to_excel(writer, sheet_name = "MPExEm")
-        # ModelPeriodEmissionLimit.to_excel(writer, sheet_name = "MPEmLim")
-
-        #Parametros nuevos
-        CostoNoAsociado.to_excel(writer, sheet_name = "CNA")
-        MinimumOperatingLoad.to_excel(writer, sheet_name =  "MOL")
-        Availability.to_excel(writer,sheet_name="Avail")
-        NumberOfExistingUnits.to_excel(writer,sheet_name="NOEU")
-        CostoRecuperacion.to_excel(writer,sheet_name= "CostoRec")
-        VidaUtilRecuperada.to_excel(writer, sheet_name= "VUR")
+            # Access and add filters to each sheet
+            workbook = writer.book
+            sheet = workbook[sheet_name]
+            sheet.auto_filter.ref = sheet.dimensions
 
     DataExcel.close()
     return True
