@@ -6,11 +6,17 @@ the results should be written
 '''
 
 import os
+from OSeMOSYS.SolveSolutions import solve_model
+from OSeMOSYS.postprocessing.plots import plot_activity
 
 # go up one folder to be in the main repository folder
 os.chdir('..')
 
-from OSeMOSYS.SolveSolutions import solve_model
+# Define the input file and the folder to store the results and run the model
 results_folder = 'results'
 input_file = 'data/OsemosysNew.xlsx'
 solve_model(input_file, results_folder)
+
+# plot the results
+datafile = results_folder + '/v_RateOfActivity.csv'
+plot_activity(datafile)
