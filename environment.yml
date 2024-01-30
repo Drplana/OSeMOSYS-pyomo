@@ -5,7 +5,7 @@ dependencies:
   - python ==3.10
   - ipykernel
   - pyomo
-  - openpyxl
+  - openpyxl == 3.0.10
   - numpy
   - pandas
   - vincent
