@@ -1,4 +1,5 @@
 """Storage Investment"""
+from pyomo.environ import * 
 def SI1_StorageUpperLimit(model, r,s,y):
     return (
         model.v_AccumulatedNewStorageCapacity[r,s,y]
@@ -13,7 +14,7 @@ def SI2_StorageLowerLimit(model, r,s,y):
     )
 def SI3_TotalNewStorage(model, r,s,y):
     return(
-        sum(model.NewStorageCapacity[r,s,yy]
+        sum(model.v_NewStorageCapacity[r,s,yy]
             for yy in model.YEAR
             if (y-yy<model.p_OperationalLifeStorage[r,s]) and y-yy>=0)
     == model.v_AccumulatedNewStorageCapacity[r,s,y]
@@ -35,10 +36,11 @@ def SI6_SalvageValueStorageAtEndOfPeriod1(model,r,s,y):
         return (      
                 0 <= model.v_SalvageValueStorage[r,s,y]
         )
+    else: return Constraint.Skip
 def SI7_SalvageValueStorageAtEndOfPeriod2(model, r,s,y):
     if (model.p_DepreciationMethod[r]==1 
         and (y+model.p_OperationalLifeStorage[r,s]-1)>max(model.YEAR)
-        and model.DiscountRate[r]==0 
+        and model.p_DiscountRate[r]==0 
         or model.p_DepreciationMethod[r]==2 
         and (y+model.p_OperationalLifeStorage[r,s]-1)>max(model.YEAR) 
         ):
@@ -47,15 +49,17 @@ def SI7_SalvageValueStorageAtEndOfPeriod2(model, r,s,y):
             /model.p_OperationalLifeStorage[r,s]
             == model.v_SalvageValueStorage[r,s,y]
         )
+    else: return Constraint.Skip
 def SI8_SalvageValueStorageAtEndOfPeriod3(model, r,s,y):
     if (model.p_DepreciationMethod[r]==1
     and (y+model.p_OperationalLifeStorage[r,s]-1)> max(model.YEAR)
     and model.p_DiscountRate[r]>0
     ):
         return (
-            model.v_CapitalInvestmentStorage[r,s,y]*(1-(((1+model.p_DiscountRate[r])**max(model.YEAR - y+1)-1)/((1+model.p_DiscountRate[r])**model.p_OperationalLifeStorage[r,s]-1)))
+            model.v_CapitalInvestmentStorage[r,s,y]*(1-(((1+model.p_DiscountRate[r])**(max(model.YEAR) - y+1)-1)/((1+model.p_DiscountRate[r])**model.p_OperationalLifeStorage[r,s]-1)))
             == model.v_SalvageValueStorage[r,s,y]
         )
+    else: return Constraint.Skip
 def SI9_SalvageValueStorageDiscountedToStartYear(model, r,s,y):
     return (model.v_SalvageValueStorage[r,s,y]
             /(1+model.p_DiscountRate[r])**(max(model.YEAR)-min(model.YEAR)+1)
@@ -63,7 +67,7 @@ def SI9_SalvageValueStorageDiscountedToStartYear(model, r,s,y):
             )
 def SI10_TotalDiscountedCostByStorage(model,r,s,y):
     return (
-        model.v_DiscountedCapitalInvestment[r,s,y]
+        model.v_DiscountedCapitalInvestmentStorage[r,s,y]
         -model.v_DiscountedSalvageValueStorage[r,s,y]
         == model.v_TotalDiscountedStorageCost[r,s,y]
     )

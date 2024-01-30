@@ -3,22 +3,22 @@ import pandas as pd
 from pyomo.environ import value, Var
 from pyomo.opt import SolverFactory
 from itertools import count
-from .MainModel import define_model
+from MainModel import define_model
 #%%
 from vincent.colors import brews
-from .readXlsData import read_excel
+# from readXlsData import read_excel
 
 from highspy import *
 
 def solve_model(input_file,results_folder):
 
-    ParamDict, OsemosysDict = read_excel(input_file,results_folder=results_folder)
+    # ParamDict, OsemosysDict = read_excel(input_file,results_folder=results_folder)
 
     #define the model with default values:
     model = define_model(input_file)
 
     # TODO: use the OsemosysDIct directly instead of passing through the json file
-    instance = model.create_instance(results_folder + '/Data.json')
+    instance = model.create_instance('../data/Data.json')
 
     #%%
     "Solvers used - cbc, ***scip*** or highs"
@@ -29,7 +29,7 @@ def solve_model(input_file,results_folder):
     opt = SolverFactory("scip")
     #%%
     # opt.solve(instance)
-    results = opt.solve(instance, tee=True)
+    results = opt.solve(instance)
     results.write()
 
     # %%
@@ -199,6 +199,7 @@ def solve_model(input_file,results_folder):
     # %%
 
 if __name__ =='__main__':
-    results_folder = '../results'
+    results = '../results'
+    data = '../data'
     input_file = '../data/OsemosysNew.xlsx'
-    solve_model(input_file,results_folder)
+    solve_model(input_file,results)
