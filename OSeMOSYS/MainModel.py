@@ -1,11 +1,13 @@
 #%%
 from pyomo.environ import AbstractModel,DataPortal,Set,Param,Var,NonNegativeReals,NonNegativeIntegers,Objective,\
     Constraint
-from .readXlsData import read_defaults
+from readXlsData import *
+# from ReadSets import *
 from pyomo.opt import SolverFactory
 import json
+from pyomo.environ import units as u
 
-def define_model(input_file):
+def define_model(file_path):
     # from Data import *
     model = AbstractModel()
     data = DataPortal()
@@ -23,7 +25,7 @@ def define_model(input_file):
 
     #%%
     """Reading excel Default parameter values  """
-    Default = read_defaults(input_file)
+    
     discountrate = Default.loc['DiscountRate', 'Defaul value']
     daysplit = Default.loc['DaySplit', 'Defaul value']
     conversionls = Default.loc['Conversionls', 'Defaul value']
@@ -307,7 +309,7 @@ def define_model(input_file):
                                          model.DAYTYPE,
                                          model.DAILYTIMEBRACKET,
                                          model.YEAR,
-                                         )
+                                         initialize = 0.0)
 
     """NetChargeWithinYear[r,s,ls,ld,lh,y]	Net quantity of commodity charged to storage 
     facility s in year y. It is a function of the RateOfStorageCharge and the RateOfStorageDischarge
@@ -318,7 +320,7 @@ def define_model(input_file):
                                       model.DAYTYPE,
                                       model.DAILYTIMEBRACKET,
                                       model.YEAR,
-                                      )
+                                      initialize = 0.0)
 
     """NetChargeWithinDay[r,s,ls,ld,lh,y]	Net quantity of commodity charged to storage 
     facility s in daytype ld. It is a function of the RateOfStorageCharge and the 
@@ -439,7 +441,7 @@ def define_model(input_file):
 
     """ProductionByTechnologyAnnual[r,t,f,y] >=0	Annual production of fuel f by technology t. Energy"""
     model.v_ProductionByTechnologyAnnual = Var(model.REGION, model.TECHNOLOGY, model.FUEL, model.YEAR,
-                                                domain = NonNegativeReals )
+                                                domain = NonNegativeReals , units  = u.PJ)
     """RateOfProduction[r,l,f,y] >=0 Sum of the RateOfProductionByTechnology over all the technologies.	Energy (per year)"""
     model.v_RateOfProduction  = Var(model.REGION, model.TIMESLICE, model.FUEL,
                                     model.YEAR, domain = NonNegativeReals )
@@ -513,10 +515,10 @@ def define_model(input_file):
     ##################                      Reserve Margin               ###########################
     """TotalCapacityInReserveMargin[r,y] >=0 Total available capacity of the technologies required to provide reserve margin. 
     It is derived from the TotalCapacityAnnual and the parameter ReserveMarginTagTechnology. | Energy"""
-    model.v_TotalCapacityInReserveMargin = Var(model.REGION, model.YEAR, domain = NonNegativeReals, initialize = 0.0 )
+    model.v_TotalCapacityInReserveMargin = Var(model.REGION, model.YEAR, domain = NonNegativeReals, initialize = 0.0)
     """DemandNeedingReserveMargin[r,l,y] >=0 Quantity of fuel produced that is assigned to a target of reserve margin. 
     Derived from the RateOfProduction and the parameter ReserveMarginTagFuel. Energy (per year)"""
-    model.v_DemandNeedingReserveMargin = Var(model.REGION,model.TIMESLICE, model.YEAR, domain = NonNegativeReals )
+    model.v_DemandNeedingReserveMargin = Var(model.REGION,model.TIMESLICE, model.YEAR, domain = NonNegativeReals, initialize =0.0 )
     ################################################################################################
     #################                  Renewable Generation Target        ##########################
     """TotalREProductionAnnual[r,y]	Annual production by all technologies tagged as renewable in the model. 
@@ -559,7 +561,7 @@ def define_model(input_file):
     model.v_ConnectedUnits = Var(model.REGION, model.TECHNOLOGY, model.SEASON, model.YEAR,
                                  domain=NonNegativeIntegers, initialize=0.0)
     """"probando nueva capacidad residual"""
-    model.v_ResidualCapacity  = Var(model.REGION,model.TECHNOLOGY,model.YEAR)
+    model.v_ResidualCapacity  = Var(model.REGION,model.TECHNOLOGY,model.YEAR, initialize  = 0.0)
     # model.v_RecuperadasAcumuladas = Var(model.REGION, model.TECHNOLOGY, model.YEAR, domain = NonNegativeReals, initialize=0.0)
     # model.v_Recuperadas = Var(model.REGION, model.TECHNOLOGY, model.YEAR, domain = NonNegativeReals, initialize=0.0)
     model.v_NumeroUnidadesRecuperadas = Var(model.REGION, model.TECHNOLOGY, model.YEAR, domain=NonNegativeIntegers, initialize=0.0)
@@ -594,7 +596,7 @@ def define_model(input_file):
 
     # data.load(filename='Data.json')
 
-    from .constraints.ObjectiveFunction import ObjectiveFunction
+    from constraints.ObjectiveFunction import ObjectiveFunction
     model.objectivefunction = Objective(rule = ObjectiveFunction)
     #%%
     def SpecifiedDemand_EQ (model, r, l, f, y ):
@@ -602,7 +604,7 @@ def define_model(input_file):
         model.p_SpecifiedAnnualDemand[r,f,y]*model.p_SpecifiedDemandProfile[r,f,l,y]/model.p_YearSplit[l,y])
     model.SpecifiedDemand_EQ = Constraint(model.REGION,model.TIMESLICE,model.FUEL,model.YEAR, rule = SpecifiedDemand_EQ)
     #%%
-    from .constraints.CapacityAdequacyAB import CAa1_TotalNewCapacity,CAa1n_TotalResidualCapacity,CAa2_TotalAnnualCapacity, \
+    from constraints.CapacityAdequacyAB import CAa1_TotalNewCapacity,CAa2_TotalAnnualCapacity, \
         CAa3_TotalActivityOfEachTechnology, CAa4_ConstraintCapacity, CAa5_TotalNewCapacity, CAb1_PlannedMaintenance
     model.CAa1_TotalNewCapacity = Constraint(
         model.REGION,
@@ -610,14 +612,6 @@ def define_model(input_file):
         model.YEAR,
         rule = CAa1_TotalNewCapacity
         )
-    model.CAa1n_TotalResidualCapacity = Constraint(
-        model.REGION,
-        model.TECHNOLOGY,
-        model.YEAR,
-        rule = CAa1n_TotalResidualCapacity
-    )
-
-
     model.CAa2_TotalAnnualCapacity = Constraint(
         model.REGION,
         model.TECHNOLOGY,
@@ -699,7 +693,7 @@ def define_model(input_file):
 
 
     #%%
-    from .constraints.EnergyBalance import EBa1_RateOfFuelProduction1,EBa2_RateOfFuelProduction2, EBa3_RateOfFuelProduction3, \
+    from constraints.EnergyBalance import EBa1_RateOfFuelProduction1,EBa2_RateOfFuelProduction2, EBa3_RateOfFuelProduction3, \
         EBa4_RateOfFuelUse1, EBa5_RateOfFuelUse2, EBa6_RateOfFuelUse3, EBa7_EnergyBalanceEachTS1, EBa8_EnergyBalanceEachTS2, \
         EBa9_EnergyBalanceEachTS3, EBa10_EnergyBalanceEachTS4, EBa11_EnergyBalanceEachTS5, EBb1_EnergyBalanceEachYear1, \
         EBb2_EnergyBalanceEachYear2, EBb3_EnergyBalanceEachYear3, EBb4_EnergyBalanceEachYear4
@@ -805,7 +799,7 @@ def define_model(input_file):
         model.YEAR,
         rule = EBb4_EnergyBalanceEachYear4)
     #%%
-    from .constraints.AccountingTechnologyProductionUse import Acc1_FuelProductionByTechnology, Acc2_FuelUseByTechnology, \
+    from constraints.AccountingTechnologyProductionUse import Acc1_FuelProductionByTechnology, Acc2_FuelUseByTechnology, \
         Acc3_AverageAnnualRateOfActivity, Acc4_ModelPeriodCostByRegion
     model.Acc1_FuelProductionByTechnology = Constraint(
         model.REGION,
@@ -831,7 +825,7 @@ def define_model(input_file):
         model.REGION,
         rule = Acc4_ModelPeriodCostByRegion)
     #%%
-    from .constraints.StorageEq import S1_RateOfStorageCharge, S2_RateOfStorageDischarge, S3_NetChargeWithinYear, \
+    from constraints.StorageEq import S1_RateOfStorageCharge, S2_RateOfStorageDischarge, S3_NetChargeWithinYear, \
         S4_NetChargeWithinDay, S5_and_S6_StorageLevelYearStart, S7_and_S8_StorageLevelYearFinish, S9_and_S10_StorageLevelSeasonStart, \
         S11_and_S12_StorageLevelDayTypeStart, S13_and_S14_and_S15_StorageLevelDayTypeFinish
     model.S1_RateOfStorageCharge = Constraint(
@@ -906,7 +900,7 @@ def define_model(input_file):
             rule= S13_and_S14_and_S15_StorageLevelDayTypeFinish
             )
     #%%
-    from .constraints.StorageConst import (
+    from constraints.StorageConst import (
         SC1_LowerLimit_BeginningOfDailyTimeBracketOfFirstInstanceOfDayTypeInFirstWeekConstraint,
         SC1_UpperLimit_BeginningOfDailyTimeBracketOfFirstInstanceOfDayTypeInFirstWeekConstraint,
         SC2_LowerLimit_EndOfDailyTimeBracketOfLastInstanceOfDayTypeInFirstWeekConstraint,
@@ -1009,7 +1003,7 @@ def define_model(input_file):
         rule = SC6_MaxDischargeConstraint
     )
     #%%
-    from .constraints.StorageInv import (
+    from constraints.StorageInv import (
         SI1_StorageUpperLimit,
         SI2_StorageLowerLimit,
         SI3_TotalNewStorage,
@@ -1086,7 +1080,7 @@ def define_model(input_file):
 
 
     #%%
-    from .constraints.CapitalCost import (
+    from constraints.CapitalCost import (
         CC1_UndiscountedCapitalInvestment,
         CC2_DiscountingCapitalInvestment
     )
@@ -1101,7 +1095,7 @@ def define_model(input_file):
         model.YEAR,
         rule = CC2_DiscountingCapitalInvestment)
     #%%
-    from .constraints.SalvageValue import (
+    from constraints.SalvageValue import (
         SV123_SalvageValueAtEndOfPeriod1,
         SV4_SalvageValueDiscountedToStarYear
     )
@@ -1116,7 +1110,7 @@ def define_model(input_file):
         model.YEAR,
         rule = SV4_SalvageValueDiscountedToStarYear)
     #%%
-    from .constraints.OperatingCosts import (
+    from constraints.OperatingCosts import (
         OC1_OperatingCostVariable,
         OC2_OperatingCostsFixedAnnual,
         OC3_OperatingCostsTotalAnnual,
@@ -1125,6 +1119,7 @@ def define_model(input_file):
     model.OC1_OperatingCostVariable = Constraint(
         model.REGION,
         model.TECHNOLOGY,
+        # model.TIMESLICE,
         model.YEAR,
         rule = OC1_OperatingCostVariable)
     model.OC2_OperatingCostsFixedAnnual = Constraint(
@@ -1143,7 +1138,7 @@ def define_model(input_file):
         model.YEAR,
         rule = OC4_DiscountedOperatingCostsTotalAnnual)
     #%%
-    from .constraints.TotalDiscountedCosts import (
+    from constraints.TotalDiscountedCosts import (
         TDC1_TotalDiscountedCostByTechnology,
         TDC2_TotalDiscountedCost
     )
@@ -1157,7 +1152,7 @@ def define_model(input_file):
         model.YEAR,
         rule = TDC2_TotalDiscountedCost)
     #%%
-    from .constraints.MinMaxCapacity import (
+    from constraints.MinMaxCapacity import (
         TCC1_TotalAnnualMaxCapacityConstraint,
         TCC2_TotalAnnualMinCapacityConstraint,
         NCC1_TotalAnnualMaxNewCapacityConstraint,
@@ -1184,7 +1179,7 @@ def define_model(input_file):
         model.YEAR,
         rule = NCC2_TotalAnnualMinNewCapacityConstraint)
     #%%
-    from .constraints.ActivityConstrains import (
+    from constraints.ActivityConstrains import (
         AAC1_TotalAnnualTechnologyActivity,
         AAC2_TotalAnnualTechnologyActivityUpperLimit,
         AAC3_TotalAnnualTechnologyActivityLowerLimit,
@@ -1220,29 +1215,29 @@ def define_model(input_file):
         model.TECHNOLOGY,
         rule = TAC3_TotalModelHorizenTechnologyActivityLowerLimit)
     #%%
-    from .constraints.ReserveMargin import (
-        RM1_ReserveMargin_TechnologiesIncluded_In_Activity_Units,
-        RM2_ReserveMargin_FuelsIncluded,
+    from constraints.ReserveMargin import (
+        # RM1_ReserveMargin_TechnologiesIncluded_In_Activity_Units,
+        # RM2_ReserveMargin_FuelsIncluded,
         RM3_ReserveMargin_Constraint
     )
-    model.RM1_ReserveMargin_TechnologiesIncluded_In_Activity_Units = Constraint(
-        model.REGION,
-        # model.TIMESLICE,
-        model.YEAR,
-        rule = RM1_ReserveMargin_TechnologiesIncluded_In_Activity_Units
-        )
-    model.RM2_ReserveMargin_FuelsIncluded = Constraint(
-        model.REGION,
-        model.TIMESLICE,
-        model.YEAR,
-        rule = RM2_ReserveMargin_FuelsIncluded)
+    # model.RM1_ReserveMargin_TechnologiesIncluded_In_Activity_Units = Constraint(
+    #     model.REGION,
+    #     # model.TIMESLICE,
+    #     model.YEAR,
+    #     rule = RM1_ReserveMargin_TechnologiesIncluded_In_Activity_Units
+    #     )
+    # model.RM2_ReserveMargin_FuelsIncluded = Constraint(
+    #     model.REGION,
+    #     model.TIMESLICE,
+    #     model.YEAR,
+    #     rule = RM2_ReserveMargin_FuelsIncluded)
     model.RM3_ReserveMargin_Constraint = Constraint(
         model.REGION,
         model.TIMESLICE,
         model.YEAR,
         rule = RM3_ReserveMargin_Constraint)
     #%%
-    from .constraints.ReTagTech import (
+    from constraints.ReTagTech import (
         RE1_FuelProductionByTechnologyAnnual,
         RE2_TechIncluded,
         RE3_FuelIncluded,
@@ -1280,7 +1275,7 @@ def define_model(input_file):
         )
 
     #%%
-    from .constraints.Emission import (
+    from constraints.Emission import (
         E1_AnnualEmissionProductionByMode,
         E2_AnnualEmissionProduction,
         E3_EmissionsPenaltyByTechAndEmission,
@@ -1351,8 +1346,9 @@ def define_model(input_file):
 
 if __name__ =='__main__':
     results_folder = '../results'
-    input_file = '../data/OsemosysNew.xlsx'
-    m=define_model(input_file)
+    data = '../data'
+    file_path = '../data/OsemosysNew.xlsx'
+    m=define_model(file_path)
 
 
 

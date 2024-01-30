@@ -82,18 +82,14 @@ def S7_and_S8_StorageLevelYearFinish(model,r,s,y):
                   for lh in model.DAILYTIMEBRACKET)
             == model.v_StorageLevelYearFinish[r,s,y]
         )
-def S9_and_S10_StorageLevelSeasonStart(model, r,s,ls,y):
+def S9_and_S10_StorageLevelSeasonStart(model, r, s, ls, y):
     if ls == min(model.SEASON):
-        return model.v_StorageLevelYearStart[r,s,y] == model.v_StorageLevelSeasonStart[r,s,ls,y]
+        return model.v_StorageLevelYearStart[r, s, y] == model.v_StorageLevelSeasonStart[r, s, ls, y]
     else:
-        return(
-            model.v_StorageLevelSeasonStart[r,s,ls-1,y]
-            + sum(model.v_NetChargeWithinYear[r,s,ls,ld-1,lh,y]
-                  for ld in model.DAYTYPE
-                  for lh in model.DAILYTIMEBRACKET
-                )
-            == model.v_StorageLevelSeasonStart[r,s,ls,y]
-        )
+        return model.v_StorageLevelSeasonStart[r, s, ls, y] == \
+               model.v_StorageLevelSeasonStart[r, s, ls-1, y] + \
+               sum(model.v_NetChargeWithinYear[r, s, ls-1, ld, lh, y] for ld in model.DAYTYPE for lh in model.DAILYTIMEBRACKET)
+        
 def S11_and_S12_StorageLevelDayTypeStart(model, r,s,ls,ld,y):
     if ld == min(model.DAYTYPE):
         return model.v_StorageLevelSeasonStart[r,s,ls,y] == model.v_StorageLevelDayTypeStart[r,s,ls,ld,y]
