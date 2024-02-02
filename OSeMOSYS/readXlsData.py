@@ -1,6 +1,6 @@
 #%%
 import pandas as pd
-from ReadSets import *
+from .ReadSets import *
 import os
   # Replace with the actual file path
 import json

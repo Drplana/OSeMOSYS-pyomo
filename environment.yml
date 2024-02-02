@@ -11,6 +11,7 @@ dependencies:
   - vincent
   - plotly
   - highs
+  - pint
 
 # installing the scip solver:
   - gcg 

@@ -6,7 +6,8 @@ the results should be written
 '''
 import os,sys
 # include the main library path (the parent folder) in the path environment variable
-sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
+root_folder = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+sys.path.append(root_folder)
 
 #Two solution to import the library
 # (1) as a package (defined in __init__.py) => function calls are done through the lpackage (eg om.solve_model)
