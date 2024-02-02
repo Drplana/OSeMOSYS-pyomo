@@ -3,7 +3,7 @@ import pandas as pd
 from pyomo.environ import value, Var
 from pyomo.opt import SolverFactory
 from itertools import count
-from MainModel import define_model
+from .MainModel import define_model
 #%%
 from vincent.colors import brews
 # from readXlsData import read_excel

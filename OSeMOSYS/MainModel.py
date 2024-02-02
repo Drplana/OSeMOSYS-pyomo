@@ -1,7 +1,7 @@
 #%%
 from pyomo.environ import AbstractModel,DataPortal,Set,Param,Var,NonNegativeReals,NonNegativeIntegers,Objective,\
     Constraint
-from readXlsData import *
+from .readXlsData import *
 # from ReadSets import *
 from pyomo.opt import SolverFactory
 import json
@@ -596,7 +596,7 @@ def define_model(file_path):
 
     # data.load(filename='Data.json')
 
-    from constraints.ObjectiveFunction import ObjectiveFunction
+    from .constraints.ObjectiveFunction import ObjectiveFunction
     model.objectivefunction = Objective(rule = ObjectiveFunction)
     #%%
     def SpecifiedDemand_EQ (model, r, l, f, y ):
@@ -604,7 +604,7 @@ def define_model(file_path):
         model.p_SpecifiedAnnualDemand[r,f,y]*model.p_SpecifiedDemandProfile[r,f,l,y]/model.p_YearSplit[l,y])
     model.SpecifiedDemand_EQ = Constraint(model.REGION,model.TIMESLICE,model.FUEL,model.YEAR, rule = SpecifiedDemand_EQ)
     #%%
-    from constraints.CapacityAdequacyAB import CAa1_TotalNewCapacity,CAa2_TotalAnnualCapacity, \
+    from .constraints.CapacityAdequacyAB import CAa1_TotalNewCapacity,CAa2_TotalAnnualCapacity, \
         CAa3_TotalActivityOfEachTechnology, CAa4_ConstraintCapacity, CAa5_TotalNewCapacity, CAb1_PlannedMaintenance
     model.CAa1_TotalNewCapacity = Constraint(
         model.REGION,
@@ -693,7 +693,7 @@ def define_model(file_path):
 
 
     #%%
-    from constraints.EnergyBalance import EBa1_RateOfFuelProduction1,EBa2_RateOfFuelProduction2, EBa3_RateOfFuelProduction3, \
+    from .constraints.EnergyBalance import EBa1_RateOfFuelProduction1,EBa2_RateOfFuelProduction2, EBa3_RateOfFuelProduction3, \
         EBa4_RateOfFuelUse1, EBa5_RateOfFuelUse2, EBa6_RateOfFuelUse3, EBa7_EnergyBalanceEachTS1, EBa8_EnergyBalanceEachTS2, \
         EBa9_EnergyBalanceEachTS3, EBa10_EnergyBalanceEachTS4, EBa11_EnergyBalanceEachTS5, EBb1_EnergyBalanceEachYear1, \
         EBb2_EnergyBalanceEachYear2, EBb3_EnergyBalanceEachYear3, EBb4_EnergyBalanceEachYear4
@@ -799,7 +799,7 @@ def define_model(file_path):
         model.YEAR,
         rule = EBb4_EnergyBalanceEachYear4)
     #%%
-    from constraints.AccountingTechnologyProductionUse import Acc1_FuelProductionByTechnology, Acc2_FuelUseByTechnology, \
+    from .constraints.AccountingTechnologyProductionUse import Acc1_FuelProductionByTechnology, Acc2_FuelUseByTechnology, \
         Acc3_AverageAnnualRateOfActivity, Acc4_ModelPeriodCostByRegion
     model.Acc1_FuelProductionByTechnology = Constraint(
         model.REGION,
@@ -825,7 +825,7 @@ def define_model(file_path):
         model.REGION,
         rule = Acc4_ModelPeriodCostByRegion)
     #%%
-    from constraints.StorageEq import S1_RateOfStorageCharge, S2_RateOfStorageDischarge, S3_NetChargeWithinYear, \
+    from .constraints.StorageEq import S1_RateOfStorageCharge, S2_RateOfStorageDischarge, S3_NetChargeWithinYear, \
         S4_NetChargeWithinDay, S5_and_S6_StorageLevelYearStart, S7_and_S8_StorageLevelYearFinish, S9_and_S10_StorageLevelSeasonStart, \
         S11_and_S12_StorageLevelDayTypeStart, S13_and_S14_and_S15_StorageLevelDayTypeFinish
     model.S1_RateOfStorageCharge = Constraint(
@@ -900,7 +900,7 @@ def define_model(file_path):
             rule= S13_and_S14_and_S15_StorageLevelDayTypeFinish
             )
     #%%
-    from constraints.StorageConst import (
+    from .constraints.StorageConst import (
         SC1_LowerLimit_BeginningOfDailyTimeBracketOfFirstInstanceOfDayTypeInFirstWeekConstraint,
         SC1_UpperLimit_BeginningOfDailyTimeBracketOfFirstInstanceOfDayTypeInFirstWeekConstraint,
         SC2_LowerLimit_EndOfDailyTimeBracketOfLastInstanceOfDayTypeInFirstWeekConstraint,
@@ -1003,7 +1003,7 @@ def define_model(file_path):
         rule = SC6_MaxDischargeConstraint
     )
     #%%
-    from constraints.StorageInv import (
+    from .constraints.StorageInv import (
         SI1_StorageUpperLimit,
         SI2_StorageLowerLimit,
         SI3_TotalNewStorage,
@@ -1080,7 +1080,7 @@ def define_model(file_path):
 
 
     #%%
-    from constraints.CapitalCost import (
+    from .constraints.CapitalCost import (
         CC1_UndiscountedCapitalInvestment,
         CC2_DiscountingCapitalInvestment
     )
@@ -1095,7 +1095,7 @@ def define_model(file_path):
         model.YEAR,
         rule = CC2_DiscountingCapitalInvestment)
     #%%
-    from constraints.SalvageValue import (
+    from .constraints.SalvageValue import (
         SV123_SalvageValueAtEndOfPeriod1,
         SV4_SalvageValueDiscountedToStarYear
     )
@@ -1110,7 +1110,7 @@ def define_model(file_path):
         model.YEAR,
         rule = SV4_SalvageValueDiscountedToStarYear)
     #%%
-    from constraints.OperatingCosts import (
+    from .constraints.OperatingCosts import (
         OC1_OperatingCostVariable,
         OC2_OperatingCostsFixedAnnual,
         OC3_OperatingCostsTotalAnnual,
@@ -1138,7 +1138,7 @@ def define_model(file_path):
         model.YEAR,
         rule = OC4_DiscountedOperatingCostsTotalAnnual)
     #%%
-    from constraints.TotalDiscountedCosts import (
+    from .constraints.TotalDiscountedCosts import (
         TDC1_TotalDiscountedCostByTechnology,
         TDC2_TotalDiscountedCost
     )
@@ -1152,7 +1152,7 @@ def define_model(file_path):
         model.YEAR,
         rule = TDC2_TotalDiscountedCost)
     #%%
-    from constraints.MinMaxCapacity import (
+    from .constraints.MinMaxCapacity import (
         TCC1_TotalAnnualMaxCapacityConstraint,
         TCC2_TotalAnnualMinCapacityConstraint,
         NCC1_TotalAnnualMaxNewCapacityConstraint,
@@ -1179,7 +1179,7 @@ def define_model(file_path):
         model.YEAR,
         rule = NCC2_TotalAnnualMinNewCapacityConstraint)
     #%%
-    from constraints.ActivityConstrains import (
+    from .constraints.ActivityConstrains import (
         AAC1_TotalAnnualTechnologyActivity,
         AAC2_TotalAnnualTechnologyActivityUpperLimit,
         AAC3_TotalAnnualTechnologyActivityLowerLimit,
@@ -1215,7 +1215,7 @@ def define_model(file_path):
         model.TECHNOLOGY,
         rule = TAC3_TotalModelHorizenTechnologyActivityLowerLimit)
     #%%
-    from constraints.ReserveMargin import (
+    from .constraints.ReserveMargin import (
         # RM1_ReserveMargin_TechnologiesIncluded_In_Activity_Units,
         # RM2_ReserveMargin_FuelsIncluded,
         RM3_ReserveMargin_Constraint
@@ -1237,7 +1237,7 @@ def define_model(file_path):
         model.YEAR,
         rule = RM3_ReserveMargin_Constraint)
     #%%
-    from constraints.ReTagTech import (
+    from .constraints.ReTagTech import (
         RE1_FuelProductionByTechnologyAnnual,
         RE2_TechIncluded,
         RE3_FuelIncluded,
@@ -1275,7 +1275,7 @@ def define_model(file_path):
         )
 
     #%%
-    from constraints.Emission import (
+    from .constraints.Emission import (
         E1_AnnualEmissionProductionByMode,
         E2_AnnualEmissionProduction,
         E3_EmissionsPenaltyByTechAndEmission,
