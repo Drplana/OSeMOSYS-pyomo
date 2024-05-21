@@ -7,7 +7,7 @@ dependencies:
   - pyomo
   - openpyxl == 3.0.10
   - numpy
-  - pandas
+  - pandas==2.1.0
   - vincent
   - plotly
   - highs
