@@ -26,7 +26,7 @@ def solve_model(input_file,results_folder):
     #opt = SolverFactory("scip", tempdir = new_folder_path)
     # cbc_path = "C:/Program Files (x86)/COIN-OR/1.7.4/win32-msvc15/bin/cbc.exe"
     # opt = SolverFactory('cbc', executable=cbc_path)
-    opt = SolverFactory("scip")
+    opt = SolverFactory("gurobi")
     #%%
     # opt.solve(instance)
     results = opt.solve(instance)
