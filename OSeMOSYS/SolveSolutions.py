@@ -70,30 +70,30 @@ def solve_model(input_file,results_folder):
             'v_ConnectedUnits': ['REGION', 'TECHNOLOGY', 'SEASON', 'YEAR', 'value'],
 
             # Variables with ['REGION', 'STORAGE', 'SEASON', 'DAYTYPE', 'DAILYTIMEBRACKET', 'YEAR'] set
-            'v_RateOfStageCharge': ['REGION', 'STORAGE', 'SEASON', 'DAYTYPE', 'DAILYTIMEBRACKET', 'YEAR', 'value'],
+            'v_RateOfStorageCharge': ['REGION', 'STORAGE', 'SEASON', 'DAYTYPE', 'DAILYTIMEBRACKET', 'YEAR', 'value'],
             'v_RateOfStorageDischarge': ['REGION', 'STORAGE', 'SEASON', 'DAYTYPE', 'DAILYTIMEBRACKET', 'YEAR', 'value'],
             'v_NetChargeWithinYear': ['REGION', 'STORAGE', 'SEASON', 'DAYTYPE', 'DAILYTIMEBRACKET', 'YEAR', 'value'],
             'v_NetChargeWithinDay': ['REGION', 'STORAGE', 'SEASON', 'DAYTYPE', 'DAILYTIMEBRACKET', 'YEAR', 'value'],
 
-            # Variables with ['REGION', 'STAGE', 'YEAR'] set
-            'v_StageLevelYearStart': ['REGION', 'STAGE', 'YEAR', 'value'],
-            'v_StageLevelYearFinish': ['REGION', 'STAGE', 'YEAR', 'value'],
-            'v_StageLowerLimit': ['REGION', 'STAGE', 'YEAR', 'value'],
-            'v_StageUpperLimit': ['REGION', 'STAGE', 'YEAR', 'value'],
-            'v_AccumulatedNewStageCapacity': ['REGION', 'STAGE', 'YEAR', 'value'],
-            'v_NewStageCapacity': ['REGION', 'STAGE', 'YEAR', 'value'],
-            'v_CapitalInvestmentStage': ['REGION', 'STAGE', 'YEAR', 'value'],
-            'v_DiscountedCapitalInvestmentStage': ['REGION', 'STAGE', 'YEAR', 'value'],
-            'v_SalvageValueStage': ['REGION', 'STAGE', 'YEAR', 'value'],
-            'v_DiscountedSalvageValueStage': ['REGION', 'STAGE', 'YEAR', 'value'],
-            'v_TotalDiscountedStageCost': ['REGION', 'STAGE', 'YEAR', 'value'],
+            # Variables with ['REGION', 'STORAGE', 'YEAR'] set
+            'v_StorageLevelYearStart': ['REGION', 'STORAGE', 'YEAR', 'value'],
+            'v_StorageLevelYearFinish': ['REGION', 'STORAGE', 'YEAR', 'value'],
+            'v_StorageLowerLimit': ['REGION', 'STORAGE', 'YEAR', 'value'],
+            'v_StorageUpperLimit': ['REGION', 'STORAGE', 'YEAR', 'value'],
+            'v_AccumulatedNewStorageCapacity': ['REGION', 'STORAGE', 'YEAR', 'value'],
+            'v_NewStorageCapacity': ['REGION', 'STORAGE', 'YEAR', 'value'],
+            'v_CapitalInvestmentStorage': ['REGION', 'STORAGE', 'YEAR', 'value'],
+            'v_DiscountedCapitalInvestmentStorage': ['REGION', 'STORAGE', 'YEAR', 'value'],
+            'v_SalvageValueStorage': ['REGION', 'STORAGE', 'YEAR', 'value'],
+            'v_DiscountedSalvageValueStorage': ['REGION', 'STORAGE', 'YEAR', 'value'],
+            'v_TotalDiscountedStorageCost': ['REGION', 'STORAGE', 'YEAR', 'value'],
 
-            # Variables with ['REGION', 'STAGE', 'SEASON', 'YEAR'] set
-            'v_StageLevelSeasonStart': ['REGION', 'STAGE', 'SEASON', 'YEAR', 'value'],
+            # Variables with ['REGION', 'STORAGE', 'SEASON', 'YEAR'] set
+            'v_StorageLevelSeasonStart': ['REGION', 'STORAGE', 'SEASON', 'YEAR', 'value'],
 
-            # Variables with ['REGION', 'STAGE', 'SEASON', 'DAYTYPE', 'YEAR'] set
-            'v_StageLevelDayTypeStart': ['REGION', 'STAGE', 'SEASON', 'DAYTYPE', 'YEAR', 'value'],
-            'v_StageLevelDayTypeFinish': ['REGION', 'STAGE', 'SEASON', 'DAYTYPE', 'YEAR', 'value'],
+            # Variables with ['REGION', 'STORAGE', 'SEASON', 'DAYTYPE', 'YEAR'] set
+            'v_StorageLevelDayTypeStart': ['REGION', 'STORAGE', 'SEASON', 'DAYTYPE', 'YEAR', 'value'],
+            'v_StorageLevelDayTypeFinish': ['REGION', 'STORAGE', 'SEASON', 'DAYTYPE', 'YEAR', 'value'],
 
             # Variables with ['REGION', 'TIMESLICE', 'TECHNOLOGY', 'MODE_OF_OPERATION', 'YEAR'] set
             'v_RateOfActivity': ['REGION', 'TIMESLICE', 'TECHNOLOGY', 'MODE_OF_OPERATION', 'YEAR', 'value'],
