@@ -350,6 +350,10 @@ def define_model(file_path):
     """StorageLowerLimit[r,s,y]>=0	Minimum allowed level of stored commodity in 
     storage facility s, as a function of the storage capacity and the user-defined 
     MinStorageCharge ratio.	Energy"""
+    model.v_StorageLevel = Var(model.REGION, model.STORAGE, model.SEASON, model.DAYTYPE, 
+                               model.DAILYTIMEBRACKET, model.YEAR, domain = NonNegativeReals)
+
+
     model.v_StorageLowerLimit = Var(model.REGION, model.STORAGE, model.YEAR,
                                     domain = NonNegativeReals)
     """StorageUpperLimit[r,s,y]>=0	Maximum allowed level of stored commodity in storage
@@ -827,7 +831,7 @@ def define_model(file_path):
     #%%
     from .constraints.StorageEq import S1_RateOfStorageCharge, S2_RateOfStorageDischarge, S3_NetChargeWithinYear, \
         S4_NetChargeWithinDay, S5_and_S6_StorageLevelYearStart, S7_and_S8_StorageLevelYearFinish, S9_and_S10_StorageLevelSeasonStart, \
-        S11_and_S12_StorageLevelDayTypeStart, S13_and_S14_and_S15_StorageLevelDayTypeFinish
+        S11_and_S12_StorageLevelDayTypeStart, S13_and_S14_and_S15_StorageLevelDayTypeFinish, S16_StorageLevel
     model.S1_RateOfStorageCharge = Constraint(
             model.REGION,
             model.STORAGE,
@@ -899,6 +903,14 @@ def define_model(file_path):
             model.YEAR,
             rule= S13_and_S14_and_S15_StorageLevelDayTypeFinish
             )
+    model.S16_StorageLevel = Constraint(
+        model.REGION, 
+        model.STORAGE, 
+        model.SEASON,
+        model.DAYTYPE, 
+        model.DAILYTIMEBRACKET, 
+        model.YEAR, 
+        rule=S16_StorageLevel)
     #%%
     from .constraints.StorageConst import (
         SC1_LowerLimit_BeginningOfDailyTimeBracketOfFirstInstanceOfDayTypeInFirstWeekConstraint,

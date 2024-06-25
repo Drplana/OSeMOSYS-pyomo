@@ -16,7 +16,7 @@ def SI3_TotalNewStorage(model, r,s,y):
     return(
         sum(model.v_NewStorageCapacity[r,s,yy]
             for yy in model.YEAR
-            if (y-yy<model.p_OperationalLifeStorage[r,s]) and y-yy>=0)
+            if (y-yy<model.p_OperationalLifeStorage[r,s]) and (y-yy>=0) )
     == model.v_AccumulatedNewStorageCapacity[r,s,y]
     )
 def SI4_UndiscountedCapitalInvestmentStorage(model,r,s,y):
@@ -28,13 +28,13 @@ def SI4_UndiscountedCapitalInvestmentStorage(model,r,s,y):
 def SI5_DiscountingCapitalInvestmentStorage(model,r,s,y):
     return(
         model.v_CapitalInvestmentStorage[r,s,y]
-        /(1+model.p_DiscountRate[r])**(y-min(model.YEAR))
+        /((1+model.p_DiscountRate[r])**(y-min(model.YEAR)))
         ==model.v_DiscountedCapitalInvestmentStorage[r,s,y]    
     )
 def SI6_SalvageValueStorageAtEndOfPeriod1(model,r,s,y):
     if (y + model.p_OperationalLifeStorage[r,s]-1)<= max(model.YEAR):
         return (      
-                0 <= model.v_SalvageValueStorage[r,s,y]
+                0 == model.v_SalvageValueStorage[r,s,y]
         )
     else: return Constraint.Skip
 def SI7_SalvageValueStorageAtEndOfPeriod2(model, r,s,y):
