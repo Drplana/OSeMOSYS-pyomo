@@ -351,7 +351,7 @@ def define_model(file_path):
     storage facility s, as a function of the storage capacity and the user-defined 
     MinStorageCharge ratio.	Energy"""
     model.v_StorageLevel = Var(model.REGION, model.STORAGE, model.SEASON, model.DAYTYPE, 
-                               model.DAILYTIMEBRACKET, model.YEAR, domain = NonNegativeReals)
+                               model.DAILYTIMEBRACKET, model.YEAR, domain = NonNegativeReals, initialize = 0.0)
 
 
     model.v_StorageLowerLimit = Var(model.REGION, model.STORAGE, model.YEAR,
