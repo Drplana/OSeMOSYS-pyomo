@@ -21,7 +21,7 @@ There is an if included to save memory
     return(
             sum(model.v_ProductionByTechnologyAnnual[r,t,f,y]
             *model.p_RETagTechnology[r,t,y] for t in model.TECHNOLOGY
-            for f in model.FUEL if model.p_RETagTechnology[r,t,y] != 0
+            for f in model.FUEL #if model.p_RETagTechnology[r,t,y] != 0
             )
             == model.v_TotalREProductionAnnual[r,y]
             )
@@ -35,7 +35,7 @@ RateOfProduction[r,l,f,y]*YearSplit[l,y]*RETagFuel[r,f,y] = RETotalProductionOfT
                 *model.p_YearSplit[l,y]
                 *model.p_RETagFuel[r,f,y] 
                 for l in model.TIMESLICE
-                for f in model.FUEL if model.p_RETagFuel[r,f,y] != 0)
+                for f in model.FUEL) #if model.p_RETagFuel[r,f,y] != 0)
                 ==model.v_RETotalProductionOfTargetFuelAnnual[r,y]
             )
 def RE4_EnergyConstraint(model, r,y):
