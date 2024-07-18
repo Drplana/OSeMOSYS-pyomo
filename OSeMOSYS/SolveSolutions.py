@@ -74,6 +74,7 @@ def solve_model(input_file,results_folder):
             'v_RateOfStorageDischarge': ['REGION', 'STORAGE', 'SEASON', 'DAYTYPE', 'DAILYTIMEBRACKET', 'YEAR', 'value'],
             'v_NetChargeWithinYear': ['REGION', 'STORAGE', 'SEASON', 'DAYTYPE', 'DAILYTIMEBRACKET', 'YEAR', 'value'],
             'v_NetChargeWithinDay': ['REGION', 'STORAGE', 'SEASON', 'DAYTYPE', 'DAILYTIMEBRACKET', 'YEAR', 'value'],
+            'v_StorageLevel' : ['REGION', 'STORAGE', 'SEASON', 'DAYTYPE', 'DAILYTIMEBRACKET', 'YEAR', 'value'],
 
             # Variables with ['REGION', 'STORAGE', 'YEAR'] set
             'v_StorageLevelYearStart': ['REGION', 'STORAGE', 'YEAR', 'value'],
@@ -94,7 +95,7 @@ def solve_model(input_file,results_folder):
             # Variables with ['REGION', 'STORAGE', 'SEASON', 'DAYTYPE', 'YEAR'] set
             'v_StorageLevelDayTypeStart': ['REGION', 'STORAGE', 'SEASON', 'DAYTYPE', 'YEAR', 'value'],
             'v_StorageLevelDayTypeFinish': ['REGION', 'STORAGE', 'SEASON', 'DAYTYPE', 'YEAR', 'value'],
-
+                      
             # Variables with ['REGION', 'TIMESLICE', 'TECHNOLOGY', 'MODE_OF_OPERATION', 'YEAR'] set
             'v_RateOfActivity': ['REGION', 'TIMESLICE', 'TECHNOLOGY', 'MODE_OF_OPERATION', 'YEAR', 'value'],
 

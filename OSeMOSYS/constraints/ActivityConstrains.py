@@ -20,11 +20,14 @@ def AAC2_TotalAnnualTechnologyActivityUpperLimit(model, r,t,y):
     """
 s.t. AAC2_TotalAnnualTechnologyActivityUpperLimit{r in REGION, t in TECHNOLOGY, y in YEAR}: 
 TotalTechnologyAnnualActivity[r,t,y] <= TotalTechnologyAnnualActivityUpperLimit[r,t,y] ;
-    """    
-    return(
+    """
+    if model.p_TotalTechnologyAnnualActivityUpperLimit[r,t,y]!=-1:
+        return(
         model.v_TotalTechnologyAnnualActivity[r,t,y]
         <=model.p_TotalTechnologyAnnualActivityUpperLimit[r,t,y]
     )
+    else:
+        return Constraint.Skip
 def AAC3_TotalAnnualTechnologyActivityLowerLimit(model, r,t,y):
     """
 s.t. AAC3_TotalAnnualTechnologyActivityLowerLimit{r in REGION, t in TECHNOLOGY, y in YEAR: 
@@ -58,7 +61,7 @@ s.t. TAC2_TotalModelHorizonTechnologyActivityUpperLimit{r in REGION, t in TECHNO
     TotalTechnologyModelPeriodActivityUpperLimit[r,t]>0}: 
         TotalTechnologyModelPeriodActivity[r,t] <= TotalTechnologyModelPeriodActivityUpperLimit[r,t] ;
     """    
-    if model.p_TotalTechnologyModelPeriodActivityUpperLimit[r,t]>0:
+    if model.p_TotalTechnologyModelPeriodActivityUpperLimit[r,t]!=-1:
         return(
         model.v_TotalTechnologyModelPeriodActivity[r,t]
         <= model.p_TotalTechnologyModelPeriodActivityUpperLimit[r,t]
