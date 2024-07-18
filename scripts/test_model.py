@@ -23,5 +23,5 @@ input_file = '../data/OsemosysNew.xlsx'
 om.solve_model(input_file, results_folder)
 
 # plot the results
-datafile = results_folder + '/v_RateOfActivity.csv'
+datafile = results_folder + '/v_ProductionByTechnologyAnnual.csv'
 om.plot_activity(datafile)

@@ -38,11 +38,13 @@ def SI6_SalvageValueStorageAtEndOfPeriod1(model,r,s,y):
         )
     else: return Constraint.Skip
 def SI7_SalvageValueStorageAtEndOfPeriod2(model, r,s,y):
-    if (model.p_DepreciationMethod[r]==1 
+    if (
+        
+        (model.p_DepreciationMethod[r]==1 
         and (y+model.p_OperationalLifeStorage[r,s]-1)>max(model.YEAR)
-        and model.p_DiscountRate[r]==0 
-        or model.p_DepreciationMethod[r]==2 
-        and (y+model.p_OperationalLifeStorage[r,s]-1)>max(model.YEAR) 
+        and model.p_DiscountRate[r]==0) 
+        or (model.p_DepreciationMethod[r]==2 
+        and (y+model.p_OperationalLifeStorage[r,s]-1)>max(model.YEAR)) 
         ):
         return (
             model.v_CapitalInvestmentStorage[r,s,y]*(1-max(model.YEAR)-y+1)
@@ -71,3 +73,4 @@ def SI10_TotalDiscountedCostByStorage(model,r,s,y):
         -model.v_DiscountedSalvageValueStorage[r,s,y]
         == model.v_TotalDiscountedStorageCost[r,s,y]
     )
+    

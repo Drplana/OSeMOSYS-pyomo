@@ -426,7 +426,7 @@ def define_model(file_path):
                                  model.YEAR, domain = NonNegativeReals  )
     """TotalTechnologyModelPeriodActivity[r,t]	Sum of the TotalTechnologyAnnualActivity 
     over the years of the modelled period.	Energy"""
-    model.v_TotalTechnologyModelPeriodActivity = Var(model.REGION,model.TECHNOLOGY, domain = NonNegativeReals )
+    model.v_TotalTechnologyModelPeriodActivity = Var(model.REGION,model.TECHNOLOGY )
     """RateOfProductionByTechnologyByMode[r,l,t,m,f,y] >=0	Intermediate variable. 
     It represents the quantity of fuel f that technology t would produce in one mode
      of operation and in time slice l, if the latter lasted the whole year. 
