@@ -80,7 +80,9 @@ def plot_activity(datafile):
         specs=[[{'type': 'domain'}, {'type': 'domain'}, {'type': 'domain'}]],
         subplot_titles=('2019','2030', '2050')
     )
-
+    total_2019 = round(data[data['YEAR'] == 2019]['value'].sum(),0)
+    total_2030 = round(data[data['YEAR'] == 2030]['value'].sum(),0)
+    total_2050 = round(data[data['YEAR'] == 2050]['value'].sum(),0)
 
     for trace in fig1.data:
         fig.add_trace(trace, row=1, col=1)
@@ -89,9 +91,14 @@ def plot_activity(datafile):
         fig.add_trace(trace, row=1, col=2)
     for trace in fig3.data:
         fig.add_trace(trace, row=1, col=3)
+    annotations = [
+    dict(text=f'Total 2019<br> {total_2019} GWh', x=0.145, y=0.45,  font=dict(size=20, color='#2f4f4f'), showarrow=False),
+    dict(text=f'Total 2030<br> {total_2030} GWh', x=0.50, y=0.45, font=dict(size=20, color='#2f4f4f'), showarrow=False),
+    dict(text=f'Total 2050<br> {total_2050} GWh', x=0.855, y=0.45, font=dict(size=20, color='#2f4f4f'), showarrow=False)
+    ]
     
 
-    fig.update_layout(height=700, width=1200,title={'text': 'Energy Production by technology REN37 scenario(%)', 'x': 0.5} , font=dict( size=16,color='black'))
+    fig.update_layout(height=700, width=1200, title={'text': 'Energy Production by technology REN37 scenario(%)', 'x': 0.5, 'y':0.85, 'font':{'size': 28}} , font=dict( size=16,color='black'),annotations=annotations)
 
     fig.show()
 
