@@ -1,9 +1,11 @@
 import pandas as pd
+import os, sys
+root_folder = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+sys.path.append(root_folder)
+from OSeMOSYS.config import INPUT_FILE_PATH
 
-
-file_path = '../data/OsemosysNew.xlsx'
-
-
+file_path = INPUT_FILE_PATH
+print(file_path)
 def load_sets(file_path):
     
     DataExcel = pd.ExcelFile(file_path)
@@ -25,7 +27,7 @@ def load_sets(file_path):
     DataExcel.close()
     return Default, REGION, YEAR, TECHNOLOGY, FUEL, SEASON, DAYTYPE, DAILYTIMEBRACKET, TIMESLICE, MODE_OF_OPERATION, STORAGE, EMISSION
 
-Default, REGION, YEAR, TECHNOLOGY, FUEL, SEASON, DAYTYPE, DAILYTIMEBRACKET, TIMESLICE, MODE_OF_OPERATION, STORAGE, EMISSION = load_sets(file_path)
+# Default, REGION, YEAR, TECHNOLOGY, FUEL, SEASON, DAYTYPE, DAILYTIMEBRACKET, TIMESLICE, MODE_OF_OPERATION, STORAGE, EMISSION = load_sets(file_path)
 
 sets = ['REGION', 'YEAR', 'TECHNOLOGY', 'FUEL', 'SEASON', 'DAYTYPE', 'DAILYTIMEBRACKET', 'TIMESLICE', 'MODE_OF_OPERATION', 'STORAGE', 'EMISSION']
 variable_mapping = {'REGION': REGION, 
@@ -95,7 +97,7 @@ RE= ['REGION','EMISSION']
 sheet_names = ["YS", "LLS", "LLD","LLH", "DS", "DIDT", "SAD", "SDP", "AAD", "C2AU", "CF", "AF", "OL", "RC", "IAR", "OAR", "CC", "VC", "FC", "TTS", "TFS", "StLS",
             "StMxChR", "StMxDCh", "MinStCh", "OpLiSt", "CCSt", "ReStCap", "C1TU", "TAMaxC", "TAMinC", "TAMaxCI", "TAMinCI", "TTAAUL", "TTAALL", "TTMPAUL",
             "TTMPALL", "RMTT", "RMTF", "RM", "ReTagT", "ReTagF", "REMinPT", "EmAR", "EmP", "AExEm", "AEmLim", "MPExEm", "MPEmLim", "CNA", "MOL", "Avail",
-            "NOEU", "CostoRec", "VUR"]
+            "NOEU", "CostoRec", "VUR", 'Maintenance',  "Exp", "MustRunTech","MustRunFuel", "MustRun"]
 
   
 dataframe_names = ["YearSplit", "Conversionls", "Conversionld","Conversionlh",
@@ -117,7 +119,7 @@ dataframe_names = ["YearSplit", "Conversionls", "Conversionld","Conversionlh",
                 "EmissionActivityRatio", "EmissionsPenalty", "AnnualExogenousEmission", 
                 "AnnualEmissionLimit", "ModelPeriodExogenousEmission", "ModelPeriodEmissionLimit", 
                 "CostoNoAsociado", "MinimumOperatingLoad", "Availability", 
-                "NumberOfExistingUnits", "CostoRecuperacion", "VidaUtilRecuperada"]
+                "NumberOfExistingUnits", "CostoRecuperacion", "VidaUtilRecuperada", "ExportPrice", "MustRunTech","MustRunFuel","MustRun"]
 
 def read_excel_sheets(file_path, sheet_names, dataframe_names):
     """
@@ -159,8 +161,8 @@ def create_multiindex_dataframe(lists_dict):
 #     DataExcel.close()
 #     return Default
 if __name__ == "__main__":
-    filename = '../data/OsemosysNew.xlsx'
+    filename = INPUT_FILE_PATH
     # ParamDict, OsemosysDict = read_excel(file_path)
-    Default = load_sets(file_path)
+    Default = load_sets(INPUT_FILE_PATH)
     a= 1
 # Example usage

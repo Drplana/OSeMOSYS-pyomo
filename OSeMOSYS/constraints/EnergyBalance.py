@@ -108,7 +108,9 @@ def EBa11_EnergyBalanceEachTS5(model, r,l,f,y):
             + model.v_Use[r,l,f,y]
             + sum(model.v_Trade[r,rr,l,f,y]*model.p_TradeRoute[r,rr,f,y] 
                   for rr in model.REGION)
+            + model.v_Export[r,l,f,y]
             )
+            
 ################################################################################
 ################              Energy Balance B           #######################
 #s.t. EBb1_EnergyBalanceEachYear1{r in REGION, f in FUEL, y in YEAR}: sum{l in TIMESLICE} Production[r,l,f,y] = ProductionAnnual[r,f,y];

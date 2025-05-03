@@ -6,10 +6,10 @@ s.t. OC1_OperatingCostsVariable{r in REGION, t in TECHNOLOGY, l in TIMESLICE, y 
 sum{m in MODE_OF_OPERATION} TotalAnnualTechnologyActivityByMode[r,t,m,y] * VariableCost[r,t,m,y] 
 = AnnualVariableOperatingCost[r,t,y];
 
-    """    
+    """
     return (
             sum(model.v_TotalAnnualTechnologyActivityByMode[r,t,m,y]
-            *model.p_VariableCost[r,t,m,y] for m in model.MODE_OF_OPERATION)
+            *model.p_VariableCost[r,t,m,y] for m in model.MODE_OF_OPERATION if model.p_VariableCost[r,t,m,y]!=0 )
             == model.v_AnnualVariableOperatingCost[r,t,y]
         )
 def OC2_OperatingCostsFixedAnnual(model,r,t,y):

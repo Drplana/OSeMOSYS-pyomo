@@ -1,7 +1,7 @@
 #%%
 from pyomo.environ import AbstractModel,DataPortal,Set,Param,Var,NonNegativeReals,NonNegativeIntegers,Objective,\
     Constraint
-from .readXlsData import *
+from .readXlsData import Default
 # from ReadSets import *
 from pyomo.opt import SolverFactory
 import json
@@ -499,20 +499,20 @@ def define_model(file_path):
     """DiscountedSalvageValue[r,t,y] >=0 Salvage value of technology t, discounted through the parameter DiscountRate. Monetary units"""
     model.v_DiscountedSalvageValue  = Var(model.REGION, model.TECHNOLOGY, model.YEAR, domain = NonNegativeReals )
     """OperatingCost[r,t,y] >=0	Undiscounted sum of the annual variable and fixed operating costs of technology t.	Monetary units"""
-    model.v_OperatingCost =  Var(model.REGION, model.TECHNOLOGY, model.YEAR, domain = NonNegativeReals )
+    model.v_OperatingCost =  Var(model.REGION, model.TECHNOLOGY, model.YEAR)#, domain = NonNegativeReals )
     """DiscountedOperatingCost[r,t,y] >=0 Annual OperatingCost of technology t, discounted through the parameter DiscountRate. Monetary units"""
-    model.v_DiscountedOperatingCost = Var(model.REGION, model.TECHNOLOGY, model.YEAR, domain = NonNegativeReals )
+    model.v_DiscountedOperatingCost = Var(model.REGION, model.TECHNOLOGY, model.YEAR)#, domain = NonNegativeReals )
     """AnnualVariableOperatingCost[r,t,y] >=0	Annual variable operating cost of technology t. Derived from the 
     TotalAnnualTechnologyActivityByMode and the parameter VariableCost. Monetary units"""
-    model.v_AnnualVariableOperatingCost = Var(model.REGION, model.TECHNOLOGY, model.YEAR, domain = NonNegativeReals )
+    model.v_AnnualVariableOperatingCost = Var(model.REGION, model.TECHNOLOGY, model.YEAR)#, domain = NonNegativeReals )
     """AnnualFixedOperatingCost[r,t,y] >=0	Annual fixed operating cost of technology t. 
     Derived from the TotalCapacityAnnual and the parameter FixedCost.	Monetary units"""
     model.v_AnnualFixedOperatingCost = Var(model.REGION, model.TECHNOLOGY, model.YEAR, domain = NonNegativeReals )
     """TotalDiscountedCostByTechnology[r,t,y] >=0 Difference between the sum of discounted operating 
     cost / capital cost / emission penalties and the salvage value. Monetary units"""
-    model.v_TotalDiscountedCostByTechnology = Var(model.REGION, model.TECHNOLOGY, model.YEAR, domain = NonNegativeReals )
+    model.v_TotalDiscountedCostByTechnology = Var(model.REGION, model.TECHNOLOGY, model.YEAR)#, domain = NonNegativeReals )
     """TotalDiscountedCost[r,y] >=0	Sum of the TotalDiscountedCostByTechnology over all the technologies. Monetary units"""
-    model.v_TotalDiscountedCost = Var(model.REGION, model.YEAR, domain = NonNegativeReals )
+    model.v_TotalDiscountedCost = Var(model.REGION, model.YEAR)#, domain = NonNegativeReals )
     """ModelPeriodCostByRegion[r] >=0 Sum of the TotalDiscountedCost over all modelled years. Monetary units"""
     model.v_ModelPeriodCostByRegion = Var(model.REGION, domain = NonNegativeReals )
     ################################################################################################
@@ -566,10 +566,14 @@ def define_model(file_path):
                                  domain=NonNegativeIntegers, initialize=0.0)
     """"probando nueva capacidad residual"""
     model.v_ResidualCapacity  = Var(model.REGION,model.TECHNOLOGY,model.YEAR, initialize  = 0.0)
-    # model.v_RecuperadasAcumuladas = Var(model.REGION, model.TECHNOLOGY, model.YEAR, domain = NonNegativeReals, initialize=0.0)
+    model.v_AccumulatedRecoveredUnits = Var(model.REGION, model.TECHNOLOGY, model.YEAR)
+    model.v_AccumulatedRecoveredCapacity = Var(model.REGION, model.TECHNOLOGY, model.YEAR)
     # model.v_Recuperadas = Var(model.REGION, model.TECHNOLOGY, model.YEAR, domain = NonNegativeReals, initialize=0.0)
-    model.v_NumeroUnidadesRecuperadas = Var(model.REGION, model.TECHNOLOGY, model.YEAR, domain=NonNegativeIntegers, initialize=0.0)
+    model.v_RecoveredExistingUnits = Var(model.REGION, model.TECHNOLOGY, model.YEAR, domain = NonNegativeIntegers, initialize = 0)
+    model.v_RecoveredCapacity      = Var(model.REGION, model.TECHNOLOGY, model.YEAR, domain = NonNegativeReals, initialize = 0)
     #model.v_UnidadesFinVida = Var(model.REGION, model.TECHNOLOGY, model.YEAR, domain=NonNegativeIntegers, initialize=0.0)
+    """ Exporting a commodity"""
+    model.v_Export = Var(model.REGION, model.TIMESLICE, model.FUEL, model.YEAR, domain = NonNegativeReals)
 
     """Parameters"""
 
@@ -583,11 +587,16 @@ def define_model(file_path):
     """Unidades que estan operando"""
     model.p_NumberOfExistingUnits  = Param(model.REGION, model.TECHNOLOGY, model.YEAR, default = 0)
     """Costo de re-invertir en una tecnologia"""
-    model.p_CostoRecuperacion = Param(model.REGION, model.TECHNOLOGY, model.YEAR, default = 0.0001)
+    model.p_CostoRecuperacion = Param(model.REGION, model.TECHNOLOGY, model.YEAR, default = 99999999)
     """Vida Util despues de recuperadas"""
-    model.p_VidaUtilRecuperada = Param(model.REGION, model.TECHNOLOGY, default = 1)
+    model.p_VidaUtilRecuperada = Param(model.REGION, model.TECHNOLOGY, default = 0)
     '''Período de mantenimiento en años'''
     model.p_Mantenimiento = Param(model.REGION, model.TECHNOLOGY,model.TIMESLICE, model.YEAR)
+    """Export price"""
+    model.p_ExportPrice = Param(model.REGION, model.FUEL, model.YEAR, default = 0)
+    model.p_MustRun = Param(model.REGION, model.YEAR, default = 0)
+    model.p_MustRunTech = Param(model.REGION, model.TECHNOLOGY, model.YEAR, default = 0)
+    model.p_MustRunFuel = Param(model.REGION, model.FUEL, model.TIMESLICE, model.YEAR, default = 0 )
 
 
 
@@ -609,7 +618,7 @@ def define_model(file_path):
     model.SpecifiedDemand_EQ = Constraint(model.REGION,model.TIMESLICE,model.FUEL,model.YEAR, rule = SpecifiedDemand_EQ)
     #%%
     from .constraints.CapacityAdequacyAB import CAa1_TotalNewCapacity,CAa2_TotalAnnualCapacity, \
-        CAa3_TotalActivityOfEachTechnology, CAa4_ConstraintCapacity, CAa5_TotalNewCapacity, CAb1_PlannedMaintenance
+        CAa3_TotalActivityOfEachTechnology, CAa4_ConstraintCapacity, CAa5_TotalNewCapacity, CAb1_PlannedMaintenance, CAa1n_TotalResidualCapacity
     model.CAa1_TotalNewCapacity = Constraint(
         model.REGION,
         model.TECHNOLOGY,
@@ -636,13 +645,20 @@ def define_model(file_path):
         model.YEAR,
         rule = CAa4_ConstraintCapacity
         )
-    # # # # # model.CAa4b_ConstraintCapacity = Constraint(
-    # # # # #     model.REGION,
-    # # # # #     model.TECHNOLOGY,
-    # # # # #     model.TIMESLICE,
-    # # # # #     model.YEAR,
-    # # # # #     rule = CAa4b_ConstraintCapacity
-    # # # # #     )
+    model.CAa1n_TotalResidualCapacity = Constraint(
+        model.REGION,
+        model.TECHNOLOGY,
+        model.YEAR,
+        rule = CAa1n_TotalResidualCapacity
+
+    )
+        # # # # # model.CAa4b_ConstraintCapacity = Constraint(
+        # # # # #     model.REGION,
+        # # # # #     model.TECHNOLOGY,
+        # # # # #     model.TIMESLICE,
+        # # # # #     model.YEAR,
+        # # # # #     rule = CAa4b_ConstraintCapacity
+        # # # # #     )
     model.CAa5_TotalNewCapacity = Constraint(
         model.REGION,
         model.TECHNOLOGY,
@@ -694,6 +710,31 @@ def define_model(file_path):
     #     model.YEAR,
     #     rule = CAa1R_Recuperadas
     # )
+    from .constraints.RecoveredUnits import Recovered_Existing_Units, Accumulated_Recovered_Existing_Units, Recovered_Residual_Aggregated, Accumulated_Recovered_Capacity
+    model.Recovered_Existing_Units = Constraint(
+        model.REGION,
+        model.TECHNOLOGY,
+        model.YEAR,
+        rule = Recovered_Existing_Units
+    )
+    model.Accumulated_Recovered_Existing_Units = Constraint(
+        model.REGION,
+        model.TECHNOLOGY,
+        model.YEAR,
+       rule = Accumulated_Recovered_Existing_Units 
+    )
+    model.Recovered_Residual_Aggregated = Constraint(
+    model.REGION,
+    model.TECHNOLOGY,
+    model.YEAR,
+    rule = Recovered_Residual_Aggregated
+    )
+    model.Accumulated_Recovered_Capacity = Constraint(
+        model.REGION,
+        model.TECHNOLOGY,
+        model.YEAR,
+       rule = Accumulated_Recovered_Capacity 
+    )
 
 
     #%%
@@ -1354,12 +1395,22 @@ def define_model(file_path):
         model.EMISSION,
         rule = E9_ModelPeriodEmissionsLimit
     )
+    from .constraints.MustRun import (Must_Run)
+    model.Must_Run = Constraint(
+        model.REGION,
+        model.TIMESLICE,
+        model.MODE_OF_OPERATION,
+        model.TECHNOLOGY,
+        model.FUEL,
+        model.YEAR,
+        rule = Must_Run
+    )
     return model
-
+    
 if __name__ =='__main__':
     results_folder = '../results'
     data = '../data'
-    file_path = '../data/OsemosysNew.xlsx'
+    file_path = '../data/s.xlsx'
     m=define_model(file_path)
 
 

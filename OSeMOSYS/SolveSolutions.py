@@ -1,4 +1,5 @@
 #%%
+import os
 import pandas as pd
 from pyomo.environ import value, Var
 from pyomo.opt import SolverFactory
@@ -6,9 +7,11 @@ from itertools import count
 from .MainModel import define_model
 #%%
 from vincent.colors import brews
+from .config import INPUT_FILE_PATH, RESULTS_FOLDER
+
 # from readXlsData import read_excel
 
-from highspy import *
+# from highspy import *
 
 def solve_model(input_file,results_folder):
 
@@ -19,7 +22,11 @@ def solve_model(input_file,results_folder):
 
     # TODO: use the OsemosysDIct directly instead of passing through the json file
     instance = model.create_instance('../data/Data.json')
-
+    # instance.EBa11_EnergyBalanceEachTS5.pprint()
+    # instance.Must_Run.pprint()
+    # instance.SpecifiedDemand_EQ.pprint()
+    # instance.EBa9_EnergyBalanceEachTS3.pprint()
+    # instance.EBa11_EnergyBalanceEachTS5.pprint()
     #%%
     "Solvers used - cbc, ***scip*** or highs"
     #opt = SolverFactory("appsi_highs")
@@ -33,10 +40,10 @@ def solve_model(input_file,results_folder):
     results.write()
 
     # %%
-    import numpy as np
-    import plotly.express as px
-    from plotly.offline import download_plotlyjs, init_notebook_mode, plot, iplot
-    instance.solutions.load_from(results)
+    # import numpy as np
+    # import plotly.express as px
+    # from plotly.offline import download_plotlyjs, init_notebook_mode, plot, iplot
+    # instance.solutions.load_from(results)
     column_map = {
             # Variables with ['REGION', 'TECHNOLOGY', 'YEAR'] set
             'v_NumberOfNewTechnologyUnits': ['REGION', 'TECHNOLOGY', 'YEAR', 'value'],
@@ -59,7 +66,10 @@ def solve_model(input_file,results_folder):
             'v_ResidualCapacity': ['REGION', 'TECHNOLOGY', 'YEAR', 'value'],
             'v_Abandono':['REGION', 'TECHNOLOGY', 'TIMESLICE', 'YEAR', 'value'],
             'v_Cubrimiento':['REGION', 'TECHNOLOGY', 'TIMESLICE', 'YEAR', 'value'],
-
+            'v_RecoveredExistingUnits':['REGION', 'TECHNOLOGY',  'YEAR', 'value'],
+            'v_AccumulatedRecoveredUnits':['REGION', 'TECHNOLOGY',  'YEAR', 'value'],
+            'v_AccumulatedRecoveredCapacity':['REGION', 'TECHNOLOGY',  'YEAR', 'value'],
+            'v_RecoveredCapacity':['REGION', 'TECHNOLOGY',  'YEAR', 'value'],
             # Variables with ['REGION', 'TIMESLICE', 'FUEL', 'YEAR'] set
             'v_RateOfProduction': ['REGION', 'TIMESLICE', 'FUEL', 'YEAR', 'value'],
             'v_RateOfDemand': ['REGION', 'TIMESLICE', 'FUEL', 'YEAR', 'value'],
@@ -68,6 +78,7 @@ def solve_model(input_file,results_folder):
             'v_RateOfUse': ['REGION', 'TIMESLICE', 'FUEL', 'YEAR', 'value'],
             'v_Use': ['REGION', 'TIMESLICE', 'FUEL', 'YEAR', 'value'],
             'v_ConnectedUnits': ['REGION', 'TECHNOLOGY', 'SEASON', 'YEAR', 'value'],
+            'v_Export': ['REGION', 'TIMESLICE', 'FUEL', 'YEAR', 'value'],
 
             # Variables with ['REGION', 'STORAGE', 'SEASON', 'DAYTYPE', 'DAILYTIMEBRACKET', 'YEAR'] set
             'v_RateOfStorageCharge': ['REGION', 'STORAGE', 'SEASON', 'DAYTYPE', 'DAILYTIMEBRACKET', 'YEAR', 'value'],
@@ -178,7 +189,9 @@ def solve_model(input_file,results_folder):
             print(v)
 
             # Export the DataFrame to a CSV file
-            df.to_csv(f"./{results_folder}/{v}.csv", index=False)
+            # df.to_csv(f"./{results_folder}/{v}.csv", index=False)
+            output_file = os.path.join(results_folder, f"{v}.csv")
+            df.to_csv(output_file, index=False)
 
             # Store the DataFrame in the datas dictionary
             datas[str(v)] = df
@@ -198,9 +211,10 @@ def solve_model(input_file,results_folder):
         #         plot(px.area(piv1), filename = "./solutions/"+str(v)+".html", auto_open = False)
 
     # %%
-
-if __name__ =='__main__':
-    results = '../results'
+    return instance
+if __name__ == '__main__':
+    # results = '../results'
+    results = RESULTS_FOLDER
     data = '../data'
-    input_file = '../data/OsemosysNew.xlsx'
+    input_file = INPUT_FILE_PATH
     solve_model(input_file,results)

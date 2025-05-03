@@ -43,10 +43,10 @@ from pyomo.environ import *
 
 """"Short Code equation"""
 def RM3_ReserveMargin_Constraint(model, r, l, y):
-     if model.p_OutputActivityRatio !=0 :
+    #  if model.p_OutputActivityRatio !=0 :
         return (
             sum(model.v_RateOfActivity [r, l, t, m, y] * model.p_OutputActivityRatio [r, t, f, m, y] * model.p_ReserveMarginTagFuel [r, f, y] * model.p_ReserveMargin [r, y] 
-                for t in model.TECHNOLOGY for m in model.MODE_OF_OPERATION for f in model.FUEL)
+                for t in model.TECHNOLOGY for m in model.MODE_OF_OPERATION for f in model.FUEL if model.p_OutputActivityRatio[r, t, f, m, y] != 0)
         <= sum((sum(model.v_NewCapacity[r, t, yy] for yy in model.YEAR if y - yy < model.p_OperationalLife[r, t] and y - yy >= 0) + model.p_ResidualCapacity[r, t, y]) * model.p_ReserveMarginTagTechnology[r, t, y] * model.p_CapacityToActivityUnit[r, t] for t in model.TECHNOLOGY)
         )
 

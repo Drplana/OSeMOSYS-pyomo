@@ -1,10 +1,20 @@
 #%%
 import json
 import pandas as pd
-from ReadSets import *
+import os
+import sys
+
+root_folder = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+sys.path.append(root_folder)
+
+from OSeMOSYS.ReadSets import create_multiindex_dataframe, lists_dict, dataframe_names, sheet_names, file_path
+from OSeMOSYS.config import INPUT_FILE_PATH
 import warnings
 
+# from .config import INPUT_FILE_PATH
 ### DataFrames with all possible matrix configuration.
+
+
 result_dataframes = create_multiindex_dataframe(lists_dict)
 
 # %%
@@ -77,13 +87,17 @@ CostoNoAsociado = result_dataframes['RTY']
 Availability  = result_dataframes['RTY']
 NumberOfExistingUnits = result_dataframes['RTY']
 CostoRecuperacion = result_dataframes['RTY']
-VidaUtilRecuperada = result_dataframes['RTY']
+VidaUtilRecuperada = result_dataframes['RT']
+MustRunTech = result_dataframes['RTY']
+MustRunFuel = result_dataframes['RFY']
+MustRun = result_dataframes['RY']
+ExportPrice = result_dataframes['RFY']
 
 dataframes = [globals()[name] for name in dataframe_names if name in globals() and isinstance(globals()[name], pd.DataFrame)]
 
 # %%
 
-with pd.ExcelWriter("../data/OsemosysNew.xlsx",
+with pd.ExcelWriter(INPUT_FILE_PATH,
                     mode="a",
                     engine="openpyxl",
                     if_sheet_exists= "replace"

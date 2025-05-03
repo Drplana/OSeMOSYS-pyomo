@@ -1,22 +1,24 @@
 #%%
 import pandas as pd
-from .ReadSets import *
-import os
+from OSeMOSYS.ReadSets import load_sets, read_excel_sheets, lists_dict, dataframe_names, sheet_names
+import os, sys
+root_folder = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+sys.path.append(root_folder)
   # Replace with the actual file path
 import json
 import pandas as pd
-
+from OSeMOSYS.config import INPUT_FILE_PATH, DATA_FILE_PATH
 # REGION, YEAR, TECHNOLOGY, FUEL, SEASON, DAYTYPE, DAILYTIMEBRACKET, TIMESLICE, MODE_OF_OPERATION, STORAGE, EMISSION = load_sets(file_path)
 
 
 # This will creata a dict with all sets forms inside the yaml file
 
 #%%
-
+Default, REGION, YEAR, TECHNOLOGY, FUEL, SEASON, DAYTYPE, DAILYTIMEBRACKET, TIMESLICE, MODE_OF_OPERATION, STORAGE, EMISSION = load_sets(file_path)
 # Printing the RFY set
 # print("RFY set values:", RFY_set)
 
-data_frames = read_excel_sheets(file_path='../data/OsemosysNew.xlsx', sheet_names=sheet_names, dataframe_names=dataframe_names)
+data_frames = read_excel_sheets(file_path=INPUT_FILE_PATH, sheet_names=sheet_names, dataframe_names=dataframe_names)
 #%%
 YearSplit  = data_frames['YearSplit'].set_index('TIMESLICE').stack().reset_index().rename(columns = {"level_1": "YEAR", 0:"value"})
 DaySplit = data_frames['DaySplit'].set_index('DAILYTIMEBRACKET').stack().reset_index().rename(columns = {"level_1": "YEAR", 0:"value"})
@@ -76,10 +78,16 @@ AnnualExogenousEmission= data_frames['AnnualExogenousEmission'].set_index(RE).st
 AnnualEmissionLimit=   data_frames['AnnualEmissionLimit'].set_index(RE).stack().reset_index().rename(columns={f"level_{len(REY)-1}": "YEAR",0:"value"})
 ModelPeriodExogenousEmission=  data_frames['ModelPeriodExogenousEmission'].set_index('REGION').stack().reset_index().rename(columns={f"level_{len(RE)-1}": "EMISSION",0:"value"})
 ModelPeriodEmissionLimit= data_frames['ModelPeriodEmissionLimit'].set_index('REGION'). stack().reset_index().rename(columns={f"level_{len(RE)-1}": "EMISSION",0:"value"})
-
-
+""" New Parameters"""
+NumberOfExistingUnits =  data_frames['NumberOfExistingUnits'].set_index(RT).stack().reset_index().rename(columns={"level_2": "YEAR",0:"value"})
+VidaUtilRecuperada = data_frames['VidaUtilRecuperada'].set_index(['REGION']).stack().reset_index().rename(columns={"level_1": "TECHNOLOGY",0:"value"})
+CostoRecuperacion = data_frames['CostoRecuperacion'].set_index(RT).stack().reset_index().rename(columns={"level_2": "YEAR",0:"value"})
+ExportPrice = data_frames['ExportPrice'].set_index(RF).stack().reset_index().rename(columns={"level_2": "YEAR",0:"value"})
+MustRunTech  = data_frames['MustRunTech'].set_index(RT).stack().reset_index().rename(columns= {"level_2": "YEAR",0:"value"})
+MustRunFuel  = data_frames['MustRunFuel'].set_index(['REGION','FUEL','TIMESLICE']).stack().reset_index().rename(columns = {"level_3": "YEAR", 0:"value"})
+MustRun = data_frames['MustRun'].set_index('REGION').stack().reset_index().rename(columns={"level_1": "YEAR",0:"value"})
 #%%
-def save_dataframes_to_csv(names_list, folder_path='../data/'):
+def save_dataframes_to_csv(names_list, folder_path=DATA_FILE_PATH):
     # Create the target folder if it doesn't exist
     os.makedirs(folder_path, exist_ok=True)
 
@@ -98,7 +106,7 @@ def save_dataframes_to_csv(names_list, folder_path='../data/'):
         else:
             print(f"Error: DataFrame {df_name} not found in the current environment")
 
-save_dataframes_to_csv(dataframe_names)
+
 #%%
 
 YearSplit = YearSplit.set_index(['TIMESLICE', 'YEAR']).to_dict('index')
@@ -150,6 +158,13 @@ AnnualExogenousEmission = AnnualExogenousEmission.set_index(REY).to_dict('index'
 AnnualEmissionLimit = AnnualEmissionLimit.set_index(REY).to_dict('index')
 ModelPeriodExogenousEmission = ModelPeriodExogenousEmission.set_index(RE).to_dict('index')
 ModelPeriodEmissionLimit = ModelPeriodEmissionLimit.set_index(RE).to_dict('index')
+NumberOfExistingUnits = NumberOfExistingUnits.set_index(RTY).to_dict('index')
+VidaUtilRecuperada = VidaUtilRecuperada.set_index(RT).to_dict('index')
+CostoRecuperacion = CostoRecuperacion.set_index(RTY).to_dict('index')
+ExportPrice = ExportPrice.set_index(RFY).to_dict('index')
+MustRunTech = MustRunTech.set_index(RTY).to_dict('index')
+MustRunFuel = MustRunFuel.set_index(RFLY).to_dict('index')
+MustRun = MustRun.set_index(RY).to_dict('index')
 #%%
 # def ListDict(name, dictionary):
 #     return {name: [{"index": index, "value": data["value"]} for index, data in dictionary.items()]}
@@ -193,26 +208,30 @@ def parameters_dict(dataframe_names):
 #      ParamDict.update((ListDict(data,ParamDict[data]))) 
 #     except KeyError:
 #         print(f"KeyError: {data}")
+def dict_to_json():
+    ParamDict = parameters_dict(dataframe_names) 
+    #%%
+    OsemosysDict = {
+        "REGION":REGION,
+        "YEAR":YEAR,
+        "TECHNOLOGY":TECHNOLOGY,
+        "FUEL":FUEL,
+        "SEASON":SEASON,
+        "DAYTYPE":DAYTYPE,
+        "DAILYTIMEBRACKET":DAILYTIMEBRACKET,
+        "TIMESLICE":TIMESLICE,
+        "MODE_OF_OPERATION":MODE_OF_OPERATION,
+        "STORAGE":STORAGE,
+        "EMISSION":EMISSION,
+        # OsemosysDict
+    }
+    if isinstance (ParamDict, dict):
+        OsemosysDict.update(ParamDict)
 
-ParamDict = parameters_dict(dataframe_names) 
-#%%
-OsemosysDict = {
-    "REGION":REGION,
-    "YEAR":YEAR,
-    "TECHNOLOGY":TECHNOLOGY,
-    "FUEL":FUEL,
-    "SEASON":SEASON,
-    "DAYTYPE":DAYTYPE,
-    "DAILYTIMEBRACKET":DAILYTIMEBRACKET,
-    "TIMESLICE":TIMESLICE,
-    "MODE_OF_OPERATION":MODE_OF_OPERATION,
-    "STORAGE":STORAGE,
-    "EMISSION":EMISSION,
-    # OsemosysDict
-}
-if isinstance (ParamDict, dict):
-    OsemosysDict.update(ParamDict)
 
+    with open('../data/'+'/Data.json', 'w') as json_file:
+        json.dump(OsemosysDict, json_file) 
 
-with open('../data/'+'/Data.json', 'w') as json_file:
-    json.dump(OsemosysDict, json_file) 
+if __name__ == "__main__":
+    dict_to_json()
+    save_dataframes_to_csv(dataframe_names)

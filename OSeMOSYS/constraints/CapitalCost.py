@@ -10,6 +10,8 @@ CapitalCost[r,t,y] * NewCapacity[r,t,y] = CapitalInvestment[r,t,y];
     """    
     return (
         model.v_NewCapacity[r,t,y]*model.p_CapitalCost[r,t,y] 
+        + model.v_RecoveredExistingUnits[r,t,y]*model.p_CostoRecuperacion[r,t,y]*model.p_CapacityOfOneTechnologyUnit[r,t,min(model.YEAR)]
+        + model.v_RecoveredCapacity[r,t,y]*model.p_CostoRecuperacion[r,t,y]
         == model.v_CapitalInvestment[r,t,y]
     )
 def CC2_DiscountingCapitalInvestment(model, r,t,y):

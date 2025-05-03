@@ -2,7 +2,7 @@
 Ensures that production from technologies tagged as renewable energy "
 technologies (RETagTechnology = 1) is at least equal to the user-defined
 renewable energy (RE) target."""
-
+RE_AtLeast = 1 
 def RE1_FuelProductionByTechnologyAnnual(model, r, t, f, y):
     """
 s.t. RE1_FuelProductionByTechnologyAnnual{r in REGION, t in TECHNOLOGY, f in FUEL, y in YEAR}: 
@@ -42,12 +42,19 @@ def RE4_EnergyConstraint(model, r,y):
     """
 s.t. RE4_EnergyConstraint{r in REGION, y in YEAR}:
 REMinProductionTarget[r,y]*RETotalProductionOfTargetFuelAnnual[r,y] <= TotalREProductionAnnual[r,y];
-    """    
-    return (
+    """
+    if RE_AtLeast==1:
+        return (
         model.v_RETotalProductionOfTargetFuelAnnual[r,y]
         *model.p_REMinProductionTarget[r,y]
         <= model.v_TotalREProductionAnnual[r,y]
     )
+    else:
+        return (
+        model.v_RETotalProductionOfTargetFuelAnnual[r,y]
+        *model.p_REMinProductionTarget[r,y]
+        >= model.v_TotalREProductionAnnual[r,y] )
+
 def RE5_FuelUseByTechnologyAnnual(model, r,t,f,y):
     """
 s.t. RE5_FuelUseByTechnologyAnnual{r in REGION, t in TECHNOLOGY, f in FUEL, y in YEAR}: 
