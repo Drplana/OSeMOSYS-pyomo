@@ -1340,10 +1340,12 @@ if __name__ == "__main__":
         os.path.join(root_folder, 'data/01-BaseScenario.xlsx'),
         os.path.join(root_folder, 'data/02-BaseScenarioWind.xlsx'),
         os.path.join(root_folder, 'data/03-BaseScenarioWindBiomass.xlsx'),
+        os.path.join(root_folder, 'data/04-BaseScenarioWindBiomassPV.xlsx'),
+        os.path.join(root_folder, 'data/05-BaseScenarioWindBiomassPVAnnualInvLimit.xlsx'),
+        os.path.join(root_folder, 'data/06-MustRunTechBase.xlsx'),
     ]
-
-    # Ejecutar los archivos en paralelo
-    scenario_manager.run_files_in_parallel(input_files, solver_name="gurobi")
+    # Ejecutar los archivos en paralelo de 3 en 3. Batch_size define el número de instancias a correr.
+    scenario_manager.run_files_in_batches(input_files=input_files, batch_size=3, solver_name="gurobi")
 
 
     # dimension_manager = DimensionManager(sets)

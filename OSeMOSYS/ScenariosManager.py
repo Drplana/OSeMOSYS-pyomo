@@ -339,4 +339,20 @@ class ScenarioManager:
         with ProcessPoolExecutor() as executor:
             results = executor.map(self.process_file, input_files, [solver_name] * len(input_files))
             for result in results:
-                print(result)        
+                print(result)
+    def run_files_in_batches(self, input_files, batch_size=3, solver_name="gurobi"):
+        """
+        Ejecuta los archivos de entrada en lotes secuenciales.
+
+        Args:
+            input_files (list): Lista de rutas de archivos de entrada.
+            batch_size (int): Tamaño del lote (número de archivos por grupo).
+            solver_name (str): Nombre del solver a utilizar.
+
+        Returns:
+            None
+        """
+        for i in range(0, len(input_files), batch_size):
+            batch = input_files[i:i + batch_size]
+            print(f"Ejecutando lote {i // batch_size + 1}: {batch}")
+            self.run_files_in_parallel(batch, solver_name)   
