@@ -7,6 +7,8 @@ from concurrent.futures import ProcessPoolExecutor
 from OSeMOSYS.utils import dataframe_metadata
 from OSeMOSYS.SolveSolutions import solve_model, export_results
 from OSeMOSYS.readXlsData import load_dataframes, transform_all_dataframes, save_dataframes_to_csv, dict_to_json, adjust_json_for_pyomo, export_to_json
+from OSeMOSYS.config import configure_paths
+
 def generate_task(task):
     """
     Función global para generar un archivo JSON para un subescenario específico.
@@ -277,3 +279,64 @@ class ScenarioManager:
 
         except Exception as e:
             return f"Error al resolver el subescenario {subscenario_name}: {e}"
+        
+
+    def process_file(self, input_file, solver_name="gurobi"):
+        """
+        Procesa un archivo de entrada ejecutando el modelo y guardando los resultados.
+
+        Args:
+            input_file (str): Ruta del archivo de entrada.
+            solver_name (str): Nombre del solver a utilizar.
+
+        Returns:
+            str: Mensaje indicando el resultado del procesamiento.
+        """
+        try:
+            # Configurar rutas
+            paths = configure_paths(input_file, self.root_folder)
+            results_folder = paths['RESULTS_FOLDER']
+            json_file_path = paths['OUTPUT_JSON_DATA_PATH']
+
+            # Cargar y transformar los datos
+            dataframe = load_dataframes(input_file)
+            transf_data = transform_all_dataframes(dataframe)
+            dict_to_be_adjusted = dict_to_json(transf_data, input_file)
+            pyomo_dict = adjust_json_for_pyomo(dict_to_be_adjusted)
+
+            # Exportar los datos a JSON
+            export_to_json(pyomo_dict, json_file_path)
+
+            # Ejecutar el modelo
+            instance = solve_model(
+                input_file=input_file,
+                solver_name=solver_name,
+                json_file_path_or_dict=json_file_path,
+                solver_options=None,
+                tee=True
+            )
+
+            # Exportar resultados
+            export_results(instance, results_folder)
+            return f"Modelo ejecutado exitosamente para: {input_file}"
+
+        except Exception as e:
+            error_message = f"Error al procesar el archivo {input_file}: {e}"
+            traceback.print_exc()
+            return error_message
+
+    def run_files_in_parallel(self, input_files, solver_name="gurobi"):
+        """
+        Ejecuta múltiples archivos de entrada en paralelo.
+
+        Args:
+            input_files (list): Lista de rutas de archivos de entrada.
+            solver_name (str): Nombre del solver a utilizar.
+
+        Returns:
+            None
+        """
+        with ProcessPoolExecutor() as executor:
+            results = executor.map(self.process_file, input_files, [solver_name] * len(input_files))
+            for result in results:
+                print(result)        

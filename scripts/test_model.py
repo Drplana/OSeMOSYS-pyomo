@@ -1326,8 +1326,35 @@ if __name__ == "__main__":
         "STORAGE": STORAGE,
         "EMISSION": EMISSION
     }
-    # dimension_manager = DimensionManager(sets)
 
+
+    dimension_manager = DimensionManager(sets)
+    scenario_manager = ScenarioManager(
+        input_file=None,  # No es necesario para este caso
+        root_folder=root_folder,
+        dimension_manager=dimension_manager
+    )
+
+    # Lista de archivos de entrada
+    input_files = [
+        os.path.join(root_folder, 'data/01-BaseScenario.xlsx'),
+        os.path.join(root_folder, 'data/02-BaseScenarioWind.xlsx'),
+        os.path.join(root_folder, 'data/03-BaseScenarioWindBiomass.xlsx'),
+    ]
+
+    # Ejecutar los archivos en paralelo
+    scenario_manager.run_files_in_parallel(input_files, solver_name="gurobi")
+
+
+    # dimension_manager = DimensionManager(sets)
+##########################################################################################################################
+    """ Module 0 for creating scenarios with multiple parameters and filters"""
+###########################################################################################################################
+    # Aquí es para crear escenarios combinados con un parámetro principal y otros parámetros secundarios.
+    # Se puede crear varios escenarios con diferentes variantes del parámetro principal 
+    # y cambiar a su vez los parámetros que desee el usuario
+    """
+    
     dimension_manager = DimensionManager(sets)
     scenario_manager = ScenarioManager(
         input_file=input_files_base_scenarios[0],
@@ -1344,14 +1371,14 @@ if __name__ == "__main__":
             "filters": {"REGION": ["Cuba"], "TECHNOLOGY": ["PWRPV01"], "YEAR": list(range(2025, 2050))}
         }
     ]
-    json_files = scenario_manager.generate_combined_scenarios(parameter_name, values, additional_parameters)
+    json_files = scenario_manager.generate_combined_scenarios(parameter_name, values, additional_parameters)        
 
     # Resolver escenarios
     scenario_manager.solve_subscenarios_in_parallel(json_files, solver_name="gurobi")
+    
+    """
+##########################################################################################################################
 
-
-    # scenarios1 = create_scenarios_single_parameter("CostoRecuperacion", [500, 600, 700, 800])
-    # print(scenarios1)
 
     ###############################################################################
     """Module 1 for creating scenarios with a single parameter"""
@@ -1369,9 +1396,9 @@ if __name__ == "__main__":
     # solve_subscenarios_in_parallel(json_files, input_file, solver_name="gurobi")
 
 
-    ############################################################################
+###############################################################################
     """Module 2 for creating scenarios with filters and multiple parameters"""
-    ############################################################################
+################################################################################
     # parameters = [
     #     {
     #         "name": "TotalAnnualMaxCapacityInvestment",
