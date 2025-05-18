@@ -2,7 +2,8 @@
 Ensures that production from technologies tagged as renewable energy "
 technologies (RETagTechnology = 1) is at least equal to the user-defined
 renewable energy (RE) target."""
-RE_AtLeast = 1 
+RE_AtLeast = 1
+
 def RE1_FuelProductionByTechnologyAnnual(model, r, t, f, y):
     """
 s.t. RE1_FuelProductionByTechnologyAnnual{r in REGION, t in TECHNOLOGY, f in FUEL, y in YEAR}: 

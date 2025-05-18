@@ -1,177 +1,321 @@
-#%%
+# %%
 import pandas as pd
 import numpy as np
 import calendar
-#%%
-# Read in your data as a pandas DataFrame
-data = pd.read_excel('DatosCub.xlsx', sheet_name = "Sheet1" )
-cfwind = pd.read_excel('DatosCub.xlsx', sheet_name = "Sheet2" )
-cfpv = pd.read_excel('DatosCub.xlsx', sheet_name = "CFSOL" )
-#%%
-start_date = '2023-01-01'
-end_date = '2024-01-01'
-date_range = pd.date_range(start=start_date, end=end_date, freq='H')
-hourly_data = pd.DataFrame({'Date': date_range})
+# Función para mapear meses a estaciones usando un diccionario
+def map_seasons(data, season_mapping):
+    def get_season(month):
+        for season, months in season_mapping.items():
+            if month in months:
+                return season
+        return "Unknown"
+    data['Season'] = data['Month'].apply(get_season)
+    return data
 
-# Convert the 'Date' column to a datetime object
-#data['Date'] = pd.to_datetime(data['Date'])
-data = pd.concat([hourly_data, data], axis=1)
+# Función para definir los días tipo
+def map_daytypes(data, daytype_mapping):
+    def get_daytype(day_of_week):
+        for daytype, days in daytype_mapping.items():
+            if day_of_week in days:
+                return daytype
+        return "Unknown"
+    data['DayType'] = data['Date'].dt.dayofweek.apply(get_daytype)
+    return data
 
-data['Total'] =data.loc[:,'Node1':].sum(axis=1)
+# Función para definir los bloques horarios
+def map_daylight_brackets(data, bracket_mapping):
+    def get_bracket(hour):
+        for bracket, hours in bracket_mapping.items():
+            if hour in hours:
+                return bracket
+        return "Unknown"
+    data['DaylyTimeBracket'] = data['Hour'].apply(get_bracket)
+    return data
 
-data['Hour'] = data['Date'].dt.hour
-data['Weekend'] = data['Date'].dt.dayofweek >= 5
-data['Month'] = data['Date'].dt.month
+# Función para calcular los timeslices
+def calculate_timeslices(seasons, daytypes, brackets):
+    timeslices = []
+    for season in seasons:
+        for daytype in daytypes:
+            for bracket in brackets:
+                timeslices.append(f"{season}_{daytype}_{bracket}")
+    return timeslices
 
-def season_mapping(month):
-    if month in [12, 1, 2]:
-        return 'Winter'
-    elif month in [3, 4, 5]:
-        return 'Spring'
-    elif month in [6, 7, 8]:
-        return 'Summer'
-    elif month in [9, 10, 11]:
-        return 'Autumn'
-    else:
-        return 'Unknown'
-#%%
+# Función para calcular el promedio de factores de capacidad
+def calculate_capacity_factor(data, cf_data):
+    # Identificar columnas que contienen "Node" en su nombre
+    node_columns = [col for col in cf_data.columns if "Node" in col]
 
-data['Season'] =  data['Month'].apply(season_mapping)
-season_order = (data['Season'].unique()) 
-data = pd.concat([data, cfpv['Average'], cfwind['Wind']], axis=1)
-#%%
-# Define the time ranges for the different groups of hours
-night_hours = list(range(20, 24)) + list(range(0, 1))
-dawn_hours = range(1, 6)
-sunrise_hours = range(6, 8)
-morning_hours = range(8, 11)
-noonpeak_hour = range(11, 13)
-afternoon_hours = range(13, 16)
-eveningpeak_hours = range(16,18)
-night_hours_2 = list(range(18, 20)) 
+    # Verificar que se encontraron columnas de nodos
+    if not node_columns:
+        raise ValueError("No se encontraron columnas con 'Node' en el nombre en los datos de factor de capacidad.")
 
-# Filter the data to only include workdays and weekends
-workdays = data[data['Weekend'] == False]
-weekends = data[data['Weekend'] == True]
+    # Calcular el promedio de los factores de capacidad entre los nodos
+    cf_data['Average_CF'] = cf_data[node_columns].mean(axis=1)
+
+    # Agregar el promedio al DataFrame principal
+    data['Average_CF'] = cf_data['Average_CF']
+
+    return data
+
+# Función para calcular los factores de capacidad ajustados a los timeslices
+def calculate_cf_timeslices(data):
+    # Agrupar por timeslices y calcular el promedio del factor de capacidad
+    grouped = data.groupby(['Season', 'DayType', 'DaylyTimeBracket'])
+    cf_timeslices = grouped['Average_CF'].mean().reset_index()
+
+    # Agregar los timeslices como columna
+    cf_timeslices['Timeslice'] = cf_timeslices['Season']+cf_timeslices['DayType']+cf_timeslices['DaylyTimeBracket']
+    return cf_timeslices
+def transform_to_hourly(results, bracket_mapping, daytype_mapping, season_mapping):
+    # Crear un DataFrame vacío para almacenar los resultados horarios
+    hourly_results = []
+
+    # Iterar sobre cada fila de los resultados por timeslice
+    for _, row in results.iterrows():
+        region = row['REGION']
+        timeslice = row['TIMESLICE']
+        fuel = row['FUEL']
+        year = row['YEAR']
+        value = row['value']
+
+        # Determinar las horas correspondientes al bloque horario (bracket_mapping)
+        hours = bracket_mapping[timeslice]
+
+        # Calcular el valor por hora
+        hourly_value = value / len(hours)
+
+        # Generar las filas horarias
+        for hour in hours:
+            hourly_results.append({
+                'REGION': region,
+                'FUEL': fuel,
+                'YEAR': year,
+                'HOUR': hour,
+                'VALUE': hourly_value
+            })
+
+    # Convertir la lista de resultados horarios en un DataFrame
+    hourly_results_df = pd.DataFrame(hourly_results)
+
+    return hourly_results_df
+
+def calculate_yearsplit(season_mapping, daytype_mapping, bracket_mapping, year):
+    # Total de horas en un año
+    total_hours = 8760
+
+    # Crear un DataFrame para almacenar los resultados
+    yearsplit = []
+
+    # Iterar sobre cada estación
+    for season, months in season_mapping.items():
+        # Calcular la duración de la estación en horas usando días exactos
+        season_hours = sum(calendar.monthrange(year, month)[1] * 24 for month in months)
+
+        # Iterar sobre cada día tipo
+        for daytype, days in daytype_mapping.items():
+            daytype_hours = season_hours / len(daytype_mapping)  # Dividir entre los días tipo
+
+            # Iterar sobre cada bloque horario
+            for bracket, hours in bracket_mapping.items():
+                bracket_hours = len(hours) * daytype_hours / 24  # Dividir entre las 24 horas del día
+                fraction = bracket_hours / total_hours
+
+                # Agregar el resultado al DataFrame
+                yearsplit.append({
+                    'Season': season,
+                    'DayType': daytype,
+                    'Bracket': bracket,
+                    'YearSplit': fraction
+                })
+
+    # Convertir a DataFrame
+    yearsplit_df = pd.DataFrame(yearsplit)
+
+    # Normalizar los valores para que la suma sea exactamente 1
+    yearsplit_df['YearSplit'] = yearsplit_df['YearSplit'] / yearsplit_df['YearSplit'].sum()
+
+    return yearsplit_df
+
+def calculate_specified_demand_profile(data):
+    # Agrupar la demanda total por Season, DayType y DaylyTimeBracket
+    grouped_demand = data.groupby(['Season', 'DayType', 'DaylyTimeBracket'])['Total'].sum().reset_index()
+
+    # Calcular la fracción de la demanda total
+    total_demand = grouped_demand['Total'].sum()
+    grouped_demand['SpecifiedDemandProfile'] = grouped_demand['Total'] / total_demand
+
+    return grouped_demand[['Season', 'DayType', 'DaylyTimeBracket', 'SpecifiedDemandProfile']]
+
+def calculate_daysplit(bracket_mapping, year):
+    """
+    Calcula el DaySplit para cada bloque horario como la fracción del año.
+    """
+    total_hours_in_year = 8760  # Total de horas en un año (365 días * 24 horas)
+    days_in_year = 365  # Número de días en un año no bisiesto
+    day_split = []
+
+    for bracket, hours in bracket_mapping.items():
+        # Calcular la duración del bloque horario en horas
+        bracket_hours = len(hours)
+        # Calcular DaySplit como fracción del año
+        day_split_fraction = (bracket_hours / 24) / days_in_year
+        day_split.append({
+            'Bracket': bracket,
+            'DaySplit': day_split_fraction
+        })
+
+    # Convertir a DataFrame
+    day_split_df = pd.DataFrame(day_split)
+    return day_split_df
+
+# Main script
+if __name__ == "__main__":
+    # Leer datos
+    year = 2023
+    data = pd.read_excel('/home/david/Documents/001 - Proyectos/Variantes/DatosCub.xlsx', sheet_name="DEMAND")
+    cfwind = pd.read_excel('/home/david/Documents/001 - Proyectos/Variantes/DatosCub.xlsx', sheet_name="CFWIND")
+    cfpv = pd.read_excel('/home/david/Documents/001 - Proyectos/Variantes/DatosCub.xlsx', sheet_name="CFSOL")
+    # cfpv = cfpv['Average'].astype(float)
+    # print(cfpv)
+    data['Total'] =data.loc[:,'Node1':].sum(axis=1)
+
+    if 'Date' not in data.columns:
+        print("La columna 'Date' no existe. Creando un rango de fechas automáticamente...")
+        start_date = f'{year}-01-01'
+        end_date = f'{year}-12-31 23:00:00'
+        date_range = pd.date_range(start=start_date, end=end_date, freq='h')
+        data['Date'] = date_range
+        # print(data)
+    
 
 
-hour_group_order = ['Night', 'Dawnn', 'Sunrise', 'Morning', 'NoonPeak', 'Afternoon', 'EveningPeak', 'Night 2']
-# Create a new column indicating the hour group for each observation
-workdays['Hour_Group'] = pd.Categorical( np.select([workdays['Hour'].isin(night_hours), workdays['Hour'].isin(dawn_hours), 
-                                    workdays['Hour'].isin(sunrise_hours), workdays['Hour'].isin(morning_hours), 
-                                    workdays['Hour'].isin(noonpeak_hour), workdays['Hour'].isin(afternoon_hours), 
-                                    workdays['Hour'].isin(eveningpeak_hours), workdays['Hour'].isin(night_hours_2)], 
-                                    ['Night', 'Dawnn', 'Sunrise', 'Morning', 'NoonPeak', 'Afternoon', 'EveningPeak', 'Night 2']),
-                                        categories=hour_group_order, ordered=True)
-weekends['Hour_Group'] = pd.Categorical(np.select([weekends['Hour'].isin(night_hours), weekends['Hour'].isin(dawn_hours), 
-                                    weekends['Hour'].isin(sunrise_hours), weekends['Hour'].isin(morning_hours), 
-                                    weekends['Hour'].isin(noonpeak_hour), weekends['Hour'].isin(afternoon_hours), 
-                                    weekends['Hour'].isin(eveningpeak_hours), weekends['Hour'].isin(night_hours_2)], 
-                                    ['Night', 'Dawnn', 'Sunrise', 'Morning', 'NoonPeak', 'Afternoon', 'EveningPeak', 'Night 2']),
-                                         categories=hour_group_order, ordered=True)
-#%%
-cfpv = pd.concat([workdays, weekends]) \
-    .groupby(['Season','Weekend','Hour_Group']) \
-        ['Average'].mean().dropna().reset_index(name = 'Average')
-cfpv ['Season']= pd.Categorical(cfpv['Season'], categories=season_order, ordered=True)        
-cfpv = cfpv.sort_values(['Season', 'Weekend', 'Hour_Group'])     
-   
-cfwind = pd.concat([workdays, weekends]) \
-    .groupby(['Season','Weekend','Hour_Group']) \
-        ['Wind'].mean().dropna().reset_index(name = 'Wind')
-cfwind ['Season']= pd.Categorical(cfwind['Season'], categories=season_order, ordered=True)        
-cfwind = cfwind.sort_values(['Season', 'Weekend', 'Hour_Group'])          
-# Calcular la suma de las horas 
-hourly_sum_by_season_month_hour_group = pd.concat([workdays, weekends]) \
-    .groupby(['Season','Weekend','Hour_Group']) \
-        ['Total'].sum()
-hourly_sum_by_season_month_hour_group = hourly_sum_by_season_month_hour_group[hourly_sum_by_season_month_hour_group != 0]
-total_sum = data['Total'].sum()
+    ##############################################################################
+    # Configuración de las estaciones, días tipo y bloques horarios
+    ################################################################################
+    # Configuración del modelo
+    # season_mapping = {
+    #     "Winter": [12, 1, 2],
+    #     "Spring": [3, 4, 5],
+    #     "Summer": [6, 7, 8],
+    #     "Autumn": [9, 10, 11]
+    # }
+    # daytype_mapping = {
+    #     "Workday": [0, 1, 2, 3, 4],
+    #     "Weekend": [5, 6]
+    # }
+    # bracket_mapping = {
+    #     "Night": list(range(0, 6)),
+    #     "Morning": list(range(6, 12)),
+    #     "Afternoon": list(range(12, 18)),
+    #     "Evening": list(range(18, 24))
+    # }
+    #  Configuración para simular cada día de la semana por separado
+    # daytype_mapping = {
+    #     "Monday": [0],
+    #     "Tuesday": [1],
+    #     "Wednesday": [2],
+    #     "Thursday": [3],
+    #     "Friday": [4],
+    #     "Saturday": [5],
+    #     "Sunday": [6]
+    # }
 
-normalized_hourly_sum = hourly_sum_by_season_month_hour_group.div(total_sum).reset_index(name='Value')
-normalized_hourly_sum ['Season'] = pd.Categorical(normalized_hourly_sum['Season'], categories=season_order, ordered=True)
-normalized_hourly_sum = normalized_hourly_sum.sort_values(['Season', 'Weekend', 'Hour_Group'])
+    # Configuración para 1 estación, 1 tipo de día y 2 bloques horarios dia y noche   
+    # season_mapping = {
+    #     "": list(range(1, 13))  # Todos los meses pertenecen a la misma estación
+    # }
+    # daytype_mapping = {
+    #     "": list(range(0, 7)) # Todos los días pertenecen al mismo tipo
+    # }
+    # bracket_mapping = {
+    #     "Night": list(range(0, 6)) + list(range(18, 24)),  # De 00:00 a 06:00 y de 18:00 a 24:00
+    #     "Day": list(range(6, 18))  # De 06:00 a 18:00
+    # }
+    season_mapping = {
+    "1": [12, 1, 2],  # Invierno
+    "2": [3, 4, 5],   # Primavera
+    "3": [6, 7, 8],   # Verano
+    "4": [9, 10, 11]  # Otoño
+    }
 
-#data['fraction'] = normalized_hourly_sum
-#hourly_sum_by_season_month_hour_group.to_excel('postdatas.xlsx')
-# Group the workday data by month and hour and calculate the sum of the 'Value' column
-hourly_sum_workdays_by_month = workdays.groupby(['Month', 'Hour'])['Total'].sum()
+    daytype_mapping = {
+        "1": [0, 1, 2, 3, 4],  # Workdays (lunes a viernes)
+        "2": [5, 6]            # Weekends (sábado y domingo)
+    }
 
-# Group the weekend data by month and hour and calculate the sum of the 'Value' column
-hourly_sum_weekends_by_month = weekends.groupby(['Month', 'Hour'])['Total'].sum()
-
-#%%
-# Create a list of dates with the start and end date of the data
-dates = pd.date_range(start='1/1/2023', end='12/31/2023')
-
-# Create a DataFrame with a column of dates
-df = pd.DataFrame({'date': dates})
-
-# Extract the month and day of week from the date column
-
-df['Month'] = df['date'].dt.month_name()
-df['Type'] = df['date'].apply(lambda x: 'Weekday' if x.weekday() < 5 else 'Weekend')
-df['Season'] = df['date'].dt.month.map(season_mapping)
-# Create a new DataFrame with the number of weekdays and weekends by month
-
-monthly_counts = df.groupby(['Season', 'Type']).size().reset_index(name='Value')
-#%%
-# Sort the order of the months chronologically
-#month_order = [calendar.month_name[i] for i in range(1, 13)]
-monthly_counts['Season'] = pd.Categorical(monthly_counts['Season'], categories=season_order, ordered=True)
-
-# Sort the rows of the monthly_counts DataFrame
-monthly_counts = monthly_counts.sort_values(['Season', 'Type'])
-# Para multiplicar los valores de una lista con otra.
-lengths = [len(night_hours), len(dawn_hours), len(sunrise_hours), len(morning_hours), len(noonpeak_hour), len(afternoon_hours), len(eveningpeak_hours), len(night_hours_2)]
-
-result = []
-for i in monthly_counts['Value']:
-    for j in lengths:
-        result.append(i*j/8760)
-result = pd.DataFrame({'result': result}, index = None)
-
-season = range(1,5)
-daytype = range(1, 3)
-dailytimebracket = range (1, 9)
-
-timeslices = []
-
-for s in season:
-    for o in daytype:
-        for f in dailytimebracket:
-            num = str(s) + str(o) + str(f)
-            timeslices.append(int(num))
-timeslices = pd.DataFrame({'timeslices': timeslices}, index = None)
-hourratio = pd.concat([timeslices,result],axis=1)
+    bracket_mapping = {
+        "1": list(range(20, 24)) + list(range(0, 1)),
+        "2": list(range(1, 6)),
+        "3": list(range(6, 8)),
+        "4": list(range(8, 11)),
+        "5": list(range(11, 13)),
+        "6": list(range(13, 16)),
+        "7": list(range(16, 18)),
+        "8": list(range(18, 20))
+    }
 
 
 
-with pd.ExcelWriter('output4.xlsx') as writer:
-    # write the first dataframe to a sheet named 'Sheet1'
-    hourratio.to_excel(writer, sheet_name='YS', index=False)
-    # write the second dataframe to a sheet named 'Sheet2'
-    normalized_hourly_sum.to_excel(writer, sheet_name='SDP', index=True)
-    cfpv.to_excel(writer, sheet_name='CFPV', index=True)
-    cfwind.to_excel(writer, sheet_name='CFWIND', index=True)
-# Filter the data to only include workdays
-"""
-workdays = data[data['Date'].dt.dayofweek < 5]
-weekends = data[data['Date'].dt.dayofweek >= 5]
-workdays['Hour'] = workdays['Date'].dt.hour
-workdays['Month'] = workdays['Date'].dt.month
-weekends['Hour'] = weekends['Date'].dt.hour
-"""
 
-#%%
-# Filter the data to only include the first hour of each day
-"first_hour = workdays[workdays['Date'].dt.hour == 0]"
-# Group the data by month, then hour and calculate the mean of the 'Value' column
-hourly_avg_by_month = workdays.groupby(['Month', 'Hour'])['Total'].mean()
-hourly_sum_by_month = workdays.groupby(['Month', 'Hour'])['Total'].sum()
-# Group the data by month and calculate the mean of the 'Value' column
-"monthly_avg = first_hour.groupby(pd.Grouper(key='Date', freq='M'))['Total'].mean()"
+    # Preprocesar datos
+    data['Month'] = data['Date'].dt.month
+    data['Hour'] = data['Date'].dt.hour
+    # data['Weekend'] = data['Date'].dt.dayofweek >= 5
 
-# Print the resulting monthly averages
+    # Mapear estaciones, días tipo y bloques horarios
+    data = map_seasons(data, season_mapping)
+    data = map_daytypes(data, daytype_mapping)
+    data = map_daylight_brackets(data, bracket_mapping)
+    
 
-# %%
+    # Calcular factores de capacidad para solar
+    data = calculate_capacity_factor(data, cfpv)
+
+    # Calcular factores de capacidad ajustados a los timeslices para solar
+    cf_timeslices_pv = calculate_cf_timeslices(data)
+
+    # Calcular factores de capacidad para viento
+    data = calculate_capacity_factor(data, cfwind)
+
+    # Calcular factores de capacidad ajustados a los timeslices para viento
+    cf_timeslices_wind = calculate_cf_timeslices(data)
+
+    # Calcular YearSplit
+    yearsplit = calculate_yearsplit(season_mapping, daytype_mapping, bracket_mapping, year)
+
+
+    # Calcular Specified Demand Profile
+    specified_demand_profile = calculate_specified_demand_profile(data)
+
+    daysplit = calculate_daysplit(bracket_mapping, year)
+
+    # Calcular timeslices
+    # timeslices = calculate_timeslices(
+    #     seasons=season_mapping.keys(),
+    #     daytypes=daytype_mapping.values(),
+    #     brackets=bracket_mapping.keys()
+    # )
+
+    # Normalizar datos horarios
+    total_sum = data['Total'].sum()
+    normalized_hourly_sum = data.groupby(['Season', 'DayType', 'DaylyTimeBracket'])['Total'].sum() / total_sum
+
+
+    # Exportar resultados
+    with pd.ExcelWriter('output4.xlsx') as writer:
+        # pd.DataFrame({'Timeslices': timeslices}).to_excel(writer, sheet_name='Timeslices', index=False)
+        # normalized_hourly_sum.reset_index(name='Value').to_excel(writer, sheet_name='Normalized', index=False)
+        # cf_timeslices.to_excel(writer, sheet_name='CFPV', index=True)
+    # with pd.ExcelWriter('output4.xlsx') as writer:
+        cf_timeslices_pv[['Timeslice', 'Average_CF']].to_excel(writer, sheet_name='CFPV', index=False)
+        cf_timeslices_wind[['Timeslice', 'Average_CF']].to_excel(writer, sheet_name='CFWIND', index=False)
+        yearsplit.to_excel(writer, sheet_name='YearSplit', index=False)
+        specified_demand_profile.to_excel(writer, sheet_name='SpecifiedDemandProfile', index=False)
+        data.to_excel(writer, sheet_name='DemandData', index=False)
+        daysplit.to_excel(writer, sheet_name='DaySplit', index=False)
+    
+
+
+    
+

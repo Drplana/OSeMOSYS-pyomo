@@ -1,0 +1,4702 @@
+{
+    "REGION": [
+        "Simple"
+    ],
+    "YEAR": [
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025,
+        2026,
+        2027,
+        2028,
+        2029,
+        2030
+    ],
+    "TECHNOLOGY": [
+        "CIMP",
+        "CCP",
+        "BS",
+        "PWRWIND",
+        "PWRPV",
+        "PWRBIOMASS",
+        "PWRTRANS",
+        "PWRDIST",
+        "DEMRES",
+        "PWRSTORAGE",
+        "PWRSTORAGE02",
+        "PWRFO"
+    ],
+    "FUEL": [
+        "Coal",
+        "ELC01",
+        "ELC02",
+        "ELC03",
+        "RESELEC",
+        "BIOMASS",
+        "IND_ELEC",
+        "TRANSPORT"
+    ],
+    "SEASON": [
+        1
+    ],
+    "DAYTYPE": [
+        1
+    ],
+    "DAILYTIMEBRACKET": [
+        1,
+        2
+    ],
+    "TIMESLICE": [
+        "Day",
+        "Night"
+    ],
+    "MODE_OF_OPERATION": [
+        1,
+        2,
+        3
+    ],
+    "STORAGE": [
+        "DAM",
+        "Batt01",
+        "Batt02"
+    ],
+    "EMISSION": [
+        "CO2",
+        "Nox",
+        "CH4"
+    ],
+    "p_YearSplit": [
+        {
+            "index": [
+                "Day",
+                2020
+            ],
+            "value": 0.5
+        },
+        {
+            "index": [
+                "Day",
+                2021
+            ],
+            "value": 0.5
+        },
+        {
+            "index": [
+                "Day",
+                2022
+            ],
+            "value": 0.5
+        },
+        {
+            "index": [
+                "Day",
+                2023
+            ],
+            "value": 0.5
+        },
+        {
+            "index": [
+                "Day",
+                2024
+            ],
+            "value": 0.5
+        },
+        {
+            "index": [
+                "Day",
+                2025
+            ],
+            "value": 0.5
+        },
+        {
+            "index": [
+                "Day",
+                2026
+            ],
+            "value": 0.5
+        },
+        {
+            "index": [
+                "Day",
+                2027
+            ],
+            "value": 0.5
+        },
+        {
+            "index": [
+                "Day",
+                2028
+            ],
+            "value": 0.5
+        },
+        {
+            "index": [
+                "Day",
+                2029
+            ],
+            "value": 0.5
+        },
+        {
+            "index": [
+                "Day",
+                2030
+            ],
+            "value": 0.5
+        },
+        {
+            "index": [
+                "Night",
+                2020
+            ],
+            "value": 0.5
+        },
+        {
+            "index": [
+                "Night",
+                2021
+            ],
+            "value": 0.5
+        },
+        {
+            "index": [
+                "Night",
+                2022
+            ],
+            "value": 0.5
+        },
+        {
+            "index": [
+                "Night",
+                2023
+            ],
+            "value": 0.5
+        },
+        {
+            "index": [
+                "Night",
+                2024
+            ],
+            "value": 0.5
+        },
+        {
+            "index": [
+                "Night",
+                2025
+            ],
+            "value": 0.5
+        },
+        {
+            "index": [
+                "Night",
+                2026
+            ],
+            "value": 0.5
+        },
+        {
+            "index": [
+                "Night",
+                2027
+            ],
+            "value": 0.5
+        },
+        {
+            "index": [
+                "Night",
+                2028
+            ],
+            "value": 0.5
+        },
+        {
+            "index": [
+                "Night",
+                2029
+            ],
+            "value": 0.5
+        },
+        {
+            "index": [
+                "Night",
+                2030
+            ],
+            "value": 0.5
+        }
+    ],
+    "p_Conversionls": [
+        {
+            "index": [
+                "Day",
+                1
+            ],
+            "value": 1
+        },
+        {
+            "index": [
+                "Night",
+                1
+            ],
+            "value": 1
+        }
+    ],
+    "p_Conversionld": [
+        {
+            "index": [
+                "Day",
+                1
+            ],
+            "value": 1
+        },
+        {
+            "index": [
+                "Night",
+                1
+            ],
+            "value": 1
+        }
+    ],
+    "p_Conversionlh": [
+        {
+            "index": [
+                "Day",
+                1
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Night",
+                2
+            ],
+            "value": 1.0
+        }
+    ],
+    "p_DaySplit": [],
+    "p_DaysInDayType": [],
+    "p_SpecifiedAnnualDemand": [
+        {
+            "index": [
+                "Simple",
+                "RESELEC",
+                2020
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "RESELEC",
+                2021
+            ],
+            "value": 2.0
+        },
+        {
+            "index": [
+                "Simple",
+                "RESELEC",
+                2022
+            ],
+            "value": 3.0
+        },
+        {
+            "index": [
+                "Simple",
+                "RESELEC",
+                2023
+            ],
+            "value": 4.0
+        },
+        {
+            "index": [
+                "Simple",
+                "RESELEC",
+                2024
+            ],
+            "value": 5.0
+        },
+        {
+            "index": [
+                "Simple",
+                "RESELEC",
+                2025
+            ],
+            "value": 6.0
+        },
+        {
+            "index": [
+                "Simple",
+                "RESELEC",
+                2026
+            ],
+            "value": 7.0
+        },
+        {
+            "index": [
+                "Simple",
+                "RESELEC",
+                2027
+            ],
+            "value": 8.0
+        },
+        {
+            "index": [
+                "Simple",
+                "RESELEC",
+                2028
+            ],
+            "value": 9.0
+        },
+        {
+            "index": [
+                "Simple",
+                "RESELEC",
+                2029
+            ],
+            "value": 10.0
+        },
+        {
+            "index": [
+                "Simple",
+                "RESELEC",
+                2030
+            ],
+            "value": 11.0
+        }
+    ],
+    "p_SpecifiedDemandProfile": [
+        {
+            "index": [
+                "Simple",
+                "RESELEC",
+                "Day",
+                2020
+            ],
+            "value": 0.5
+        },
+        {
+            "index": [
+                "Simple",
+                "RESELEC",
+                "Day",
+                2021
+            ],
+            "value": 0.5
+        },
+        {
+            "index": [
+                "Simple",
+                "RESELEC",
+                "Day",
+                2022
+            ],
+            "value": 0.5
+        },
+        {
+            "index": [
+                "Simple",
+                "RESELEC",
+                "Day",
+                2023
+            ],
+            "value": 0.5
+        },
+        {
+            "index": [
+                "Simple",
+                "RESELEC",
+                "Day",
+                2024
+            ],
+            "value": 0.5
+        },
+        {
+            "index": [
+                "Simple",
+                "RESELEC",
+                "Day",
+                2025
+            ],
+            "value": 0.5
+        },
+        {
+            "index": [
+                "Simple",
+                "RESELEC",
+                "Day",
+                2026
+            ],
+            "value": 0.5
+        },
+        {
+            "index": [
+                "Simple",
+                "RESELEC",
+                "Day",
+                2027
+            ],
+            "value": 0.5
+        },
+        {
+            "index": [
+                "Simple",
+                "RESELEC",
+                "Day",
+                2028
+            ],
+            "value": 0.5
+        },
+        {
+            "index": [
+                "Simple",
+                "RESELEC",
+                "Day",
+                2029
+            ],
+            "value": 0.5
+        },
+        {
+            "index": [
+                "Simple",
+                "RESELEC",
+                "Day",
+                2030
+            ],
+            "value": 0.5
+        },
+        {
+            "index": [
+                "Simple",
+                "RESELEC",
+                "Night",
+                2020
+            ],
+            "value": 0.5
+        },
+        {
+            "index": [
+                "Simple",
+                "RESELEC",
+                "Night",
+                2021
+            ],
+            "value": 0.5
+        },
+        {
+            "index": [
+                "Simple",
+                "RESELEC",
+                "Night",
+                2022
+            ],
+            "value": 0.5
+        },
+        {
+            "index": [
+                "Simple",
+                "RESELEC",
+                "Night",
+                2023
+            ],
+            "value": 0.5
+        },
+        {
+            "index": [
+                "Simple",
+                "RESELEC",
+                "Night",
+                2024
+            ],
+            "value": 0.5
+        },
+        {
+            "index": [
+                "Simple",
+                "RESELEC",
+                "Night",
+                2025
+            ],
+            "value": 0.5
+        },
+        {
+            "index": [
+                "Simple",
+                "RESELEC",
+                "Night",
+                2026
+            ],
+            "value": 0.5
+        },
+        {
+            "index": [
+                "Simple",
+                "RESELEC",
+                "Night",
+                2027
+            ],
+            "value": 0.5
+        },
+        {
+            "index": [
+                "Simple",
+                "RESELEC",
+                "Night",
+                2028
+            ],
+            "value": 0.5
+        },
+        {
+            "index": [
+                "Simple",
+                "RESELEC",
+                "Night",
+                2029
+            ],
+            "value": 0.5
+        },
+        {
+            "index": [
+                "Simple",
+                "RESELEC",
+                "Night",
+                2030
+            ],
+            "value": 0.5
+        }
+    ],
+    "p_AccumulatedAnnualDemand": [],
+    "p_CapacityToActivityUnit": [
+        {
+            "index": [
+                "Simple",
+                "CCP"
+            ],
+            "value": 31.56
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRWIND"
+            ],
+            "value": 31.56
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRPV"
+            ],
+            "value": 31.56
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRBIOMASS"
+            ],
+            "value": 31.56
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRSTORAGE"
+            ],
+            "value": 31.56
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRSTORAGE02"
+            ],
+            "value": 31.56
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRFO"
+            ],
+            "value": 31.56
+        }
+    ],
+    "p_CapacityFactor": [
+        {
+            "index": [
+                "Simple",
+                "CCP",
+                "Day",
+                2020
+            ],
+            "value": 0.95
+        },
+        {
+            "index": [
+                "Simple",
+                "CCP",
+                "Day",
+                2021
+            ],
+            "value": 0.95
+        },
+        {
+            "index": [
+                "Simple",
+                "CCP",
+                "Day",
+                2022
+            ],
+            "value": 0.95
+        },
+        {
+            "index": [
+                "Simple",
+                "CCP",
+                "Day",
+                2023
+            ],
+            "value": 0.95
+        },
+        {
+            "index": [
+                "Simple",
+                "CCP",
+                "Day",
+                2024
+            ],
+            "value": 0.95
+        },
+        {
+            "index": [
+                "Simple",
+                "CCP",
+                "Day",
+                2025
+            ],
+            "value": 0.95
+        },
+        {
+            "index": [
+                "Simple",
+                "CCP",
+                "Day",
+                2026
+            ],
+            "value": 0.95
+        },
+        {
+            "index": [
+                "Simple",
+                "CCP",
+                "Day",
+                2027
+            ],
+            "value": 0.95
+        },
+        {
+            "index": [
+                "Simple",
+                "CCP",
+                "Day",
+                2028
+            ],
+            "value": 0.95
+        },
+        {
+            "index": [
+                "Simple",
+                "CCP",
+                "Day",
+                2029
+            ],
+            "value": 0.95
+        },
+        {
+            "index": [
+                "Simple",
+                "CCP",
+                "Day",
+                2030
+            ],
+            "value": 0.95
+        },
+        {
+            "index": [
+                "Simple",
+                "CCP",
+                "Night",
+                2020
+            ],
+            "value": 0.95
+        },
+        {
+            "index": [
+                "Simple",
+                "CCP",
+                "Night",
+                2021
+            ],
+            "value": 0.95
+        },
+        {
+            "index": [
+                "Simple",
+                "CCP",
+                "Night",
+                2022
+            ],
+            "value": 0.95
+        },
+        {
+            "index": [
+                "Simple",
+                "CCP",
+                "Night",
+                2023
+            ],
+            "value": 0.95
+        },
+        {
+            "index": [
+                "Simple",
+                "CCP",
+                "Night",
+                2024
+            ],
+            "value": 0.95
+        },
+        {
+            "index": [
+                "Simple",
+                "CCP",
+                "Night",
+                2025
+            ],
+            "value": 0.95
+        },
+        {
+            "index": [
+                "Simple",
+                "CCP",
+                "Night",
+                2026
+            ],
+            "value": 0.95
+        },
+        {
+            "index": [
+                "Simple",
+                "CCP",
+                "Night",
+                2027
+            ],
+            "value": 0.95
+        },
+        {
+            "index": [
+                "Simple",
+                "CCP",
+                "Night",
+                2028
+            ],
+            "value": 0.95
+        },
+        {
+            "index": [
+                "Simple",
+                "CCP",
+                "Night",
+                2029
+            ],
+            "value": 0.95
+        },
+        {
+            "index": [
+                "Simple",
+                "CCP",
+                "Night",
+                2030
+            ],
+            "value": 0.95
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRWIND",
+                "Day",
+                2020
+            ],
+            "value": 0.2
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRWIND",
+                "Day",
+                2021
+            ],
+            "value": 0.2
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRWIND",
+                "Day",
+                2022
+            ],
+            "value": 0.2
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRWIND",
+                "Day",
+                2023
+            ],
+            "value": 0.2
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRWIND",
+                "Day",
+                2024
+            ],
+            "value": 0.2
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRWIND",
+                "Day",
+                2025
+            ],
+            "value": 0.2
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRWIND",
+                "Day",
+                2026
+            ],
+            "value": 0.2
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRWIND",
+                "Day",
+                2027
+            ],
+            "value": 0.2
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRWIND",
+                "Day",
+                2028
+            ],
+            "value": 0.2
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRWIND",
+                "Day",
+                2029
+            ],
+            "value": 0.2
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRWIND",
+                "Day",
+                2030
+            ],
+            "value": 0.2
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRWIND",
+                "Night",
+                2020
+            ],
+            "value": 0.45
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRWIND",
+                "Night",
+                2021
+            ],
+            "value": 0.45
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRWIND",
+                "Night",
+                2022
+            ],
+            "value": 0.45
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRWIND",
+                "Night",
+                2023
+            ],
+            "value": 0.45
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRWIND",
+                "Night",
+                2024
+            ],
+            "value": 0.45
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRWIND",
+                "Night",
+                2025
+            ],
+            "value": 0.45
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRWIND",
+                "Night",
+                2026
+            ],
+            "value": 0.45
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRWIND",
+                "Night",
+                2027
+            ],
+            "value": 0.45
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRWIND",
+                "Night",
+                2028
+            ],
+            "value": 0.45
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRWIND",
+                "Night",
+                2029
+            ],
+            "value": 0.45
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRWIND",
+                "Night",
+                2030
+            ],
+            "value": 0.45
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRPV",
+                "Day",
+                2020
+            ],
+            "value": 0.25
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRPV",
+                "Day",
+                2021
+            ],
+            "value": 0.25
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRPV",
+                "Day",
+                2022
+            ],
+            "value": 0.25
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRPV",
+                "Day",
+                2023
+            ],
+            "value": 0.25
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRPV",
+                "Day",
+                2024
+            ],
+            "value": 0.25
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRPV",
+                "Day",
+                2025
+            ],
+            "value": 0.25
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRPV",
+                "Day",
+                2026
+            ],
+            "value": 0.25
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRPV",
+                "Day",
+                2027
+            ],
+            "value": 0.25
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRPV",
+                "Day",
+                2028
+            ],
+            "value": 0.25
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRPV",
+                "Day",
+                2029
+            ],
+            "value": 0.25
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRPV",
+                "Day",
+                2030
+            ],
+            "value": 0.25
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRPV",
+                "Night",
+                2020
+            ],
+            "value": 0.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRPV",
+                "Night",
+                2021
+            ],
+            "value": 0.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRPV",
+                "Night",
+                2022
+            ],
+            "value": 0.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRPV",
+                "Night",
+                2023
+            ],
+            "value": 0.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRPV",
+                "Night",
+                2024
+            ],
+            "value": 0.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRPV",
+                "Night",
+                2025
+            ],
+            "value": 0.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRPV",
+                "Night",
+                2026
+            ],
+            "value": 0.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRPV",
+                "Night",
+                2027
+            ],
+            "value": 0.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRPV",
+                "Night",
+                2028
+            ],
+            "value": 0.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRPV",
+                "Night",
+                2029
+            ],
+            "value": 0.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRPV",
+                "Night",
+                2030
+            ],
+            "value": 0.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRBIOMASS",
+                "Day",
+                2020
+            ],
+            "value": 0.95
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRBIOMASS",
+                "Day",
+                2021
+            ],
+            "value": 0.95
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRBIOMASS",
+                "Day",
+                2022
+            ],
+            "value": 0.95
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRBIOMASS",
+                "Day",
+                2023
+            ],
+            "value": 0.95
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRBIOMASS",
+                "Day",
+                2024
+            ],
+            "value": 0.95
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRBIOMASS",
+                "Day",
+                2025
+            ],
+            "value": 0.95
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRBIOMASS",
+                "Day",
+                2026
+            ],
+            "value": 0.95
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRBIOMASS",
+                "Day",
+                2027
+            ],
+            "value": 0.95
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRBIOMASS",
+                "Day",
+                2028
+            ],
+            "value": 0.95
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRBIOMASS",
+                "Day",
+                2029
+            ],
+            "value": 0.95
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRBIOMASS",
+                "Day",
+                2030
+            ],
+            "value": 0.95
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRBIOMASS",
+                "Night",
+                2020
+            ],
+            "value": 0.95
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRBIOMASS",
+                "Night",
+                2021
+            ],
+            "value": 0.95
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRBIOMASS",
+                "Night",
+                2022
+            ],
+            "value": 0.95
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRBIOMASS",
+                "Night",
+                2023
+            ],
+            "value": 0.95
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRBIOMASS",
+                "Night",
+                2024
+            ],
+            "value": 0.95
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRBIOMASS",
+                "Night",
+                2025
+            ],
+            "value": 0.95
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRBIOMASS",
+                "Night",
+                2026
+            ],
+            "value": 0.95
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRBIOMASS",
+                "Night",
+                2027
+            ],
+            "value": 0.95
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRBIOMASS",
+                "Night",
+                2028
+            ],
+            "value": 0.95
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRBIOMASS",
+                "Night",
+                2029
+            ],
+            "value": 0.95
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRBIOMASS",
+                "Night",
+                2030
+            ],
+            "value": 0.95
+        }
+    ],
+    "p_AvailabilityFactor": [],
+    "p_OperationalLife": [
+        {
+            "index": [
+                "Simple",
+                "CCP"
+            ],
+            "value": 30.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRWIND"
+            ],
+            "value": 25.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRPV"
+            ],
+            "value": 25.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRBIOMASS"
+            ],
+            "value": 30.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRSTORAGE"
+            ],
+            "value": 35.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRSTORAGE02"
+            ],
+            "value": 35.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRFO"
+            ],
+            "value": 25.0
+        }
+    ],
+    "p_ResidualCapacity": [],
+    "p_InputActivityRatio": [
+        {
+            "index": [
+                "Simple",
+                "CCP",
+                "Coal",
+                1,
+                2020
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "CCP",
+                "Coal",
+                1,
+                2021
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "CCP",
+                "Coal",
+                1,
+                2022
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "CCP",
+                "Coal",
+                1,
+                2023
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "CCP",
+                "Coal",
+                1,
+                2024
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "CCP",
+                "Coal",
+                1,
+                2025
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "CCP",
+                "Coal",
+                1,
+                2026
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "CCP",
+                "Coal",
+                1,
+                2027
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "CCP",
+                "Coal",
+                1,
+                2028
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "CCP",
+                "Coal",
+                1,
+                2029
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "CCP",
+                "Coal",
+                1,
+                2030
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "BS",
+                "Coal",
+                1,
+                2020
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "BS",
+                "Coal",
+                1,
+                2021
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "BS",
+                "Coal",
+                1,
+                2022
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "BS",
+                "Coal",
+                1,
+                2023
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "BS",
+                "Coal",
+                1,
+                2024
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "BS",
+                "Coal",
+                1,
+                2025
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "BS",
+                "Coal",
+                1,
+                2026
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "BS",
+                "Coal",
+                1,
+                2027
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "BS",
+                "Coal",
+                1,
+                2028
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "BS",
+                "Coal",
+                1,
+                2029
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "BS",
+                "Coal",
+                1,
+                2030
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRTRANS",
+                "ELC01",
+                1,
+                2020
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRTRANS",
+                "ELC01",
+                1,
+                2021
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRTRANS",
+                "ELC01",
+                1,
+                2022
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRTRANS",
+                "ELC01",
+                1,
+                2023
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRTRANS",
+                "ELC01",
+                1,
+                2024
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRTRANS",
+                "ELC01",
+                1,
+                2025
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRTRANS",
+                "ELC01",
+                1,
+                2026
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRTRANS",
+                "ELC01",
+                1,
+                2027
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRTRANS",
+                "ELC01",
+                1,
+                2028
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRTRANS",
+                "ELC01",
+                1,
+                2029
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRTRANS",
+                "ELC01",
+                1,
+                2030
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRDIST",
+                "ELC02",
+                1,
+                2020
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRDIST",
+                "ELC02",
+                1,
+                2021
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRDIST",
+                "ELC02",
+                1,
+                2022
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRDIST",
+                "ELC02",
+                1,
+                2023
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRDIST",
+                "ELC02",
+                1,
+                2024
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRDIST",
+                "ELC02",
+                1,
+                2025
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRDIST",
+                "ELC02",
+                1,
+                2026
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRDIST",
+                "ELC02",
+                1,
+                2027
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRDIST",
+                "ELC02",
+                1,
+                2028
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRDIST",
+                "ELC02",
+                1,
+                2029
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRDIST",
+                "ELC02",
+                1,
+                2030
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "DEMRES",
+                "ELC03",
+                1,
+                2020
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "DEMRES",
+                "ELC03",
+                1,
+                2021
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "DEMRES",
+                "ELC03",
+                1,
+                2022
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "DEMRES",
+                "ELC03",
+                1,
+                2023
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "DEMRES",
+                "ELC03",
+                1,
+                2024
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "DEMRES",
+                "ELC03",
+                1,
+                2025
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "DEMRES",
+                "ELC03",
+                1,
+                2026
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "DEMRES",
+                "ELC03",
+                1,
+                2027
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "DEMRES",
+                "ELC03",
+                1,
+                2028
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "DEMRES",
+                "ELC03",
+                1,
+                2029
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "DEMRES",
+                "ELC03",
+                1,
+                2030
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRSTORAGE",
+                "ELC01",
+                1,
+                2020
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRSTORAGE",
+                "ELC01",
+                1,
+                2021
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRSTORAGE",
+                "ELC01",
+                1,
+                2022
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRSTORAGE",
+                "ELC01",
+                1,
+                2023
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRSTORAGE",
+                "ELC01",
+                1,
+                2024
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRSTORAGE",
+                "ELC01",
+                1,
+                2025
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRSTORAGE",
+                "ELC01",
+                1,
+                2026
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRSTORAGE",
+                "ELC01",
+                1,
+                2027
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRSTORAGE",
+                "ELC01",
+                1,
+                2028
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRSTORAGE",
+                "ELC01",
+                1,
+                2029
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRSTORAGE",
+                "ELC01",
+                1,
+                2030
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRSTORAGE02",
+                "ELC02",
+                1,
+                2020
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRSTORAGE02",
+                "ELC02",
+                1,
+                2021
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRSTORAGE02",
+                "ELC02",
+                1,
+                2022
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRSTORAGE02",
+                "ELC02",
+                1,
+                2023
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRSTORAGE02",
+                "ELC02",
+                1,
+                2024
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRSTORAGE02",
+                "ELC02",
+                1,
+                2025
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRSTORAGE02",
+                "ELC02",
+                1,
+                2026
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRSTORAGE02",
+                "ELC02",
+                1,
+                2027
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRSTORAGE02",
+                "ELC02",
+                1,
+                2028
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRSTORAGE02",
+                "ELC02",
+                1,
+                2029
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRSTORAGE02",
+                "ELC02",
+                1,
+                2030
+            ],
+            "value": 1.0
+        }
+    ],
+    "p_OutputActivityRatio": [
+        {
+            "index": [
+                "Simple",
+                "CIMP",
+                "Coal",
+                1,
+                2020
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "CIMP",
+                "Coal",
+                1,
+                2021
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "CIMP",
+                "Coal",
+                1,
+                2022
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "CIMP",
+                "Coal",
+                1,
+                2023
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "CIMP",
+                "Coal",
+                1,
+                2024
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "CIMP",
+                "Coal",
+                1,
+                2025
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "CIMP",
+                "Coal",
+                1,
+                2026
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "CIMP",
+                "Coal",
+                1,
+                2027
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "CIMP",
+                "Coal",
+                1,
+                2028
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "CIMP",
+                "Coal",
+                1,
+                2029
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "CIMP",
+                "Coal",
+                1,
+                2030
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "CCP",
+                "ELC01",
+                1,
+                2020
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "CCP",
+                "ELC01",
+                1,
+                2021
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "CCP",
+                "ELC01",
+                1,
+                2022
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "CCP",
+                "ELC01",
+                1,
+                2023
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "CCP",
+                "ELC01",
+                1,
+                2024
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "CCP",
+                "ELC01",
+                1,
+                2025
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "CCP",
+                "ELC01",
+                1,
+                2026
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "CCP",
+                "ELC01",
+                1,
+                2027
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "CCP",
+                "ELC01",
+                1,
+                2028
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "CCP",
+                "ELC01",
+                1,
+                2029
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "CCP",
+                "ELC01",
+                1,
+                2030
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "BS",
+                "ELC01",
+                1,
+                2020
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "BS",
+                "ELC01",
+                1,
+                2021
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "BS",
+                "ELC01",
+                1,
+                2022
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "BS",
+                "ELC01",
+                1,
+                2023
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "BS",
+                "ELC01",
+                1,
+                2024
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "BS",
+                "ELC01",
+                1,
+                2025
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "BS",
+                "ELC01",
+                1,
+                2026
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "BS",
+                "ELC01",
+                1,
+                2027
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "BS",
+                "ELC01",
+                1,
+                2028
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "BS",
+                "ELC01",
+                1,
+                2029
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "BS",
+                "ELC01",
+                1,
+                2030
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRWIND",
+                "ELC01",
+                1,
+                2020
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRWIND",
+                "ELC01",
+                1,
+                2021
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRWIND",
+                "ELC01",
+                1,
+                2022
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRWIND",
+                "ELC01",
+                1,
+                2023
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRWIND",
+                "ELC01",
+                1,
+                2024
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRWIND",
+                "ELC01",
+                1,
+                2025
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRWIND",
+                "ELC01",
+                1,
+                2026
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRWIND",
+                "ELC01",
+                1,
+                2027
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRWIND",
+                "ELC01",
+                1,
+                2028
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRWIND",
+                "ELC01",
+                1,
+                2029
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRWIND",
+                "ELC01",
+                1,
+                2030
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRPV",
+                "ELC01",
+                1,
+                2020
+            ],
+            "value": 0.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRPV",
+                "ELC01",
+                1,
+                2021
+            ],
+            "value": 0.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRPV",
+                "ELC01",
+                1,
+                2022
+            ],
+            "value": 0.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRPV",
+                "ELC01",
+                1,
+                2023
+            ],
+            "value": 0.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRPV",
+                "ELC01",
+                1,
+                2024
+            ],
+            "value": 0.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRPV",
+                "ELC01",
+                1,
+                2025
+            ],
+            "value": 0.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRPV",
+                "ELC01",
+                1,
+                2026
+            ],
+            "value": 0.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRPV",
+                "ELC01",
+                1,
+                2027
+            ],
+            "value": 0.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRPV",
+                "ELC01",
+                1,
+                2028
+            ],
+            "value": 0.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRPV",
+                "ELC01",
+                1,
+                2029
+            ],
+            "value": 0.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRPV",
+                "ELC01",
+                1,
+                2030
+            ],
+            "value": 0.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRPV",
+                "ELC02",
+                1,
+                2020
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRPV",
+                "ELC02",
+                1,
+                2021
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRPV",
+                "ELC02",
+                1,
+                2022
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRPV",
+                "ELC02",
+                1,
+                2023
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRPV",
+                "ELC02",
+                1,
+                2024
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRPV",
+                "ELC02",
+                1,
+                2025
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRPV",
+                "ELC02",
+                1,
+                2026
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRPV",
+                "ELC02",
+                1,
+                2027
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRPV",
+                "ELC02",
+                1,
+                2028
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRPV",
+                "ELC02",
+                1,
+                2029
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRPV",
+                "ELC02",
+                1,
+                2030
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRTRANS",
+                "ELC02",
+                1,
+                2020
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRTRANS",
+                "ELC02",
+                1,
+                2021
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRTRANS",
+                "ELC02",
+                1,
+                2022
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRTRANS",
+                "ELC02",
+                1,
+                2023
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRTRANS",
+                "ELC02",
+                1,
+                2024
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRTRANS",
+                "ELC02",
+                1,
+                2025
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRTRANS",
+                "ELC02",
+                1,
+                2026
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRTRANS",
+                "ELC02",
+                1,
+                2027
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRTRANS",
+                "ELC02",
+                1,
+                2028
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRTRANS",
+                "ELC02",
+                1,
+                2029
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRTRANS",
+                "ELC02",
+                1,
+                2030
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRDIST",
+                "ELC03",
+                1,
+                2020
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRDIST",
+                "ELC03",
+                1,
+                2021
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRDIST",
+                "ELC03",
+                1,
+                2022
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRDIST",
+                "ELC03",
+                1,
+                2023
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRDIST",
+                "ELC03",
+                1,
+                2024
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRDIST",
+                "ELC03",
+                1,
+                2025
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRDIST",
+                "ELC03",
+                1,
+                2026
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRDIST",
+                "ELC03",
+                1,
+                2027
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRDIST",
+                "ELC03",
+                1,
+                2028
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRDIST",
+                "ELC03",
+                1,
+                2029
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRDIST",
+                "ELC03",
+                1,
+                2030
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "DEMRES",
+                "RESELEC",
+                1,
+                2020
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "DEMRES",
+                "RESELEC",
+                1,
+                2021
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "DEMRES",
+                "RESELEC",
+                1,
+                2022
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "DEMRES",
+                "RESELEC",
+                1,
+                2023
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "DEMRES",
+                "RESELEC",
+                1,
+                2024
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "DEMRES",
+                "RESELEC",
+                1,
+                2025
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "DEMRES",
+                "RESELEC",
+                1,
+                2026
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "DEMRES",
+                "RESELEC",
+                1,
+                2027
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "DEMRES",
+                "RESELEC",
+                1,
+                2028
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "DEMRES",
+                "RESELEC",
+                1,
+                2029
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "DEMRES",
+                "RESELEC",
+                1,
+                2030
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRSTORAGE",
+                "ELC01",
+                2,
+                2020
+            ],
+            "value": 0.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRSTORAGE",
+                "ELC01",
+                2,
+                2021
+            ],
+            "value": 0.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRSTORAGE",
+                "ELC01",
+                2,
+                2022
+            ],
+            "value": 0.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRSTORAGE",
+                "ELC01",
+                2,
+                2023
+            ],
+            "value": 0.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRSTORAGE",
+                "ELC01",
+                2,
+                2024
+            ],
+            "value": 0.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRSTORAGE",
+                "ELC01",
+                2,
+                2025
+            ],
+            "value": 0.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRSTORAGE",
+                "ELC01",
+                2,
+                2026
+            ],
+            "value": 0.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRSTORAGE",
+                "ELC01",
+                2,
+                2027
+            ],
+            "value": 0.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRSTORAGE",
+                "ELC01",
+                2,
+                2028
+            ],
+            "value": 0.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRSTORAGE",
+                "ELC01",
+                2,
+                2029
+            ],
+            "value": 0.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRSTORAGE",
+                "ELC01",
+                2,
+                2030
+            ],
+            "value": 0.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRSTORAGE02",
+                "ELC02",
+                2,
+                2020
+            ],
+            "value": 0.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRSTORAGE02",
+                "ELC02",
+                2,
+                2021
+            ],
+            "value": 0.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRSTORAGE02",
+                "ELC02",
+                2,
+                2022
+            ],
+            "value": 0.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRSTORAGE02",
+                "ELC02",
+                2,
+                2023
+            ],
+            "value": 0.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRSTORAGE02",
+                "ELC02",
+                2,
+                2024
+            ],
+            "value": 0.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRSTORAGE02",
+                "ELC02",
+                2,
+                2025
+            ],
+            "value": 0.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRSTORAGE02",
+                "ELC02",
+                2,
+                2026
+            ],
+            "value": 0.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRSTORAGE02",
+                "ELC02",
+                2,
+                2027
+            ],
+            "value": 0.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRSTORAGE02",
+                "ELC02",
+                2,
+                2028
+            ],
+            "value": 0.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRSTORAGE02",
+                "ELC02",
+                2,
+                2029
+            ],
+            "value": 0.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRSTORAGE02",
+                "ELC02",
+                2,
+                2030
+            ],
+            "value": 0.0
+        }
+    ],
+    "p_CapitalCost": [
+        {
+            "index": [
+                "Simple",
+                "CCP",
+                2020
+            ],
+            "value": 1800.0
+        },
+        {
+            "index": [
+                "Simple",
+                "CCP",
+                2021
+            ],
+            "value": 1800.0
+        },
+        {
+            "index": [
+                "Simple",
+                "CCP",
+                2022
+            ],
+            "value": 1800.0
+        },
+        {
+            "index": [
+                "Simple",
+                "CCP",
+                2023
+            ],
+            "value": 1800.0
+        },
+        {
+            "index": [
+                "Simple",
+                "CCP",
+                2024
+            ],
+            "value": 1800.0
+        },
+        {
+            "index": [
+                "Simple",
+                "CCP",
+                2025
+            ],
+            "value": 1800.0
+        },
+        {
+            "index": [
+                "Simple",
+                "CCP",
+                2026
+            ],
+            "value": 1800.0
+        },
+        {
+            "index": [
+                "Simple",
+                "CCP",
+                2027
+            ],
+            "value": 1800.0
+        },
+        {
+            "index": [
+                "Simple",
+                "CCP",
+                2028
+            ],
+            "value": 1800.0
+        },
+        {
+            "index": [
+                "Simple",
+                "CCP",
+                2029
+            ],
+            "value": 1800.0
+        },
+        {
+            "index": [
+                "Simple",
+                "CCP",
+                2030
+            ],
+            "value": 1800.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRWIND",
+                2020
+            ],
+            "value": 1000.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRWIND",
+                2021
+            ],
+            "value": 1000.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRWIND",
+                2022
+            ],
+            "value": 1000.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRWIND",
+                2023
+            ],
+            "value": 1000.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRWIND",
+                2024
+            ],
+            "value": 1000.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRWIND",
+                2025
+            ],
+            "value": 1000.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRWIND",
+                2026
+            ],
+            "value": 1000.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRWIND",
+                2027
+            ],
+            "value": 1000.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRWIND",
+                2028
+            ],
+            "value": 1000.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRWIND",
+                2029
+            ],
+            "value": 1000.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRWIND",
+                2030
+            ],
+            "value": 1000.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRPV",
+                2020
+            ],
+            "value": 300.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRPV",
+                2021
+            ],
+            "value": 300.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRPV",
+                2022
+            ],
+            "value": 300.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRPV",
+                2023
+            ],
+            "value": 300.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRPV",
+                2024
+            ],
+            "value": 300.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRPV",
+                2025
+            ],
+            "value": 300.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRPV",
+                2026
+            ],
+            "value": 300.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRPV",
+                2027
+            ],
+            "value": 300.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRPV",
+                2028
+            ],
+            "value": 300.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRPV",
+                2029
+            ],
+            "value": 300.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRPV",
+                2030
+            ],
+            "value": 300.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRBIOMASS",
+                2020
+            ],
+            "value": 1800.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRBIOMASS",
+                2021
+            ],
+            "value": 1800.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRBIOMASS",
+                2022
+            ],
+            "value": 1800.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRBIOMASS",
+                2023
+            ],
+            "value": 1800.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRBIOMASS",
+                2024
+            ],
+            "value": 1800.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRBIOMASS",
+                2025
+            ],
+            "value": 1800.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRBIOMASS",
+                2026
+            ],
+            "value": 1800.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRBIOMASS",
+                2027
+            ],
+            "value": 1800.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRBIOMASS",
+                2028
+            ],
+            "value": 1800.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRBIOMASS",
+                2029
+            ],
+            "value": 1800.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRBIOMASS",
+                2030
+            ],
+            "value": 1800.0
+        }
+    ],
+    "p_VariableCost": [
+        {
+            "index": [
+                "Simple",
+                "CIMP",
+                1,
+                2020
+            ],
+            "value": 11.25
+        },
+        {
+            "index": [
+                "Simple",
+                "CIMP",
+                1,
+                2021
+            ],
+            "value": 11.25
+        },
+        {
+            "index": [
+                "Simple",
+                "CIMP",
+                1,
+                2022
+            ],
+            "value": 11.25
+        },
+        {
+            "index": [
+                "Simple",
+                "CIMP",
+                1,
+                2023
+            ],
+            "value": 11.25
+        },
+        {
+            "index": [
+                "Simple",
+                "CIMP",
+                1,
+                2024
+            ],
+            "value": 11.25
+        },
+        {
+            "index": [
+                "Simple",
+                "CIMP",
+                1,
+                2025
+            ],
+            "value": 11.25
+        },
+        {
+            "index": [
+                "Simple",
+                "CIMP",
+                1,
+                2026
+            ],
+            "value": 11.25
+        },
+        {
+            "index": [
+                "Simple",
+                "CIMP",
+                1,
+                2027
+            ],
+            "value": 11.25
+        },
+        {
+            "index": [
+                "Simple",
+                "CIMP",
+                1,
+                2028
+            ],
+            "value": 11.25
+        },
+        {
+            "index": [
+                "Simple",
+                "CIMP",
+                1,
+                2029
+            ],
+            "value": 11.25
+        },
+        {
+            "index": [
+                "Simple",
+                "CIMP",
+                1,
+                2030
+            ],
+            "value": 11.25
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRBIOMASS",
+                1,
+                2020
+            ],
+            "value": 5.5
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRBIOMASS",
+                1,
+                2021
+            ],
+            "value": 5.5
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRBIOMASS",
+                1,
+                2022
+            ],
+            "value": 5.5
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRBIOMASS",
+                1,
+                2023
+            ],
+            "value": 5.5
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRBIOMASS",
+                1,
+                2024
+            ],
+            "value": 5.5
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRBIOMASS",
+                1,
+                2025
+            ],
+            "value": 5.5
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRBIOMASS",
+                1,
+                2026
+            ],
+            "value": 5.5
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRBIOMASS",
+                1,
+                2027
+            ],
+            "value": 5.5
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRBIOMASS",
+                1,
+                2028
+            ],
+            "value": 5.5
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRBIOMASS",
+                1,
+                2029
+            ],
+            "value": 5.5
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRBIOMASS",
+                1,
+                2030
+            ],
+            "value": 5.5
+        }
+    ],
+    "p_FixedCost": [
+        {
+            "index": [
+                "Simple",
+                "CCP",
+                2020
+            ],
+            "value": 21.25
+        },
+        {
+            "index": [
+                "Simple",
+                "CCP",
+                2021
+            ],
+            "value": 21.25
+        },
+        {
+            "index": [
+                "Simple",
+                "CCP",
+                2022
+            ],
+            "value": 21.25
+        },
+        {
+            "index": [
+                "Simple",
+                "CCP",
+                2023
+            ],
+            "value": 21.25
+        },
+        {
+            "index": [
+                "Simple",
+                "CCP",
+                2024
+            ],
+            "value": 21.25
+        },
+        {
+            "index": [
+                "Simple",
+                "CCP",
+                2025
+            ],
+            "value": 21.25
+        },
+        {
+            "index": [
+                "Simple",
+                "CCP",
+                2026
+            ],
+            "value": 21.25
+        },
+        {
+            "index": [
+                "Simple",
+                "CCP",
+                2027
+            ],
+            "value": 21.25
+        },
+        {
+            "index": [
+                "Simple",
+                "CCP",
+                2028
+            ],
+            "value": 21.25
+        },
+        {
+            "index": [
+                "Simple",
+                "CCP",
+                2029
+            ],
+            "value": 21.25
+        },
+        {
+            "index": [
+                "Simple",
+                "CCP",
+                2030
+            ],
+            "value": 21.25
+        },
+        {
+            "index": [
+                "Simple",
+                "BS",
+                2020
+            ],
+            "value": 9999.0
+        },
+        {
+            "index": [
+                "Simple",
+                "BS",
+                2021
+            ],
+            "value": 9999.0
+        },
+        {
+            "index": [
+                "Simple",
+                "BS",
+                2022
+            ],
+            "value": 9999.0
+        },
+        {
+            "index": [
+                "Simple",
+                "BS",
+                2023
+            ],
+            "value": 9999.0
+        },
+        {
+            "index": [
+                "Simple",
+                "BS",
+                2024
+            ],
+            "value": 9999.0
+        },
+        {
+            "index": [
+                "Simple",
+                "BS",
+                2025
+            ],
+            "value": 9999.0
+        },
+        {
+            "index": [
+                "Simple",
+                "BS",
+                2026
+            ],
+            "value": 9999.0
+        },
+        {
+            "index": [
+                "Simple",
+                "BS",
+                2027
+            ],
+            "value": 9999.0
+        },
+        {
+            "index": [
+                "Simple",
+                "BS",
+                2028
+            ],
+            "value": 9999.0
+        },
+        {
+            "index": [
+                "Simple",
+                "BS",
+                2029
+            ],
+            "value": 9999.0
+        },
+        {
+            "index": [
+                "Simple",
+                "BS",
+                2030
+            ],
+            "value": 9999.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRWIND",
+                2020
+            ],
+            "value": 39.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRWIND",
+                2021
+            ],
+            "value": 39.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRWIND",
+                2022
+            ],
+            "value": 39.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRWIND",
+                2023
+            ],
+            "value": 39.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRWIND",
+                2024
+            ],
+            "value": 39.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRWIND",
+                2025
+            ],
+            "value": 39.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRWIND",
+                2026
+            ],
+            "value": 39.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRWIND",
+                2027
+            ],
+            "value": 39.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRWIND",
+                2028
+            ],
+            "value": 39.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRWIND",
+                2029
+            ],
+            "value": 39.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRWIND",
+                2030
+            ],
+            "value": 39.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRPV",
+                2020
+            ],
+            "value": 23.3
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRPV",
+                2021
+            ],
+            "value": 23.3
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRPV",
+                2022
+            ],
+            "value": 23.3
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRPV",
+                2023
+            ],
+            "value": 23.3
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRPV",
+                2024
+            ],
+            "value": 23.3
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRPV",
+                2025
+            ],
+            "value": 23.3
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRPV",
+                2026
+            ],
+            "value": 23.3
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRPV",
+                2027
+            ],
+            "value": 23.3
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRPV",
+                2028
+            ],
+            "value": 23.3
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRPV",
+                2029
+            ],
+            "value": 23.3
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRPV",
+                2030
+            ],
+            "value": 23.3
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRBIOMASS",
+                2020
+            ],
+            "value": 37.5
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRBIOMASS",
+                2021
+            ],
+            "value": 37.5
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRBIOMASS",
+                2022
+            ],
+            "value": 37.5
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRBIOMASS",
+                2023
+            ],
+            "value": 37.5
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRBIOMASS",
+                2024
+            ],
+            "value": 37.5
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRBIOMASS",
+                2025
+            ],
+            "value": 37.5
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRBIOMASS",
+                2026
+            ],
+            "value": 37.5
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRBIOMASS",
+                2027
+            ],
+            "value": 37.5
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRBIOMASS",
+                2028
+            ],
+            "value": 37.5
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRBIOMASS",
+                2029
+            ],
+            "value": 37.5
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRBIOMASS",
+                2030
+            ],
+            "value": 37.5
+        }
+    ],
+    "p_TechnologyToStorage": [
+        {
+            "index": [
+                "Simple",
+                "PWRSTORAGE",
+                "Batt01",
+                1
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRSTORAGE02",
+                "Batt02",
+                1
+            ],
+            "value": 1.0
+        }
+    ],
+    "p_TechnologyFromStorage": [
+        {
+            "index": [
+                "Simple",
+                "PWRSTORAGE",
+                "Batt01",
+                2
+            ],
+            "value": 1.0
+        },
+        {
+            "index": [
+                "Simple",
+                "PWRSTORAGE02",
+                "Batt02",
+                2
+            ],
+            "value": 1.0
+        }
+    ],
+    "p_StorageLevelStart": [],
+    "p_StorageMaxChargeRate": [],
+    "p_StorageMaxDischargeRate": [],
+    "p_MinStorageCharge": [],
+    "p_OperationalLifeStorage": [],
+    "p_CapitalCostStorage": [
+        {
+            "index": [
+                "Simple",
+                "Batt01",
+                2020
+            ],
+            "value": 15.0
+        },
+        {
+            "index": [
+                "Simple",
+                "Batt01",
+                2021
+            ],
+            "value": 15.0
+        },
+        {
+            "index": [
+                "Simple",
+                "Batt01",
+                2022
+            ],
+            "value": 15.0
+        },
+        {
+            "index": [
+                "Simple",
+                "Batt01",
+                2023
+            ],
+            "value": 15.0
+        },
+        {
+            "index": [
+                "Simple",
+                "Batt01",
+                2024
+            ],
+            "value": 15.0
+        },
+        {
+            "index": [
+                "Simple",
+                "Batt01",
+                2025
+            ],
+            "value": 15.0
+        },
+        {
+            "index": [
+                "Simple",
+                "Batt01",
+                2026
+            ],
+            "value": 15.0
+        },
+        {
+            "index": [
+                "Simple",
+                "Batt01",
+                2027
+            ],
+            "value": 15.0
+        },
+        {
+            "index": [
+                "Simple",
+                "Batt01",
+                2028
+            ],
+            "value": 15.0
+        },
+        {
+            "index": [
+                "Simple",
+                "Batt01",
+                2029
+            ],
+            "value": 15.0
+        },
+        {
+            "index": [
+                "Simple",
+                "Batt01",
+                2030
+            ],
+            "value": 15.0
+        },
+        {
+            "index": [
+                "Simple",
+                "Batt02",
+                2020
+            ],
+            "value": 15.0
+        },
+        {
+            "index": [
+                "Simple",
+                "Batt02",
+                2021
+            ],
+            "value": 15.0
+        },
+        {
+            "index": [
+                "Simple",
+                "Batt02",
+                2022
+            ],
+            "value": 15.0
+        },
+        {
+            "index": [
+                "Simple",
+                "Batt02",
+                2023
+            ],
+            "value": 15.0
+        },
+        {
+            "index": [
+                "Simple",
+                "Batt02",
+                2024
+            ],
+            "value": 15.0
+        },
+        {
+            "index": [
+                "Simple",
+                "Batt02",
+                2025
+            ],
+            "value": 15.0
+        },
+        {
+            "index": [
+                "Simple",
+                "Batt02",
+                2026
+            ],
+            "value": 15.0
+        },
+        {
+            "index": [
+                "Simple",
+                "Batt02",
+                2027
+            ],
+            "value": 15.0
+        },
+        {
+            "index": [
+                "Simple",
+                "Batt02",
+                2028
+            ],
+            "value": 15.0
+        },
+        {
+            "index": [
+                "Simple",
+                "Batt02",
+                2029
+            ],
+            "value": 15.0
+        },
+        {
+            "index": [
+                "Simple",
+                "Batt02",
+                2030
+            ],
+            "value": 15.0
+        }
+    ],
+    "p_ResidualStorageCapacity": [],
+    "p_CapacityOfOneTechnologyUnit": [],
+    "p_TotalAnnualMaxCapacity": [],
+    "p_TotalAnnualMinCapacity": [],
+    "p_TotalAnnualMaxCapacityInvestment": [],
+    "p_TotalAnnualMinCapacityInvestment": [],
+    "p_TotalTechnologyAnnualActivityUpperLimit": [],
+    "p_TotalTechnologyAnnualActivityLowerLimit": [],
+    "p_TotalTechnologyModelPeriodActivityUpperLimit": [],
+    "p_TotalTechnologyModelPeriodActivityLowerLimit": [],
+    "p_ReserveMarginTagTechnology": [],
+    "p_ReserveMarginTagFuel": [],
+    "p_ReserveMargin": [],
+    "p_RETagTechnology": [],
+    "p_RETagFuel": [],
+    "p_REMinProductionTarget": [],
+    "p_EmissionActivityRatio": [],
+    "p_EmissionsPenalty": [],
+    "p_AnnualExogenousEmission": [],
+    "p_AnnualEmissionLimit": [],
+    "p_ModelPeriodExogenousEmission": [],
+    "p_ModelPeriodEmissionLimit": [],
+    "p_MinimumOperatingLoad": [],
+    "p_CostoNoAsociado": [],
+    "p_Availability": [],
+    "p_NumberOfExistingUnits": [],
+    "p_CostoRecuperacion": [],
+    "p_VidaUtilRecuperada": [],
+    "p_Maintenance": [],
+    "p_ExportPrice": [],
+    "p_MustRunTech": [],
+    "p_MustRunFuel": [],
+    "p_MustRun": []
+}
