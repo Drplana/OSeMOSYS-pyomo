@@ -1308,7 +1308,7 @@ Aquí es donde se introduce el archivod de entrada definido arriba:
     # return json_files   
 
 if __name__ == "__main__":
-
+    start_time = time.time()  
 
     Default, REGION, YEAR, TECHNOLOGY, FUEL, SEASON, DAYTYPE, DAILYTIMEBRACKET, TIMESLICE, MODE_OF_OPERATION, STORAGE, EMISSION = load_sets(input_files_base_scenarios[0])
 
@@ -1328,24 +1328,71 @@ if __name__ == "__main__":
     }
 
 
+
+
     dimension_manager = DimensionManager(sets)
     scenario_manager = ScenarioManager(
-        input_file=None,  # No es necesario para este caso
+        input_file=None,  # Se configurará dinámicamente
         root_folder=root_folder,
         dimension_manager=dimension_manager
     )
 
     # Lista de archivos de entrada
     input_files = [
-        os.path.join(root_folder, 'data/01-BaseScenario.xlsx'),
-        os.path.join(root_folder, 'data/02-BaseScenarioWind.xlsx'),
-        os.path.join(root_folder, 'data/03-BaseScenarioWindBiomass.xlsx'),
-        os.path.join(root_folder, 'data/04-BaseScenarioWindBiomassPV.xlsx'),
-        os.path.join(root_folder, 'data/05-BaseScenarioWindBiomassPVAnnualInvLimit.xlsx'),
         os.path.join(root_folder, 'data/06-MustRunTechBase.xlsx'),
-    ]
-    # Ejecutar los archivos en paralelo de 3 en 3. Batch_size define el número de instancias a correr.
-    scenario_manager.run_files_in_batches(input_files=input_files, batch_size=3, solver_name="gurobi")
+        os.path.join(root_folder, 'data/08-Policies24Bio.xlsx'),
+       ]
+
+    # Configurar subescenarios a partir del archivo base.
+    scenarios_config = {
+        input_files[0]: { 
+            "parameter_name": "CostoRecuperacion",
+            "values": [500, 600, 700, 800] },
+        input_files[1]: {
+            "parameter_name": "TotalAnnualMaxCapacityInvestment",
+            "values":   {
+                    "name": "VariableCost",
+                    "values": {("Cuba", "PWRBIO", year): 0 for year in range(2025, 2050)},
+                    "filters": {"REGION": ["Cuba"], "TECHNOLOGY": ["PWRBIO"], "YEAR": list(range(2025, 2050))}
+                    }   
+                }
+            }
+
+    scenario_manager.run_hybrid_scenarios_with_custom_parameters(
+        input_files=input_files,
+        batch_size=3,
+        scenarios_config=scenarios_config,
+        solver_name="gurobi"
+    )
+    end_time = time.time()  # Registrar el tiempo de finalización
+    elapsed_time = end_time - start_time  # Calcular el tiempo transcurrido
+    print(f"Tiempo total de ejecución: {elapsed_time:.2f} segundos")
+
+
+##########################################################################################################################
+    """ Correr scenarios creando un archivo excel para cada uno"""
+###########################################################################################################################
+
+    # dimension_manager = DimensionManager(sets)
+    # scenario_manager = ScenarioManager(
+    #     input_file=None,  # No es necesario para este caso
+    #     root_folder=root_folder,
+    #     dimension_manager=dimension_manager
+    # )
+
+    # # Lista de archivos de entrada
+    # input_files = [
+    #     # os.path.join(root_folder, 'data/01-BaseScenario.xlsx'),
+    #     # os.path.join(root_folder, 'data/02-BaseScenarioWind.xlsx'),
+    #     # os.path.join(root_folder, 'data/03-BaseScenarioWindBiomass.xlsx'),
+    #     # os.path.join(root_folder, 'data/04-BaseScenarioWindBiomassPV.xlsx'),
+    #     # os.path.join(root_folder, 'data/05-BaseScenarioWindBiomassPVAnnualInvLimit.xlsx'),
+    #     os.path.join(root_folder, 'data/06-MustRunTechBase.xlsx'),
+    #     os.path.join(root_folder, 'data/08-MustRunTechBaseAnnualInvLimit.xlsx'),
+
+    # ]
+    # # Ejecutar los archivos en paralelo de 3 en 3. Batch_size define el número de instancias a correr.
+    # scenario_manager.run_files_in_batches(input_files=input_files, batch_size=3, solver_name="gurobi")
 
 
     # dimension_manager = DimensionManager(sets)
@@ -1378,75 +1425,81 @@ if __name__ == "__main__":
     # Resolver escenarios
     scenario_manager.solve_subscenarios_in_parallel(json_files, solver_name="gurobi")
     
-    """
+    """   
+
 ##########################################################################################################################
 
 
     ###############################################################################
     """Module 1 for creating scenarios with a single parameter"""
     ###############################################################################
-    # parameter_name = "CostoRecuperacion"
-    # values = [500, 600, 700, 800]
-    # input_file = input_files_base_scenarios[0]
-    # json_files = generate_json_files_in_parallel(
-    #     input_file, 
-    #     parameter_name, 
-    #     values, 
-    #     dataframe_metadata, 
-    #     dimension_manager, 
-    #     root_folder)
-    # solve_subscenarios_in_parallel(json_files, input_file, solver_name="gurobi")
-
+    """" Example: 
+    parameter_name = "CostoRecuperacion"
+    values = [500, 600, 700, 800]
+    input_file = input_files_base_scenarios[0]
+    json_files = generate_json_files_in_parallel(
+        input_file, 
+        parameter_name, 
+        values, 
+        dataframe_metadata, 
+        dimension_manager, 
+        root_folder)
+    solve_subscenarios_in_parallel(json_files, input_file, solver_name="gurobi")
+    """
 
 ###############################################################################
     """Module 2 for creating scenarios with filters and multiple parameters"""
 ################################################################################
-    # parameters = [
-    #     {
-    #         "name": "TotalAnnualMaxCapacityInvestment",
-    #         "values": {
-    #             ("Cuba", "PWRBIO", year): 0.12 for year in range(2025, 2050)
-    #         },
-    #         "filters": {
-    #             "REGION": ["Cuba"],
-    #             "TECHNOLOGY": ["PWRBIO"],
-    #             "YEAR": list(range(2025, 2050))
-    #         }
-    #     },
-    #     # {
-    #     #     "name": "CostoRecuperacion",
-    #     #     "values": [800],
-    #     #     "filters": None
-    #     # },
-    #     {
-    #         "name": "CapitalCost",
-    #         "values": {
-    #             ("Cuba", "PWRPV01", year): 1000 for year in range(2025, 2050)
-    #         },
-    #         "filters": {
-    #             "REGION": ["Cuba"],
-    #             "TECHNOLOGY": ["PWRPV01"],
-    #             "YEAR": list(range(2025, 2050))
-    #         }
-    #     }
-    # ]
-    # subscenario_name_mod2 = "MaxCapacity"
+    """Example module 2:
+    parameters = [
+        {
+            "name": "TotalAnnualMaxCapacityInvestment",
+            "values": {
+                ("Cuba", "PWRBIO", year): 0.12 for year in range(2025, 2050)
+            },
+            "filters": {
+                "REGION": ["Cuba"],
+                "TECHNOLOGY": ["PWRBIO"],
+                "YEAR": list(range(2025, 2050))
+            }
+        },
+        # {
+        #     "name": "CostoRecuperacion",
+        #     "values": [800],
+        #     "filters": None
+        # },
+        {
+            "name": "CapitalCost",
+            "values": {
+                ("Cuba", "PWRPV01", year): 1000 for year in range(2025, 2050)
+            },
+            "filters": {
+                "REGION": ["Cuba"],
+                "TECHNOLOGY": ["PWRPV01"],
+                "YEAR": list(range(2025, 2050))
+            }
+        }
+    ]
+    subscenario_name_mod2 = "MaxCapacity"
 
-    # # Generar archivo JSON
-    # input_file = input_files_base_scenarios[0]
-    # json_file_path = generate_json_file_2(
-    #     input_file, 
-    #     parameters,
-    #     dataframe_metadata, 
-    #     dimension_manager, 
-    #     root_folder, 
-    #     subscenario_name_mod2
-    # )
+    # Generar archivo JSON
+    input_file = input_files_base_scenarios[0]
+    json_file_path = generate_json_file_2(
+        input_file, 
+        parameters,
+        dataframe_metadata, 
+        dimension_manager, 
+        root_folder, 
+        subscenario_name_mod2
+    )
 
-    # # Resolver el subescenario
-    # if json_file_path:
-    #     result_message = solve_subscenario(json_file_path, input_file, solver_name="gurobi")
-    #     print(result_message)
+    # Resolver el subescenario
+    if json_file_path:
+        result_message = solve_subscenario(json_file_path, input_file, solver_name="gurobi")
+        print(result_message)
+    """
+
+
     ############################################################################
     ############################################################################ 
     ############################################################################

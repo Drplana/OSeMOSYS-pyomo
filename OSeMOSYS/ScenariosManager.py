@@ -356,3 +356,123 @@ class ScenarioManager:
             batch = input_files[i:i + batch_size]
             print(f"Ejecutando lote {i // batch_size + 1}: {batch}")
             self.run_files_in_parallel(batch, solver_name)   
+
+
+    def run_hybrid_scenarios_with_custom_parameters(self, input_files, batch_size, scenarios_config, solver_name="gurobi"):
+        """
+        Ejecuta un enfoque híbrido de escenarios: múltiples archivos en paralelo y escenarios combinados con parámetros específicos por archivo.
+
+        Args:
+            input_files (list): Lista de rutas de archivos de entrada.
+            batch_size (int): Tamaño del lote (número de archivos por grupo).
+            scenarios_config (dict): Configuración de parámetros y valores para cada archivo.
+            solver_name (str): Nombre del solver a utilizar.
+
+        Returns:
+            None
+        """
+        for i in range(0, len(input_files), batch_size):
+            batch = input_files[i:i + batch_size]
+            print(f"Ejecutando lote {i // batch_size + 1}: {batch}")
+
+            # Ejecutar los archivos base directamente
+            with ProcessPoolExecutor() as executor:
+                base_results = executor.map(self.execute_base_file, batch, [solver_name] * len(batch))
+                for result in base_results:
+                    print(result)
+
+            # Ejecutar subescenarios para cada archivo en paralelo dentro del lote
+            with ProcessPoolExecutor() as executor:
+                results = executor.map(
+                    self.process_file_with_custom_scenarios,
+                    batch,
+                    [scenarios_config] * len(batch),
+                    [solver_name] * len(batch)
+                )
+                for result in results:
+                    print(result)
+
+    def process_file_with_custom_scenarios(self, input_file, scenarios_config, solver_name):
+        """
+        Procesa un archivo de entrada generando y resolviendo escenarios combinados según su configuración específica.
+
+        Args:
+            input_file (str): Ruta del archivo de entrada.
+            scenarios_config (dict): Configuración de parámetros y valores para cada archivo.
+            solver_name (str): Nombre del solver a utilizar.
+
+        Returns:
+            str: Mensaje indicando el resultado del procesamiento.
+        """
+        try:
+            # Configurar el ScenarioManager para el archivo actual
+            self.input_file = input_file
+
+            # Obtener la configuración específica para este archivo
+            if input_file not in scenarios_config:
+                return f"No se definieron escenarios para el archivo: {input_file}"
+
+            config = scenarios_config[input_file]
+            parameter_name = config["parameter_name"]
+            values = config["values"]
+
+            # Caso 1: Usar generate_combined_scenarios y solve_subscenarios_in_parallel
+            if isinstance(values, list):
+                json_files = self.generate_combined_scenarios(parameter_name, values, [])
+                self.solve_subscenarios_in_parallel(json_files, solver_name)
+
+            # Caso 2: Usar generate_json_file_2 y solve_subscenario
+            elif isinstance(values, dict):
+                subscenario_name = f"{parameter_name}_custom"
+                json_file_path = self.generate_json_file_2([{"name": parameter_name, "values": values["values"], "filters": values["filters"]}], subscenario_name)
+                if json_file_path:
+                    result_message = self.solve_subscenario(json_file_path, solver_name)
+                    print(result_message)
+
+            return f"Procesamiento completado para: {input_file}"
+
+        except Exception as e:
+            return f"Error al procesar el archivo {input_file}: {e}"
+        
+    def execute_base_file(self, input_file, solver_name):
+        """
+        Ejecuta directamente un archivo base sin generar subescenarios.
+
+        Args:
+            input_file (str): Ruta del archivo base.
+            solver_name (str): Nombre del solver a utilizar.
+
+        Returns:
+            None
+        """
+        try:
+            # Configurar rutas
+            paths = configure_paths(input_file, self.root_folder)
+            json_file_path = paths['OUTPUT_JSON_DATA_PATH']
+            results_folder = paths['RESULTS_FOLDER']
+
+            # Cargar y transformar los datos
+            dataframe = load_dataframes(input_file)
+            transf_data = transform_all_dataframes(dataframe)
+            dict_to_be_adjusted = dict_to_json(transf_data, input_file)
+            pyomo_dict = adjust_json_for_pyomo(dict_to_be_adjusted)
+
+            # Exportar los datos a JSON
+            export_to_json(pyomo_dict, json_file_path)
+
+            # Ejecutar el modelo
+            instance = solve_model(
+                input_file=input_file,
+                solver_name=solver_name,
+                json_file_path_or_dict=json_file_path,
+                solver_options=None,
+                tee=True
+            )
+
+            # Exportar resultados
+            export_results(instance, results_folder)
+            print(f"Archivo base ejecutado exitosamente: {input_file}")
+
+        except Exception as e:
+            print(f"Error al ejecutar el archivo base {input_file}: {e}")
+    
