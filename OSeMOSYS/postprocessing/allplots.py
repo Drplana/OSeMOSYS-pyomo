@@ -8,7 +8,7 @@ import plotly.express as px
 from plotly.subplots import make_subplots
 import plotly.graph_objects as go
 # from OSeMOSYS.config import INPUT_FILE_PATH, RESULTS_FOLDER, configure_paths
-from OSeMOSYS.postprocessing.charts import create_line_chart, create_stacked_bar_chart, create_donut_charts, create_line_chart_app4, create_combined_line_chart, create_heatmap
+from OSeMOSYS.postprocessing.charts import create_line_chart, create_stacked_bar_chart, create_donut_charts, create_line_chart_app4, create_combined_line_chart, create_heatmap, create_bar_chart
 from OSeMOSYS.utils import COLOR_VARIATIONS, DEPENDENCIES_VAR_DICT, assign_colors_to_technologies, dependency_key_app1, dependency_key_app2, dependency_key_app4, dependency_key_app5
 # ROOT_FOLDER = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from dash import Dash, dcc, html, Input, Output, State, callback, ctx
@@ -18,7 +18,8 @@ from itertools import cycle
 import itertools
 import colorsys
 from collections import defaultdict
-from OSeMOSYS.config import input_files_simple, season_mapping, daytype_mapping, bracket_mapping, yearsplit, specified_demand_profile
+from OSeMOSYS.config import season_mapping, daytype_mapping, bracket_mapping, yearsplit, specified_demand_profile, input_files_simple
+from concurrent.futures import ProcessPoolExecutor
 # from OSeMOSYS.CalcParam import transform_to_hourly
 
 from OSeMOSYS.CalcParam import transform_to_hourly
@@ -443,6 +444,94 @@ def get_dependency_files(input_files, dependency_key, base_folder="results"):
 
     return dependency_files
 
+
+
+def process_single_file(file_name, file_path, yearsplit, specified_demand_profile, bracket_mapping, daytype_mapping, season_mapping):
+    """
+    Procesa un único archivo y lo transforma a formato horario.
+
+    Args:
+        file_name (str): Nombre del archivo.
+        file_path (str): Ruta del archivo.
+        yearsplit (pd.Series): Serie con los valores de YearSplit indexados por TIMESLICE.
+        specified_demand_profile (pd.Series): Serie con los valores de SpecifiedDemandProfile indexados por TIMESLICE.
+        bracket_mapping (dict): Mapeo de bloques horarios.
+        daytype_mapping (dict): Mapeo de tipos de día.
+        season_mapping (dict): Mapeo de estaciones.
+
+    Returns:
+        str: Mensaje indicando el resultado del procesamiento.
+    """
+    try:
+        if file_name != "ProductionByTechnology":
+            return f"Archivo {file_name} no procesado (no es 'ProductionByTechnology')."
+
+        df = pd.read_csv(file_path)
+        if df.empty:
+            return f"El archivo {file_name} está vacío."
+
+        # Agregar columnas YearSplit y SpecifiedDemandProfile
+        df['YearSplit'] = df['TIMESLICE'].map(yearsplit)
+        df['SpecifiedDemandProfile'] = df['TIMESLICE'].map(specified_demand_profile)
+
+        if df[['YearSplit', 'SpecifiedDemandProfile']].isnull().any().any():
+            return f"Advertencia: Valores faltantes en YearSplit o SpecifiedDemandProfile para {file_name}."
+
+        # Calcular la demanda horaria
+        df['value'] = df['value'] / (df['YearSplit'] * 8760)
+
+        # Transformar los datos a formato horario
+        hourly_results = transform_to_hourly(df, bracket_mapping, daytype_mapping, season_mapping)
+
+        # Exportar los resultados a CSV
+        output_file = os.path.join(os.path.dirname(file_path), f"{file_name}_hourly.csv")
+        hourly_results.to_csv(output_file, index=False)
+        return f"Archivo procesado y guardado en: {output_file}"
+
+    except Exception as e:
+        return f"Error al procesar el archivo {file_name}: {e}"
+
+
+def process_and_save_hourly_data_parallel(dependency_files, yearsplit, specified_demand_profile, bracket_mapping, daytype_mapping, season_mapping):
+    """
+    Procesa los archivos de dependencia en paralelo y los transforma a formato horario.
+
+    Args:
+        dependency_files (dict): Diccionario con los archivos organizados por escenario.
+        yearsplit (pd.Series): Serie con los valores de YearSplit indexados por TIMESLICE.
+        specified_demand_profile (pd.Series): Serie con los valores de SpecifiedDemandProfile indexados por TIMESLICE.
+        bracket_mapping (dict): Mapeo de bloques horarios.
+        daytype_mapping (dict): Mapeo de tipos de día.
+        season_mapping (dict): Mapeo de estaciones.
+
+    Returns:
+        None
+    """
+    tasks = []
+
+    # Crear tareas para cada archivo
+    for scenario, files in dependency_files.items():
+        for file_name, file_path in files.items():
+            tasks.append((file_name, file_path, yearsplit, specified_demand_profile, bracket_mapping, daytype_mapping, season_mapping))
+
+    # Ejecutar las tareas en paralelo
+    with ProcessPoolExecutor() as executor:
+        results = executor.map(process_single_file_wrapper, tasks)
+        for result in results:
+            print(result)
+
+
+def process_single_file_wrapper(args):
+    """
+    Wrapper para desempaquetar argumentos y llamar a process_single_file.
+
+    Args:
+        args (tuple): Argumentos para process_single_file.
+
+    Returns:
+        str: Resultado de process_single_file.
+    """
+    return process_single_file(*args)
 
 
 # def create_stacked_bar_chart(data, title, COLOR_VARIATIONS):
@@ -1232,10 +1321,16 @@ def create_app_4(dependency_files):
         )
     ], style={'margin-top': '20px'}),
     html.Div([
-        dcc.Graph(id='combined-line-chart', style={'width': '100%'})
+        html.Div([
+            dcc.Graph(id='combined-line-chart', style={'width': '48%', 'display': 'inline-block'}),
+        ]),
+        html.Div([
+            dcc.Graph(id='bar-chart', style={'width': '48%', 'display': 'inline-block'})
         ])
-    ])
-    # ])
+    ], style={'display': 'flex', 'align-items': 'center'})
+])
+
+
     # Cargar todos los datos al inicio
     def load_all_data(dependency_files):
         data_cache = {}
@@ -1365,6 +1460,42 @@ def create_app_4(dependency_files):
             title=f"{selected_file} For all Scenarios",
         )
         return combined_chart
+    @app.callback(
+        Output('bar-chart', 'figure'),
+        [Input('scenario-checklist', 'value')]
+    )
+    def update_bar_chart(selected_scenarios):
+        total_costs = []
+        for scenario, files in dependency_files.items():
+            for file_name, file_path in files.items():
+                if 'TotalDiscountedCost' in file_name:
+                    try:
+                        data = pd.read_csv(file_path)
+                        if not data.empty and 'value' in data.columns:
+                            total_cost = data['value'].sum()
+                            total_costs.append({'Scenario': scenario, 'TotalDiscountedCost': total_cost})
+                    except Exception as e:
+                        print(f"Error al leer el archivo {file_path}: {e}")
+
+        if not total_costs:
+            return create_bar_chart(pd.DataFrame(), "Scenario", "TotalDiscountedCost", "Scenario", "No se encontraron datos")
+
+        total_costs_df = pd.DataFrame(total_costs)
+
+        # Crear el gráfico de barras con el nuevo estilo
+        return create_bar_chart(
+            data=total_costs_df,
+            x_column='Scenario',
+            y_column='TotalDiscountedCost',
+            color_column='Scenario',
+            title="Comparación de TotalDiscountedCost entre todos los escenarios"
+        )
+
+
+
+
+
+
     return app
 
 
@@ -1969,7 +2100,7 @@ def run_app_5(base_folder="results", color_variations=COLOR_VARIATIONS):
     app5 = create_app_5(hourly_data, COLOR_VARIATIONS)
     print("Ejecutando la App 5 en el puerto 8055...")
     webbrowser.open("http://127.0.0.1:8055/")
-    app5.run(debug=False, port=8055)
+    app5.run(debug=False, port=8055, use_reloader=False)
 
 # def run_app_5(dependency_files, bracket_mapping, daytype_mapping, season_mapping):
 #     print("Ejecutando la App 5 en el puerto 8055...")
@@ -1989,11 +2120,16 @@ def run_app_5(base_folder="results", color_variations=COLOR_VARIATIONS):
 # Ejecutar la aplicación
 if __name__ == '__main__':
 
+    # input_files_simple = [
+
+    #     os.path.join(root_folder, 'data/SuperSimpleExpandedReTagStorage.xlsx'),
+
+    #    ]
 
     dependency_files_app1 = get_dependency_files(input_files_simple, dependency_key_app1, base_folder="results")
     dependency_files_app2 = get_dependency_files(input_files_simple, dependency_key_app2, base_folder="results")
     dependency_files_app4 = get_dependency_files(input_files_simple, dependency_key_app4, base_folder="results")
-    dependency_files_app5 = get_dependency_files(input_files_simple, dependency_key_app5, base_folder="results")
+    # dependency_files_app5 = get_dependency_files(input_files_simple, dependency_key_app5, base_folder="results")
     # run_app_5(dependency_files_app5, bracket_mapping, daytype_mapping, season_mapping)
     
 
@@ -2004,11 +2140,11 @@ if __name__ == '__main__':
     Aquí es donde calculo el parámetro Production by technology de forma horaria para mostrar despacho. 
     Tengo que pensar para donde moverlo, para no tener que comentarlo cuando ejecute los gráficos.
     """
-    # dependency_files = get_dependency_files(
-    #     input_files=input_files_simple,  # Lista de archivos de entrada
-    #     dependency_key="['REGION','TIMESLICE','TECHNOLOGY','FUEL','YEAR']",  # Clave de dependencia
-    #     base_folder="results"  # Carpeta donde están los resultados
-    # )
+    dependency_files = get_dependency_files(
+        input_files=input_files_simple,  # Lista de archivos de entrada
+        dependency_key="['REGION','TIMESLICE','TECHNOLOGY','FUEL','YEAR']",  # Clave de dependencia
+        base_folder="results"  # Carpeta donde están los resultados
+    )
     
     # process_and_save_hourly_data(
     # dependency_files=dependency_files,
@@ -2018,12 +2154,22 @@ if __name__ == '__main__':
     # daytype_mapping=daytype_mapping,
     # season_mapping=season_mapping
     # )
+    print(dependency_files)
+
+    # process_and_save_hourly_data_parallel(
+    #     dependency_files=dependency_files,
+    #     yearsplit=yearsplit,
+    #     specified_demand_profile=specified_demand_profile,
+    #     bracket_mapping=bracket_mapping,
+    #     daytype_mapping=daytype_mapping,
+    #     season_mapping=season_mapping
+    # )
 ###############################################################################################
 ###############################################################################################
 
     # print(dependency_files)
     # hourly_data = transform_to_hourly_extra(dependency_files, bracket_mapping, daytype_mapping, season_mapping)
-    run_app_5(base_folder="results", color_variations=COLOR_VARIATIONS)
+    # run_app_5(base_folder="results", color_variations=COLOR_VARIATIONS)
 
 # print(dependency_files)
 
@@ -2037,22 +2183,25 @@ if __name__ == '__main__':
     
     ## definir para los gráficos de pastel. Permite ver el porcentaje de cada tecnología en cada año
     years = [2020, 2025, 2030]
+    from multiprocessing import Process
+    threads = []
+    threads.append(Thread(target=run_app_1, args=(dependency_files_app1, COLOR_VARIATIONS, scenarios)))
+    threads.append(Thread(target=run_app_2, args=(dependency_files_app2, COLOR_VARIATIONS, years, scenarios)))
+    threads.append(Thread(target=run_app_3, args=(dependency_files_app1, scenarios)))
+    threads.append(Thread(target=run_app_4, args=(dependency_files_app4,)))
+    # threads.append(Thread(target=run_app_5, args=(dependency_files_app5, COLOR_VARIATIONS)))
+    # Ejecutar App 5 en un proceso separado
+    app5_process = Process(target=run_app_5, args=("results", COLOR_VARIATIONS))
+    for thread in threads:
+        thread.start()
+    app5_process.start()
 
-    # threads = []
-    # threads.append(Thread(target=run_app_1, args=(dependency_files_app1, COLOR_VARIATIONS, scenarios)))
-    # threads.append(Thread(target=run_app_2, args=(dependency_files_app2, COLOR_VARIATIONS, years, scenarios)))
-    # threads.append(Thread(target=run_app_3, args=(dependency_files_app1, scenarios)))
-    # threads.append(Thread(target=run_app_4, args=(dependency_files_app4,)))
-
-    # for thread in threads:
-    #     thread.start()
-
-    # # Wait for all threads to finish
-    # for thread in threads:
-    #     thread.join()
+    # Wait for all threads to finish
+    for thread in threads:
+        thread.join()
     # run_app_2(dependency_files_app2, COLOR_VARIATIONS, [2019, 2030, 2050], scenarios)
-    
-    
+    # run_app_5(base_folder="results", color_variations=COLOR_VARIATIONS)
+    app5_process.join()
 
 
 

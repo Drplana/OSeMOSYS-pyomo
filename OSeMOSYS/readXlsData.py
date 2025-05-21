@@ -299,7 +299,7 @@ def generate_output_path(input_file_path, file_suffix=".json"):
 
 if __name__ == "__main__":
     # Cargar los DataFrames
-    INPUT_FILE_PATH = '/home/david/OSeMOSYS-pyomo/data/Antiguos/SuperSimple.xlsx'
+    INPUT_FILE_PATH = '/home/david/OSeMOSYS-pyomo/data/10-Storage.xlsx'
     data_frames = load_dataframes(INPUT_FILE_PATH)
     # Transformar los DataFrames
     transformed_dataframes = transform_all_dataframes(data_frames)

@@ -149,10 +149,10 @@ os.path.join(root_folder, 'data/03-BaseScenarioWindBiomass.xlsx'),
 os.path.join(root_folder, 'data/04-BaseScenarioWindBiomassPV.xlsx'),
 os.path.join(root_folder, 'data/05-BaseScenarioWindBiomassPVAnnualInvLimit.xlsx'),
 os.path.join(root_folder, 'data/06-MustRunTechBase.xlsx'),
-# os.path.join(root_folder, 'data/06-BaseScenarioWind.xlsx'),
-# os.path.join(root_folder, 'data/03-BaseScenarioWindBiomass.xlsx'),
-# os.path.join(root_folder, 'data/04-BaseScenarioWindBiomassPV.xlsx'),
-# os.path.join(root_folder, 'data/05-BaseScenarioWindBiomassPVAnnualInvLimit.xlsx'),
+# os.path.join(root_folder, 'data/06-MustRunTechBase.xlsx'),
+os.path.join(root_folder, 'data/07-Retrofit.xlsx'),
+os.path.join(root_folder, 'data/08-Policies24Bio.xlsx'),
+os.path.join(root_folder, 'data/10-Storage.xlsx'),
 
 ]
 

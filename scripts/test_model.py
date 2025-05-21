@@ -1330,55 +1330,59 @@ if __name__ == "__main__":
 
 
 
-    dimension_manager = DimensionManager(sets)
-    scenario_manager = ScenarioManager(
-        input_file=None,  # Se configurará dinámicamente
-        root_folder=root_folder,
-        dimension_manager=dimension_manager
-    )
+    # dimension_manager = DimensionManager(sets)
+    # scenario_manager = ScenarioManager(
+    #     input_file=None,  # Se configurará dinámicamente
+    #     root_folder=root_folder,
+    #     dimension_manager=dimension_manager
+    # )
 
     # Lista de archivos de entrada
     input_files = [
-        os.path.join(root_folder, 'data/06-MustRunTechBase.xlsx'),
-        os.path.join(root_folder, 'data/08-Policies24Bio.xlsx'),
+        # os.path.join(root_folder, 'data/06-MustRunTechBase.xlsx'),
+        # os.path.join(root_folder, 'data/07-Retrofit.xlsx'),
+        # os.path.join(root_folder, 'data/08-Policies24Bio.xlsx'),
+        os.path.join(root_folder, 'data/10-Storage.xlsx'),
+        # os.path.join(root_folder, 'data/SuperSimpleExpandedReTagStorage.xlsx'),
+
        ]
 
-    # Configurar subescenarios a partir del archivo base.
-    scenarios_config = {
-        input_files[0]: { 
-            "parameter_name": "CostoRecuperacion",
-            "values": [500, 600, 700, 800] },
-        input_files[1]: {
-            "parameter_name": "TotalAnnualMaxCapacityInvestment",
-            "values":   {
-                    "name": "VariableCost",
-                    "values": {("Cuba", "PWRBIO", year): 0 for year in range(2025, 2050)},
-                    "filters": {"REGION": ["Cuba"], "TECHNOLOGY": ["PWRBIO"], "YEAR": list(range(2025, 2050))}
-                    }   
-                }
-            }
+    # # Configurar subescenarios a partir del archivo base.
+    # scenarios_config = {
+    #     input_files[1]: { 
+    #         "parameter_name": "CostoRecuperacion",
+    #         "values": [500, 600, 700, 800] },
+    #     input_files[2]: {
+    #         "parameter_name": "TotalAnnualMaxCapacityInvestment",
+    #         "values":   {
+    #                 "name": "VariableCost",
+    #                 "values": {("Cuba", "PWRBIO", year): 0 for year in range(2025, 2050)},
+    #                 "filters": {"REGION": ["Cuba"], "TECHNOLOGY": ["PWRBIO"], "YEAR": list(range(2025, 2050))}
+    #                 }   
+    #             }
+    #         }
 
-    scenario_manager.run_hybrid_scenarios_with_custom_parameters(
-        input_files=input_files,
-        batch_size=3,
-        scenarios_config=scenarios_config,
-        solver_name="gurobi"
-    )
-    end_time = time.time()  # Registrar el tiempo de finalización
-    elapsed_time = end_time - start_time  # Calcular el tiempo transcurrido
-    print(f"Tiempo total de ejecución: {elapsed_time:.2f} segundos")
+    # scenario_manager.run_hybrid_scenarios_with_custom_parameters(
+    #     input_files=input_files,
+    #     batch_size=3,
+    #     scenarios_config=scenarios_config,
+    #     solver_name="gurobi"
+    # )
+    # end_time = time.time()  # Registrar el tiempo de finalización
+    # elapsed_time = end_time - start_time  # Calcular el tiempo transcurrido
+    # print(f"Tiempo total de ejecución: {elapsed_time:.2f} segundos")
 
 
 ##########################################################################################################################
     """ Correr scenarios creando un archivo excel para cada uno"""
 ###########################################################################################################################
 
-    # dimension_manager = DimensionManager(sets)
-    # scenario_manager = ScenarioManager(
-    #     input_file=None,  # No es necesario para este caso
-    #     root_folder=root_folder,
-    #     dimension_manager=dimension_manager
-    # )
+    dimension_manager = DimensionManager(sets)
+    scenario_manager = ScenarioManager(
+        input_file=None,  # No es necesario para este caso
+        root_folder=root_folder,
+        dimension_manager=dimension_manager
+    )
 
     # # Lista de archivos de entrada
     # input_files = [
@@ -1391,8 +1395,8 @@ if __name__ == "__main__":
     #     os.path.join(root_folder, 'data/08-MustRunTechBaseAnnualInvLimit.xlsx'),
 
     # ]
-    # # Ejecutar los archivos en paralelo de 3 en 3. Batch_size define el número de instancias a correr.
-    # scenario_manager.run_files_in_batches(input_files=input_files, batch_size=3, solver_name="gurobi")
+    # Ejecutar los archivos en paralelo de 3 en 3. Batch_size define el número de instancias a correr.
+    scenario_manager.run_files_in_batches(input_files=input_files, batch_size=3, solver_name="gurobi")
 
 
     # dimension_manager = DimensionManager(sets)

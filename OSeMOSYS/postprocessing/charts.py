@@ -297,7 +297,7 @@ def create_line_chart_app4(data, x_column, y_column, color_column, title, width=
     return fig
 
 
-def create_combined_line_chart(data, x_column, y_column, color_column, line_group_column, title, width=1900, height=600):
+def create_combined_line_chart(data, x_column, y_column, color_column, line_group_column, title, width=1500, height=600):
     """
     Crea un gráfico de línea combinado con estilo profesional.
 
@@ -364,3 +364,67 @@ def create_combined_line_chart(data, x_column, y_column, color_column, line_grou
     )
     return fig
 
+def create_bar_chart(data, x_column, y_column, color_column, title, width=600, height=600):
+    """
+    Crea un gráfico de barras con estilo profesional.
+
+    Args:
+        data (pd.DataFrame): DataFrame con los datos.
+        x_column (str): Columna para el eje X.
+        y_column (str): Columna para el eje Y.
+        color_column (str): Columna para agrupar por color.
+        title (str): Título del gráfico.
+        width (int): Ancho del gráfico.
+        height (int): Altura del gráfico.
+
+    Returns:
+        go.Figure: Gráfico de barras.
+    """
+    fig = px.bar(
+        data,
+        x=x_column,
+        y=y_column,
+        color=color_column,
+        title=title,
+        color_discrete_sequence=px.colors.qualitative.Set2  # Usar la misma paleta de colores
+    )
+
+    # Personalizar el diseño
+    # fig.update_traces(marker=dict(line=dict(width=1, color='black')))  # Bordes negros en las barras
+    fig.update_layout(
+        title=dict(
+            text=title,
+            font=dict(size=20, family="Arial, sans-serif"),
+            x=0.5,
+            xanchor="center"
+        ),
+        xaxis=dict(
+            title=x_column,
+            title_font=dict(size=16, family="Arial, sans-serif"),
+            tickfont=dict(size=16, family="Arial, sans-serif"),
+            showgrid=True,
+            gridcolor="lightgrey"
+        ),
+        yaxis=dict(
+            title=y_column,
+            title_font=dict(size=16, family="Arial, sans-serif"),
+            tickfont=dict(size=16, family="Arial, sans-serif"),
+            showgrid=True,
+            gridcolor="lightgrey"
+        ),
+        legend=dict(
+            title=dict(text=color_column, font=dict(size=14, family="Arial, sans-serif")),
+            font=dict(size=14, family="Arial, sans-serif"),
+            orientation="h",
+            x=0.5,
+            xanchor="center",
+            y=-0.3
+        ),
+        showlegend=False,
+        plot_bgcolor="white",
+        margin=dict(t=60, b=150, l=60, r=40),
+        width=width,
+        height=height,
+        template="presentation"  # Usar el mismo tema
+    )
+    return fig
