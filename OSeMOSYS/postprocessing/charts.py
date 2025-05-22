@@ -4,7 +4,7 @@ from itertools import cycle
 from OSeMOSYS.utils import assign_colors_to_technologies
 from dash import Dash, dcc, html, Input, Output, State, callback, ctx
 import pandas as pd
-
+import plotly.io as pio
 
 
 def create_line_chart(data, title, x_column, y_column, color_column, COLOR_VARIATIONS):
@@ -361,6 +361,7 @@ def create_combined_line_chart(data, x_column, y_column, color_column, line_grou
         width=width,
         height=height,
         template= "presentation",  # Cambia el tema a "presentation"
+        # modebar_add=['toImage'], toImageButtonOptions={'format': 'svg'} 
     )
     return fig
 
@@ -402,14 +403,14 @@ def create_bar_chart(data, x_column, y_column, color_column, title, width=600, h
             title=x_column,
             title_font=dict(size=16, family="Arial, sans-serif"),
             tickfont=dict(size=16, family="Arial, sans-serif"),
-            showgrid=True,
+            showgrid=False,
             gridcolor="lightgrey"
         ),
         yaxis=dict(
             title=y_column,
             title_font=dict(size=16, family="Arial, sans-serif"),
             tickfont=dict(size=16, family="Arial, sans-serif"),
-            showgrid=True,
+            showgrid=False,
             gridcolor="lightgrey"
         ),
         legend=dict(
@@ -425,6 +426,10 @@ def create_bar_chart(data, x_column, y_column, color_column, title, width=600, h
         margin=dict(t=60, b=150, l=60, r=40),
         width=width,
         height=height,
-        template="presentation"  # Usar el mismo tema
+        template="presentation",  # Usar el mismo tema,
+
+        
     )
+    pio.write_image(fig, "Barras.svg", format="svg")
+
     return fig

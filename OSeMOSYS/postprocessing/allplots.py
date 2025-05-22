@@ -21,7 +21,7 @@ from collections import defaultdict
 from OSeMOSYS.config import season_mapping, daytype_mapping, bracket_mapping, yearsplit, specified_demand_profile, input_files_simple
 from concurrent.futures import ProcessPoolExecutor
 # from OSeMOSYS.CalcParam import transform_to_hourly
-
+import plotly.io as pio
 from OSeMOSYS.CalcParam import transform_to_hourly
 
 def transform_to_hourly_extra(dependency_files, bracket_mapping, daytype_mapping, season_mapping):
@@ -443,8 +443,17 @@ def get_dependency_files(input_files, dependency_key, base_folder="results"):
             dependency_files[file_name] = matching_files
 
     return dependency_files
-
-
+def get_dependency_files_from_results(results_folders, dependency_key):
+    dependency_files = {}
+    for results_folder in results_folders:
+        scenario_name = os.path.basename(results_folder)
+        matching_files = {}
+        for dependency_file in DEPENDENCIES_VAR_DICT.get(dependency_key, []):
+            file_path = os.path.join(results_folder, f"{dependency_file}.csv")
+            if os.path.exists(file_path):
+                matching_files[dependency_file] = file_path
+        dependency_files[scenario_name] = matching_files
+    return dependency_files
 
 def process_single_file(file_name, file_path, yearsplit, specified_demand_profile, bracket_mapping, daytype_mapping, season_mapping):
     """
@@ -1325,9 +1334,12 @@ def create_app_4(dependency_files):
             dcc.Graph(id='combined-line-chart', style={'width': '48%', 'display': 'inline-block'}),
         ]),
         html.Div([
-            dcc.Graph(id='bar-chart', style={'width': '48%', 'display': 'inline-block'})
-        ])
-    ], style={'display': 'flex', 'align-items': 'center'})
+            dcc.Graph(id='bar-chart', style={'width': '48%', 'display': 'inline-block'}),
+            html.Button("Export Bar Chart as SVG", id='export-bar-chart', n_clicks=0, style={'margin-top': '10px'})
+        ], style={'width': '48%', 'display': 'inline-block'})
+    ], style={'display': 'flex', 'justify-content': 'space-between', 'align-items': 'center'})
+    #     ])
+    # ], style={'display': 'flex', 'align-items': 'center'})
 ])
 
 
@@ -1344,6 +1356,20 @@ def create_app_4(dependency_files):
 
     # Almacenar los datos en memoria
     data_cache = load_all_data(dependency_files)
+    @app.callback(
+    Output('export-bar-chart', 'children'),
+    [Input('export-bar-chart', 'n_clicks')],
+    [State('bar-chart', 'figure')]
+)
+    def export_bar_chart(n_clicks, figure):
+        if n_clicks > 0:
+            file_path = "bar_chart.svg"
+            pio.write_image(figure, file_path, format='svg')
+            return "Exported Bar Chart as SVG"
+        return "Export Bar Chart as SVG"
+
+
+
     @app.callback(
         [Output('file-dropdown-1', 'options'),
         Output('file-dropdown-1', 'value')],
@@ -2118,17 +2144,94 @@ def run_app_5(base_folder="results", color_variations=COLOR_VARIATIONS):
 #     app5.run(debug=True, port=8055)
 
 # Ejecutar la aplicación
+
+
+
+
 if __name__ == '__main__':
+    # List of results folders to be plotted
+    create_hourly_files = True
+    use_results_folder = True
+    
+    if use_results_folder:
+        results_folders = [
+        os.path.join(root_folder, 'results/01-BaseScenario'),
+        os.path.join(root_folder, 'results/02-BaseScenarioWind'),
+        os.path.join(root_folder, 'results/03-BaseScenarioWindBiomass'),
+        os.path.join(root_folder, 'results/04-BaseScenarioWindBiomassPV'),
+        os.path.join(root_folder, 'results/05-BaseScenarioWindBiomassPVAnnualInvLimit'),
+        os.path.join(root_folder, 'results/06-MustRunTechBase'),
+        os.path.join(root_folder, 'results/07-Retrofit'),
+        os.path.join(root_folder, 'results/CostoRecuperacion_500'),
+        os.path.join(root_folder, 'results/CostoRecuperacion_600'),
+        os.path.join(root_folder, 'results/CostoRecuperacion_700'),
+        os.path.join(root_folder, 'results/CostoRecuperacion_800'),
+        os.path.join(root_folder, 'results/08-Policies24Bio'),
+        os.path.join(root_folder, 'results/08-Policies24noBio'),
+        os.path.join(root_folder, 'results/10-Storage'),
+    ]
+        dependency_files_app1 = get_dependency_files_from_results(results_folders, dependency_key_app1)
+        dependency_files_app2 = get_dependency_files_from_results(results_folders, dependency_key_app2)
+        dependency_files_app4 = get_dependency_files_from_results(results_folders, dependency_key_app4)
+        dependency_files_app5 = get_dependency_files_from_results(results_folders, dependency_key_app5)
 
-    # input_files_simple = [
+    else:
+    
+        dependency_files_app1 = get_dependency_files(input_files_simple, dependency_key_app1, base_folder="results")
+        dependency_files_app2 = get_dependency_files(input_files_simple, dependency_key_app2, base_folder="results")
+        dependency_files_app4 = get_dependency_files(input_files_simple, dependency_key_app4, base_folder="results")
+        dependency_files_app5 = get_dependency_files(input_files_simple, dependency_key_app5, base_folder="results")
+        # run_app_5(dependency_files_app5, bracket_mapping, daytype_mapping, season_mapping)
+    
+        
 
-    #     os.path.join(root_folder, 'data/SuperSimpleExpandedReTagStorage.xlsx'),
+    print("Dependency files for App 1:", dependency_files_app1)
+    print("Dependency files for App 2:", dependency_files_app2)
+    print("Dependency files for App 4:", dependency_files_app4)
+    print("Dependency files for App 5:", dependency_files_app5)
+    if create_hourly_files:
+        process_and_save_hourly_data_parallel(
+            dependency_files=dependency_files_app5,
+            yearsplit=yearsplit,
+            specified_demand_profile=specified_demand_profile,
+            bracket_mapping=bracket_mapping,
+            daytype_mapping=daytype_mapping,
+            season_mapping=season_mapping
+        )
 
-    #    ]
 
-    dependency_files_app1 = get_dependency_files(input_files_simple, dependency_key_app1, base_folder="results")
-    dependency_files_app2 = get_dependency_files(input_files_simple, dependency_key_app2, base_folder="results")
-    dependency_files_app4 = get_dependency_files(input_files_simple, dependency_key_app4, base_folder="results")
+    scenarios = list(dependency_files_app1.keys())
+    years = [2020, 2030, 2050]
+
+    from multiprocessing import Process
+    threads = []
+    threads.append(Thread(target=run_app_1, args=(dependency_files_app1, COLOR_VARIATIONS, scenarios)))
+    threads.append(Thread(target=run_app_2, args=(dependency_files_app2, COLOR_VARIATIONS, years, scenarios)))
+    threads.append(Thread(target=run_app_3, args=(dependency_files_app1, scenarios)))
+    threads.append(Thread(target=run_app_4, args=(dependency_files_app4,)))
+
+    # Run App 5 in a separate process
+    app5_process = Process(target=run_app_5, args=("results", COLOR_VARIATIONS))
+    for thread in threads:
+        thread.start()
+    app5_process.start()
+
+    # Wait for all threads to finish
+    for thread in threads:
+        thread.join()
+    app5_process.join()
+    
+
+
+
+
+
+
+    
+
+    # dependency_files_app1 = get_dependency_files(input_files_simple, dependency_key_app1, base_folder="results")
+    # dependency_files_app2 = get_dependency_files(input_files_simple, dependency_key_app2, base_folder="results")
+    # dependency_files_app4 = get_dependency_files(input_files_simple, dependency_key_app4, base_folder="results")
     # dependency_files_app5 = get_dependency_files(input_files_simple, dependency_key_app5, base_folder="results")
     # run_app_5(dependency_files_app5, bracket_mapping, daytype_mapping, season_mapping)
     
@@ -2140,11 +2243,11 @@ if __name__ == '__main__':
     Aquí es donde calculo el parámetro Production by technology de forma horaria para mostrar despacho. 
     Tengo que pensar para donde moverlo, para no tener que comentarlo cuando ejecute los gráficos.
     """
-    dependency_files = get_dependency_files(
-        input_files=input_files_simple,  # Lista de archivos de entrada
-        dependency_key="['REGION','TIMESLICE','TECHNOLOGY','FUEL','YEAR']",  # Clave de dependencia
-        base_folder="results"  # Carpeta donde están los resultados
-    )
+    # dependency_files = get_dependency_files(
+    #     input_files=input_files_simple,  # Lista de archivos de entrada
+    #     dependency_key="['REGION','TIMESLICE','TECHNOLOGY','FUEL','YEAR']",  # Clave de dependencia
+    #     base_folder="results"  # Carpeta donde están los resultados
+    # )
     
     # process_and_save_hourly_data(
     # dependency_files=dependency_files,
@@ -2154,7 +2257,7 @@ if __name__ == '__main__':
     # daytype_mapping=daytype_mapping,
     # season_mapping=season_mapping
     # )
-    print(dependency_files)
+    # print(dependency_files)
 
     # process_and_save_hourly_data_parallel(
     #     dependency_files=dependency_files,
@@ -2179,29 +2282,29 @@ if __name__ == '__main__':
 # Mostrar los gráficos generados
 # for chart in line_charts:
 #     chart.show()
-    scenarios = list(dependency_files_app1.keys()) # Solo depende de laos input files, no hay que crear uno para uno pero se podría hacer
+    # scenarios = list(dependency_files_app1.keys()) # Solo depende de laos input files, no hay que crear uno para uno pero se podría hacer
     
-    ## definir para los gráficos de pastel. Permite ver el porcentaje de cada tecnología en cada año
-    years = [2020, 2025, 2030]
-    from multiprocessing import Process
-    threads = []
-    threads.append(Thread(target=run_app_1, args=(dependency_files_app1, COLOR_VARIATIONS, scenarios)))
-    threads.append(Thread(target=run_app_2, args=(dependency_files_app2, COLOR_VARIATIONS, years, scenarios)))
-    threads.append(Thread(target=run_app_3, args=(dependency_files_app1, scenarios)))
-    threads.append(Thread(target=run_app_4, args=(dependency_files_app4,)))
-    # threads.append(Thread(target=run_app_5, args=(dependency_files_app5, COLOR_VARIATIONS)))
-    # Ejecutar App 5 en un proceso separado
-    app5_process = Process(target=run_app_5, args=("results", COLOR_VARIATIONS))
-    for thread in threads:
-        thread.start()
-    app5_process.start()
+    # ## definir para los gráficos de pastel. Permite ver el porcentaje de cada tecnología en cada año
+    # years = [2020, 2025, 2030]
+    # from multiprocessing import Process
+    # threads = []
+    # threads.append(Thread(target=run_app_1, args=(dependency_files_app1, COLOR_VARIATIONS, scenarios)))
+    # threads.append(Thread(target=run_app_2, args=(dependency_files_app2, COLOR_VARIATIONS, years, scenarios)))
+    # threads.append(Thread(target=run_app_3, args=(dependency_files_app1, scenarios)))
+    # threads.append(Thread(target=run_app_4, args=(dependency_files_app4,)))
+    # # threads.append(Thread(target=run_app_5, args=(dependency_files_app5, COLOR_VARIATIONS)))
+    # # Ejecutar App 5 en un proceso separado
+    # app5_process = Process(target=run_app_5, args=("results", COLOR_VARIATIONS))
+    # for thread in threads:
+    #     thread.start()
+    # app5_process.start()
 
-    # Wait for all threads to finish
-    for thread in threads:
-        thread.join()
-    # run_app_2(dependency_files_app2, COLOR_VARIATIONS, [2019, 2030, 2050], scenarios)
-    # run_app_5(base_folder="results", color_variations=COLOR_VARIATIONS)
-    app5_process.join()
+    # # Wait for all threads to finish
+    # for thread in threads:
+    #     thread.join()
+    # # run_app_2(dependency_files_app2, COLOR_VARIATIONS, [2019, 2030, 2050], scenarios)
+    # # run_app_5(base_folder="results", color_variations=COLOR_VARIATIONS)
+    # app5_process.join()
 
 
 
