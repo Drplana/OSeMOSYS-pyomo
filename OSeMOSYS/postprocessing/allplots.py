@@ -8,7 +8,7 @@ import plotly.express as px
 from plotly.subplots import make_subplots
 import plotly.graph_objects as go
 # from OSeMOSYS.config import INPUT_FILE_PATH, RESULTS_FOLDER, configure_paths
-from OSeMOSYS.postprocessing.charts import create_line_chart, create_stacked_bar_chart, create_donut_charts, create_line_chart_app4, create_combined_line_chart, create_heatmap, create_bar_chart
+from OSeMOSYS.postprocessing.charts import create_line_chart, create_stacked_bar_chart, create_donut_charts, create_line_chart_app4, create_combined_line_chart, create_heatmap,create_horizontal_bar_chart, create_bar_chart
 from OSeMOSYS.utils import COLOR_VARIATIONS, DEPENDENCIES_VAR_DICT, assign_colors_to_technologies, dependency_key_app1, dependency_key_app2, dependency_key_app4, dependency_key_app5
 # ROOT_FOLDER = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from dash import Dash, dcc, html, Input, Output, State, callback, ctx
@@ -23,6 +23,9 @@ from concurrent.futures import ProcessPoolExecutor
 # from OSeMOSYS.CalcParam import transform_to_hourly
 import plotly.io as pio
 from OSeMOSYS.CalcParam import transform_to_hourly
+import io
+import zipfile
+
 
 def transform_to_hourly_extra(dependency_files, bracket_mapping, daytype_mapping, season_mapping):
     """
@@ -670,6 +673,8 @@ def create_first_app(files_by_scenario, COLOR_VARIATIONS, scenarios):
                 inline=False,
                 style={'font-size': '16px', 'display': 'flex', 'flex-wrap': 'wrap', 'gap': '10px'},
             ),
+
+
             html.Button(
                 "Seleccionar/Deseleccionar todas",
                 id='toggle-all-button',
@@ -939,6 +944,24 @@ def create_comparison_dashboard_with_options(files_by_scenario, COLOR_VARIATIONS
             )
         ], style={'margin-bottom': '20px'}),
         html.Div([
+            html.Label("Gráficos a descargar en svg:", style={'font-size': '20px'}),
+            dcc.Checklist(
+                id='chart-selector',
+                options=[
+                    {'label': 'Gráfico de Barras 1', 'value': 'stacked-bar-chart-1'},
+                    {'label': 'Gráfico de Dona 1', 'value': 'donut-charts-1'},
+                    {'label': 'Gráfico de Barras 2', 'value': 'stacked-bar-chart-2'},
+                    {'label': 'Gráfico de Dona 2', 'value': 'donut-charts-2'}
+                ],
+                value=[],  # Ningún gráfico seleccionado por defecto
+                style={'font-size': '16px'}
+            ),
+            html.Button("Descargar Gráficos Seleccionados", id='download-button', n_clicks=0, style={'margin-top': '10px'}),
+            dcc.Download(id="download-graphs")
+        ], style={'margin-bottom': '20px'}),
+
+
+        html.Div([
         html.Label("Selecciona la unidad:", style={'font-size': '20px'}),
         dcc.RadioItems(
             id='unit-selector',
@@ -953,7 +976,9 @@ def create_comparison_dashboard_with_options(files_by_scenario, COLOR_VARIATIONS
             style={'font-size': '16px'}
         )
         ], style={'margin-bottom': '20px'}),
-        
+  
+
+
         # Dropdowns para seleccionar escenarios y archivos
         html.Div([
             html.Div([
@@ -1003,6 +1028,49 @@ def create_comparison_dashboard_with_options(files_by_scenario, COLOR_VARIATIONS
             ], style={'width': '48%', 'display': 'inline-block'})
         ])
     ])
+
+    @app.callback(
+        Output("download-graphs", "data"),
+        [Input("download-button", "n_clicks")],
+        [State("chart-selector", "value"),
+         State("stacked-bar-chart-1", "figure"),
+         State("stacked-bar-chart-2", "figure"),
+         State("donut-charts-1", "children"),
+         State("donut-charts-2", "children"),
+         State("scenario-dropdown-1", "value"),
+         State("scenario-dropdown-2", "value")]
+    )
+    def download_selected_graphs(n_clicks, selected_charts, bar_chart_1, bar_chart_2, donut_charts_1, donut_charts_2, scenario1, scenario2):
+        if n_clicks > 0 and selected_charts:
+            # Crear un archivo ZIP para almacenar los gráficos
+            zip_buffer = io.BytesIO()
+            with zipfile.ZipFile(zip_buffer, "w") as zf:
+                # Descargar gráficos de barras
+                if "stacked-bar-chart-1" in selected_charts:
+                    buffer = io.BytesIO()
+                    pio.write_image(bar_chart_1, buffer, format="svg")
+                    zf.writestr(f"{scenario1}_stacked_bar_chart_1.svg", buffer.getvalue())
+                if "stacked-bar-chart-2" in selected_charts:
+                    buffer = io.BytesIO()
+                    pio.write_image(bar_chart_2, buffer, format="svg")
+                    zf.writestr(f"{scenario2}_stacked_bar_chart_2.svg", buffer.getvalue())
+
+                # Descargar gráficos de dona
+                if "donut-charts-1" in selected_charts:
+                    for i, chart in enumerate(donut_charts_1):
+                        buffer = io.BytesIO()
+                        pio.write_image(chart["props"]["figure"], buffer, format="svg")
+                        zf.writestr(f"{scenario1}_donut_chart_{i + 1}.svg", buffer.getvalue())
+                if "donut-charts-2" in selected_charts:
+                    for i, chart in enumerate(donut_charts_2):
+                        buffer = io.BytesIO()
+                        pio.write_image(chart["props"]["figure"], buffer, format="svg")
+                        zf.writestr(f"{scenario2}_donut_chart_{i + 1}.svg", buffer.getvalue())
+
+            zip_buffer.seek(0)
+            return dcc.send_bytes(zip_buffer.getvalue(), "selected_graphs.zip")
+
+        return dash.no_update
     # Cargar todos los datos al inicio
     def load_all_data(files_by_scenario):
         data_cache = {}
@@ -1114,7 +1182,7 @@ def create_comparison_dashboard_with_options(files_by_scenario, COLOR_VARIATIONS
         data1['value'] = data1['value'] * factor
         data2['value'] = data2['value'] * factor # Asegurarse de que los valores sean numéricos
         # Crear gráficos de barras apiladas
-        bar_chart_1 = create_stacked_bar_chart(data1, f"Barras Apiladas - {scenario1}", COLOR_VARIATIONS)
+        bar_chart_1 = create_stacked_bar_chart(data1, f"{scenario1}-{file1}", COLOR_VARIATIONS)
         bar_chart_2 = create_stacked_bar_chart(data2, f"Barras Apiladas - {scenario2}", COLOR_VARIATIONS)
         bar_chart_1.update_layout(yaxis_title=f"Energy Production ({unit})")
         bar_chart_2.update_layout(yaxis_title=f"Energy Production ({unit})")
@@ -1498,22 +1566,25 @@ def create_app_4(dependency_files):
                     try:
                         data = pd.read_csv(file_path)
                         if not data.empty and 'value' in data.columns:
-                            total_cost = data['value'].sum()
+                            total_cost = data['value'].sum() / 1000
                             total_costs.append({'Scenario': scenario, 'TotalDiscountedCost': total_cost})
                     except Exception as e:
                         print(f"Error al leer el archivo {file_path}: {e}")
 
         if not total_costs:
-            return create_bar_chart(pd.DataFrame(), "Scenario", "TotalDiscountedCost", "Scenario", "No se encontraron datos")
+            return create_horizontal_bar_chart(pd.DataFrame(), "Scenario", "TotalDiscountedCost", "Scenario", "No se encontraron datos")
 
-        total_costs_df = pd.DataFrame(total_costs)
+        total_costs_df = pd.DataFrame(total_costs).sort_values(by='TotalDiscountedCost', ascending=False)
+        total_costs_df['text'] = total_costs_df['TotalDiscountedCost'].apply(lambda x: f"{x:.2f}")
+
+
 
         # Crear el gráfico de barras con el nuevo estilo
-        return create_bar_chart(
+        return create_horizontal_bar_chart(
             data=total_costs_df,
-            x_column='Scenario',
-            y_column='TotalDiscountedCost',
-            color_column='Scenario',
+            x_column='TotalDiscountedCost',
+            y_column='Scenario',
+            text_column='text',
             title="Comparación de TotalDiscountedCost entre todos los escenarios"
         )
 
@@ -2152,23 +2223,37 @@ if __name__ == '__main__':
     # List of results folders to be plotted
     create_hourly_files = True
     use_results_folder = True
-    
+
     if use_results_folder:
         results_folders = [
         os.path.join(root_folder, 'results/01-BaseScenario'),
-        os.path.join(root_folder, 'results/02-BaseScenarioWind'),
-        os.path.join(root_folder, 'results/03-BaseScenarioWindBiomass'),
-        os.path.join(root_folder, 'results/04-BaseScenarioWindBiomassPV'),
-        os.path.join(root_folder, 'results/05-BaseScenarioWindBiomassPVAnnualInvLimit'),
-        os.path.join(root_folder, 'results/06-MustRunTechBase'),
-        os.path.join(root_folder, 'results/07-Retrofit'),
-        os.path.join(root_folder, 'results/CostoRecuperacion_500'),
-        os.path.join(root_folder, 'results/CostoRecuperacion_600'),
-        os.path.join(root_folder, 'results/CostoRecuperacion_700'),
-        os.path.join(root_folder, 'results/CostoRecuperacion_800'),
-        os.path.join(root_folder, 'results/08-Policies24Bio'),
-        os.path.join(root_folder, 'results/08-Policies24noBio'),
-        os.path.join(root_folder, 'results/10-Storage'),
+        # os.path.join(root_folder, 'results/02-BaseScenarioWind'),
+        # os.path.join(root_folder, 'results/03-BaseScenarioWindBiomass'),
+        # os.path.join(root_folder, 'results/04-BaseScenarioWindBiomassPV'),
+        # os.path.join(root_folder, 'results/05-BaseScenarioWindBiomassPVAnnualInvLimit'),
+        # os.path.join(root_folder, 'results/06-MustRunTechBase'),
+        # os.path.join(root_folder, 'results/07-Retrofit'),
+        # os.path.join(root_folder, 'results/CostoRecuperacion_500'),
+        # os.path.join(root_folder, 'results/CostoRecuperacion_600'),
+        # os.path.join(root_folder, 'results/CostoRecuperacion_700'),
+        # os.path.join(root_folder, 'results/CostoRecuperacion_800'),
+        # os.path.join(root_folder, 'results/08-Policies24Bio'),
+        # os.path.join(root_folder, 'results/08-Policies24noBio'),
+        # os.path.join(root_folder, 'results/10-Storage'),
+        # os.path.join(root_folder, 'results/10-Storage-NoBio'),
+        # os.path.join(root_folder, 'results/11-PumpedStorage'),
+
+
+        # os.path.join(root_folder, 'results/01-BaseSectors'),
+        # os.path.join(root_folder, 'results/02-BaseSectorsNoBio'),
+        # os.path.join(root_folder, 'results/03-BaseSectors'),
+        # os.path.join(root_folder, 'results/04-BaseSectors'),
+        # os.path.join(root_folder, 'results/05-BaseSectors'),
+        # os.path.join(root_folder, 'results/06-BaseSectors'),
+        # os.path.join(root_folder, 'results/07-BaseSectors'),
+
+
+
     ]
         dependency_files_app1 = get_dependency_files_from_results(results_folders, dependency_key_app1)
         dependency_files_app2 = get_dependency_files_from_results(results_folders, dependency_key_app2)

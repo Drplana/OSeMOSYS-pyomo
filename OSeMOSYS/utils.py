@@ -160,7 +160,7 @@ COLOR_VARIATIONS = {
 'gas': ['orange', 'darkorange', '#FF8C00', '#FFA500', '#FFB732'],
 'bio': ['#9ACD32', '#8BB92D', '#7BA428', '#A8D645', '#B6E052'],
 'wnd': ['deepskyblue', '#00BFFF', '#0099CC', '#007399', '#005266'],
-'wind': ['deepskyblue', '#00BFFF', '#0099CC', '#007399', '#005266'],
+'wind': ['deepskyblue', '#00BFFF', "#0099CC", '#007399', '#005266'],
 'pv': ['#FFD700', '#CCAC00', '#B38F00', '#FFE55C', '#FFF380'],
 'sol': ['#FFD700', '#CCAC00', '#B38F00', '#FFE55C', '#FFF380'],
 'hyd': ['#0d5c91', '#1f77b4', '#1560BD', '#2E8BFF', '#4AA6FF'],

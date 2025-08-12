@@ -415,6 +415,7 @@ class ScenarioManager:
             config = scenarios_config[input_file]
             parameter_name = config["parameter_name"]
             values = config["values"]
+            scenario_name = values.get("name", parameter_name)
 
             # Caso 1: Usar generate_combined_scenarios y solve_subscenarios_in_parallel
             if isinstance(values, list):
@@ -423,7 +424,7 @@ class ScenarioManager:
 
             # Caso 2: Usar generate_json_file_2 y solve_subscenario
             elif isinstance(values, dict):
-                subscenario_name = f"{parameter_name}_custom"
+                subscenario_name = scenario_name#f"{parameter_name}_custom"
                 json_file_path = self.generate_json_file_2([{"name": parameter_name, "values": values["values"], "filters": values["filters"]}], subscenario_name)
                 if json_file_path:
                     result_message = self.solve_subscenario(json_file_path, solver_name)

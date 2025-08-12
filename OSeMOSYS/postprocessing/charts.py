@@ -5,6 +5,7 @@ from OSeMOSYS.utils import assign_colors_to_technologies
 from dash import Dash, dcc, html, Input, Output, State, callback, ctx
 import pandas as pd
 import plotly.io as pio
+import numpy as np
 
 
 def create_line_chart(data, title, x_column, y_column, color_column, COLOR_VARIATIONS):
@@ -35,7 +36,9 @@ def create_line_chart(data, title, x_column, y_column, color_column, COLOR_VARIA
         plot_bgcolor='white',
         font=dict(size=14),
         legend=dict(font=dict(size=12)),
-        margin=dict(t=50, b=50, l=50, r=50)
+        margin=dict(t=50, b=50, l=50, r=50),
+        height=700,
+        width=1100,
     )
 
     return fig
@@ -196,29 +199,43 @@ def create_heatmap(data, selected_technologies, title, show_colorbar=True):
     # Filtrar las tecnologías seleccionadas
     if selected_technologies:
         data = data[data['TECHNOLOGY'].isin(selected_technologies)]
+        
 
     # Agrupar por tecnología y escenario, y sumar los valores
     grouped_data = data.groupby(['TECHNOLOGY', 'SCENARIO'])['value'].sum().reset_index()
-
+    grouped_data['value']  = grouped_data['value'].round(2)
+      # Redondear a 2 decimales
     # Pivotar los datos para crear la matriz del heatmap
-    heatmap_data = grouped_data.pivot(index='TECHNOLOGY', columns='SCENARIO', values='value').fillna(0)
-
+    heatmap_data = grouped_data.pivot(index='TECHNOLOGY', columns='SCENARIO', values='value').fillna(0).round(2)
+    # heatmap_data_log = np.log10(heatmap_data + 1).round(2)   
+    
     # Crear el heatmap
     fig = px.imshow(
         heatmap_data,
-        labels=dict(x="Escenarios", y="Tecnologías", color="Valor"),
+        labels=dict(x="Escenarios", y="Tecnologías", color="value"),
         x=heatmap_data.columns,
         y=heatmap_data.index,
         color_continuous_scale="Viridis",
-        title=title
+        title=title,
+        text_auto=True
     )
+    # for i, row in enumerate(heatmap_data_log.index):
+    #     for j, col in enumerate(heatmap_data_log.columns):
+    #         fig.add_annotation(
+    #             x=col,
+    #             y=row,
+    #             text=f"{heatmap_data_log.iloc[i, j]:.1f}",  # Format to 1 decimal place
+    #             showarrow=False,
+    #             font=dict(size=10, color="black")
+    #         )
+
     if not show_colorbar:
         fig.update_coloraxes(showscale=False)
     fig.update_layout(
         xaxis=dict(
             tickangle=45,  # Rotar etiquetas del eje X
             scaleanchor="y",  # Vincular la escala del eje X con el eje Y
-            scaleratio=3  # Hacer que las celdas sean más anchas que altas
+            scaleratio=1 # Hacer que las celdas sean más anchas que altas
         ),
         yaxis=dict(
             automargin=True,  # Ajustar automáticamente los márgenes del eje Y
@@ -229,6 +246,7 @@ def create_heatmap(data, selected_technologies, title, show_colorbar=True):
         height=800,  # Altura del gráfico
         width=800,  # Ancho del gráfico
     )
+    fig.update_traces(textfont=dict(size=12))
     return fig
 
 import plotly.express as px
@@ -322,7 +340,7 @@ def create_combined_line_chart(data, x_column, y_column, color_column, line_grou
         line_group=line_group_column,
         title=title,
         markers=True,
-        color_discrete_sequence=px.colors.qualitative.Set2
+        color_discrete_sequence=px.colors.qualitative.Pastel  + px.colors.qualitative.Prism 
     )
 
     # Personalizar el diseño
@@ -387,7 +405,7 @@ def create_bar_chart(data, x_column, y_column, color_column, title, width=600, h
         y=y_column,
         color=color_column,
         title=title,
-        color_discrete_sequence=px.colors.qualitative.Set2  # Usar la misma paleta de colores
+        color_discrete_sequence=px.colors.qualitative.Pastel  + px.colors.qualitative.Prism # Usar la misma paleta de colores
     )
 
     # Personalizar el diseño
@@ -431,5 +449,60 @@ def create_bar_chart(data, x_column, y_column, color_column, title, width=600, h
         
     )
     pio.write_image(fig, "Barras.svg", format="svg")
+
+    return fig
+
+def create_horizontal_bar_chart(data, x_column, y_column, text_column, title, width=800, height=600):
+    """
+    Crea un gráfico de barras horizontal con texto personalizado.
+
+    Args:
+        data (pd.DataFrame): DataFrame con los datos.
+        x_column (str): Columna para el eje X.
+        y_column (str): Columna para el eje Y.
+        text_column (str): Columna para el texto en las barras.
+        title (str): Título del gráfico.
+        width (int): Ancho del gráfico.
+        height (int): Altura del gráfico.
+
+    Returns:
+        go.Figure: Gráfico de barras horizontal.
+    """
+    fig = px.bar(
+        data,
+        x=x_column,
+        y=y_column,
+        orientation='h',  # Horizontal bar chart
+        text=text_column,  # Add text annotations
+        title=title,
+        color_discrete_sequence=["#b41f26"]  # Single color for all bars
+    )
+    # Personalizar el diseño
+    fig.update_traces(textposition='outside')  # Position text outside the bars
+    fig.update_layout(
+        title=dict(
+            text=title,
+            font=dict(size=20, family="Arial, sans-serif"),
+            x=0.5,
+            xanchor="center"
+        ),
+        xaxis=dict(
+            title=None,  # Remove x-axis title
+            showticklabels=False,  # Hide x-axis tick labels
+            showgrid=False,  # Remove grid lines
+            zeroline=False  # Remove zero line
+        ),
+        yaxis=dict(
+            title=y_column,
+            title_font=dict(size=16, family="Arial, sans-serif"),
+            tickfont=dict(size=14, family="Arial, sans-serif"),
+            automargin=True  # Adjust margin for long scenario names
+        ),
+        plot_bgcolor="white",
+        margin=dict(t=60, b=60, l=200, r=0),  # Increase left margin for scenario names
+        width=width,
+        height=height,
+        template="presentation"  # Use the same theme
+    )
 
     return fig

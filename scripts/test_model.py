@@ -1338,39 +1338,50 @@ if __name__ == "__main__":
     )
 
     # Lista de archivos de entrada
-    input_files = [
-        # os.path.join(root_folder, 'data/06-MustRunTechBase.xlsx'),
-        os.path.join(root_folder, 'data/07-Retrofit.xlsx'),
-        os.path.join(root_folder, 'data/08-Policies24Bio.xlsx'),
-        os.path.join(root_folder, 'data/10-Storage.xlsx'),
-        # os.path.join(root_folder, 'data/SuperSimpleExpandedReTagStorage.xlsx'),
+    # input_files = [
+    #     # os.path.join(root_folder, 'data/06-MustRunTechBase.xlsx'),
+    #     # os.path.join(root_folder, 'data/07-Retrofit.xlsx'),
+    #     # os.path.join(root_folder, 'data/08-Policies24Bio.xlsx'),
+    #     # os.path.join(root_folder, 'data/10-Storage.xlsx'),
+    #     # os.path.join(root_folder, 'data/SuperSimpleExpandedReTagStorage.xlsx'),
+        
 
-       ]
+    #    ]
 
-    # Configurar subescenarios a partir del archivo base.
-    scenarios_config = {
-        input_files[1]: { 
-            "parameter_name": "CostoRecuperacion",
-            "values": [500, 600, 700, 800] },
-        input_files[2]: {
-            "parameter_name": "TotalAnnualMaxCapacityInvestment",
-            "values":   {
-                    "name": "VariableCost",
-                    "values": {("Cuba", "PWRBIO", year): 0 for year in range(2025, 2050)},
-                    "filters": {"REGION": ["Cuba"], "TECHNOLOGY": ["PWRBIO"], "YEAR": list(range(2025, 2050))}
-                    }   
-                }
-            }
+    # # Configurar subescenarios a partir del archivo base.
+    # scenarios_config = {
+    #     # input_files[1]: { 
+    #     #     "parameter_name": "CostoRecuperacion",
+    #     #     "values": [500, 600, 700, 800] },
+    #     input_files[0]: {
+    #     "parameter_name": "TotalAnnualMaxCapacityInvestment",
+    #     "values":   {
+    #             "name": "Policies24NoBio",
+    #             "values": {("Cuba", "PWRBIO", year): 0 for year in range(2025, 2051)},
+    #             "filters": {"REGION": ["Cuba"], "TECHNOLOGY": ["PWRBIO"], "YEAR": list(range(2025, 2051))}
+    #             }   
+    #         },
+        
 
-    scenario_manager.run_hybrid_scenarios_with_custom_parameters(
-        input_files=input_files,
-        batch_size=3,
-        scenarios_config=scenarios_config,
-        solver_name="gurobi"
-    )
-    end_time = time.time()  # Registrar el tiempo de finalización
-    elapsed_time = end_time - start_time  # Calcular el tiempo transcurrido
-    print(f"Tiempo total de ejecución: {elapsed_time:.2f} segundos")
+    #     input_files[1]: {
+    #         "parameter_name": "TotalAnnualMaxCapacityInvestment",
+    #         "values":   {
+    #                 "name": "10-Storage-NoBio",
+    #                 "values": {("Cuba", "PWRBIO", year): 0 for year in range(2025, 2051)},
+    #                 "filters": {"REGION": ["Cuba"], "TECHNOLOGY": ["PWRBIO"], "YEAR": list(range(2025, 2051))}
+    #                 }   
+    #             }
+    #         }
+
+    # scenario_manager.run_hybrid_scenarios_with_custom_parameters(
+    #     input_files=input_files,
+    #     batch_size=3,
+    #     scenarios_config=scenarios_config,
+    #     solver_name="gurobi"
+    # )
+    # end_time = time.time()  # Registrar el tiempo de finalización
+    # elapsed_time = end_time - start_time  # Calcular el tiempo transcurrido
+    # print(f"Tiempo total de ejecución: {elapsed_time:.2f} segundos")
 
 
 ##########################################################################################################################
@@ -1385,18 +1396,23 @@ if __name__ == "__main__":
     # )
 
     # # Lista de archivos de entrada
-    # input_files = [
-    #     # os.path.join(root_folder, 'data/01-BaseScenario.xlsx'),
-    #     # os.path.join(root_folder, 'data/02-BaseScenarioWind.xlsx'),
-    #     # os.path.join(root_folder, 'data/03-BaseScenarioWindBiomass.xlsx'),
-    #     # os.path.join(root_folder, 'data/04-BaseScenarioWindBiomassPV.xlsx'),
-    #     # os.path.join(root_folder, 'data/05-BaseScenarioWindBiomassPVAnnualInvLimit.xlsx'),
-    #     os.path.join(root_folder, 'data/06-MustRunTechBase.xlsx'),
-    #     os.path.join(root_folder, 'data/08-MustRunTechBaseAnnualInvLimit.xlsx'),
+    input_files = [
+        os.path.join(root_folder, 'data/01-BaseScenario.xlsx'),
+        # os.path.join(root_folder, 'data/02-BaseScenarioWind.xlsx'),
+        # os.path.join(root_folder, 'data/03-BaseScenarioWindBiomass.xlsx'),
+        # os.path.join(root_folder, 'data/04-BaseScenarioWindBiomassPV.xlsx'),
+        # os.path.join(root_folder, 'data/05-BaseScenarioWindBiomassPVAnnualInvLimit.xlsx'),
+        # os.path.join(root_folder, 'data/06-MustRunTechBase.xlsx'),
+        # os.path.join(root_folder, 'data/08-MustRunTechBaseAnnualInvLimit.xlsx'),
+        # os.path.join(root_folder, 'data/11-PumpedStorage.xlsx'),
+        # os.path.join(root_folder, 'data/01-BaseSectors.xlsx'),
+        # os.path.join(root_folder, 'data/02-BaseSectorsNoBio.xlsx'),
+        # os.path.join(root_folder, 'data/07-BaseSectors.xlsx'),
 
-    # ]
+
+    ]
     # Ejecutar los archivos en paralelo de 3 en 3. Batch_size define el número de instancias a correr.
-    # scenario_manager.run_files_in_batches(input_files=input_files, batch_size=3, solver_name="gurobi")
+    scenario_manager.run_files_in_batches(input_files=input_files, batch_size=3, solver_name="gurobi")
 
 
     # dimension_manager = DimensionManager(sets)
