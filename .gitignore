@@ -160,3 +160,4 @@ cython_debug/
 .idea/
 
 results/
+OSeMOSYS/postprocessing/ExampleInteractiveChart.ipynb
