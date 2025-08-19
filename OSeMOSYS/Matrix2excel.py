@@ -7,7 +7,7 @@ root_folder = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 sys.path.append(root_folder)
 from OSeMOSYS.ReadSets import create_multiindex_dataframe2, load_sets, generate_lists_dict, create_multiindex_dataframe
 from OSeMOSYS.utils import sheet_names, create_variable_mapping, dataframe_metadata
-from OSeMOSYS.config import INPUT_FILE_PATH
+# from OSeMOSYS.config import INPUT_FILE_PATH
 import warnings
 
 
@@ -208,7 +208,7 @@ def generate_excel_file_new(parameters, INPUT_FILE_PATH):
 
 if __name__ == "__main__":   # if the file is run in standalone
     # Load the sets and create the DataFrames
-    INPUT_FILE_PATH = os.path.join(root_folder, 'data', 'SuperSimpleExpandedReTagStorageDiscussion.xlsx')
+    INPUT_FILE_PATH = os.path.join(root_folder, 'data', '01-BaseScenarioBS.xlsx')
     Default, REGION, YEAR, TECHNOLOGY, FUEL, SEASON, DAYTYPE, DAILYTIMEBRACKET, TIMESLICE, MODE_OF_OPERATION, STORAGE, EMISSION = load_sets(INPUT_FILE_PATH)
     # Create the variable mapping
     variable_mapping = create_variable_mapping(
