@@ -2221,12 +2221,12 @@ def run_app_5(base_folder="results", color_variations=COLOR_VARIATIONS):
 
 if __name__ == '__main__':
     # List of results folders to be plotted
-    create_hourly_files = True
+    create_hourly_files = False
     use_results_folder = True
 
     if use_results_folder:
         results_folders = [
-        os.path.join(root_folder, 'results/01-BaseScenario'),
+        os.path.join(root_folder, 'results/01-BaseScenarioBS'),
         # os.path.join(root_folder, 'results/02-BaseScenarioWind'),
         # os.path.join(root_folder, 'results/03-BaseScenarioWindBiomass'),
         # os.path.join(root_folder, 'results/04-BaseScenarioWindBiomassPV'),

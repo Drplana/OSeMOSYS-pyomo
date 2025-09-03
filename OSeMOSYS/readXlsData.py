@@ -141,12 +141,17 @@ def dict_to_json(dataframe_dicts, input_file_path):
 
     # Crear el diccionario para Pyomo
     pyomo_dict = {"sets": sets_dict, "parameters": {}}
+    excluded_technologies = set(sets_dict['TECHNOLOGY'])
 
     # Convertir cada DataFrame a un diccionario indexado
     for param, dictionary in dataframe_dicts.items():
         try:
+            indices = dataframe_metadata[param]["indices"]
+            if "TECHNOLOGY" in indices:
+                # Filtrar el DataFrame para excluir tecnologías no permitidas
+                dictionary = dictionary[dictionary['TECHNOLOGY'].isin(excluded_technologies)]
             # Convertir las claves de tuplas a cadenas para JSON
-            param_dict = dictionary.set_index(dataframe_metadata[param]["indices"]).to_dict('index')
+            param_dict = dictionary.set_index(indices).to_dict('index')
             param_dict = {str(k): v["value"] for k, v in param_dict.items()}
             pyomo_dict["parameters"][param] = param_dict
         except KeyError:

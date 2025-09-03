@@ -1397,7 +1397,7 @@ if __name__ == "__main__":
 
     # # Lista de archivos de entrada
     input_files = [
-        os.path.join(root_folder, 'data/01-BaseScenario.xlsx'),
+        # os.path.join(root_folder, 'data/01-BaseScenario.xlsx'),
         # os.path.join(root_folder, 'data/02-BaseScenarioWind.xlsx'),
         # os.path.join(root_folder, 'data/03-BaseScenarioWindBiomass.xlsx'),
         # os.path.join(root_folder, 'data/04-BaseScenarioWindBiomassPV.xlsx'),
@@ -1408,7 +1408,7 @@ if __name__ == "__main__":
         # os.path.join(root_folder, 'data/01-BaseSectors.xlsx'),
         # os.path.join(root_folder, 'data/02-BaseSectorsNoBio.xlsx'),
         # os.path.join(root_folder, 'data/07-BaseSectors.xlsx'),
-
+        os.path.join(root_folder, 'data/01-BaseScenarioBS.xlsx'),
 
     ]
     # Ejecutar los archivos en paralelo de 3 en 3. Batch_size define el número de instancias a correr.
