@@ -6,12 +6,14 @@ dependencies:
   - ipykernel
   - pyomo
   - openpyxl == 3.0.10
-  - numpy
+  - numpy ==1.24.3
   - pandas==2.1.0
   - vincent
   - plotly
   - highs
-  - pint
+  - pint <0.24
+  - scipy ==1.10.1
+
 
 # installing the scip solver:
   - gcg 
@@ -24,4 +26,3 @@ dependencies:
   - pip >= 9.0.1
   - pip:
     - highspy
-
