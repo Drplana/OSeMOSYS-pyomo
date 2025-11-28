@@ -181,7 +181,8 @@ bracket_mapping = {
 }
 
 year = 2023
-data = pd.read_excel('/home/david/Documents/001 - Proyectos/CubaOSeMOSYS/DatosCub.xlsx', sheet_name="DEMAND")
+# data = pd.read_excel('/home/david/Documents/001 - Proyectos/CubaOSeMOSYS/DatosCub.xlsx', sheet_name="DEMAND")
+data = pd.read_csv('data/HourlyDemand.csv')
 if 'Date' not in data.columns:
         print("La columna 'Date' no existe. Creando un rango de fechas automáticamente...")
         start_date = f'{year}-01-01'
