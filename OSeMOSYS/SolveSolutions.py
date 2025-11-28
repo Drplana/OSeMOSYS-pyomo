@@ -12,6 +12,10 @@ from OSeMOSYS.MainModel import define_model
 from OSeMOSYS.readXlsData import generate_output_path
 import plotly.express as px
 import matplotlib.pyplot as plt
+from pyomo.environ import Constraint, Set, Param, Var, value
+from pyomo.util.infeasible import log_infeasible_constraints
+from pyomo.opt import TerminationCondition
+import io
 #%%
 # from vincent.colors import brews
 
@@ -41,6 +45,43 @@ def solve_model(input_file, solver_name ,  json_file_path_or_dict, solver_option
         instance = model.create_instance(json_file_path_or_dict)
     else:
         raise ValueError("El argumento 'json_file_path_or_dict' debe ser una ruta (str) o un diccionario (dict).")
+    
+    # verbose_file = "model_verbose.txt"
+    # with open(verbose_file, "w") as f:
+    #     # Exportar conjuntos
+    #     f.write("Conjuntos:\n")
+    #     for set_obj in instance.component_objects(Set, active=True):
+    #         f.write(f"{set_obj.name}:\n")
+    #         set_obj.pprint(ostream=f)
+    #         f.write("\n")
+
+    #     # Exportar parámetros
+    #     f.write("Parámetros:\n")
+    #     for param_obj in instance.component_objects(Param, active=True):
+    #         f.write(f"{param_obj.name}:\n")
+    #         param_obj.pprint(ostream=f)
+    #         f.write("\n")
+
+    #     # Exportar variables
+    #     f.write("Variables:\n")
+    #     for var_obj in instance.component_objects(Var, active=True):
+    #         f.write(f"{var_obj.name}:\n")
+    #         var_obj.pprint(ostream=f)
+    #         f.write("\n")
+
+    #     # Exportar restricciones
+    #     f.write("Restricciones:\n")
+    #     for constraint_obj in instance.component_objects(Constraint, active=True):
+    #         f.write(f"{constraint_obj.name}:\n")
+    #         constraint_obj.pprint(ostream=f)
+    #         f.write("\n")
+
+    # print(f"Archivo verbose exportado: {verbose_file}")
+
+    """instance.write(filename="model_instance.lp", format="lp", io_options={"symbolic_solver_labels": True})
+    útil para revisar las restricciones y ec. del modelo.
+    """
+
 
     print("Resolviendo el modelo...")
     solver = SolverFactory(solver_name)  # Cambia "gurobi" por el solver que estés usando
@@ -49,12 +90,48 @@ def solve_model(input_file, solver_name ,  json_file_path_or_dict, solver_option
             solver.options[option] = value
 
 
-    results = solver.solve(instance, tee=True)
+    results = solver.solve(instance, tee=True, load_solutions=False)
 
-    print(f"Estado de la solución: {results.solver.status}")
-    print(f"Resultado de la solución: {results.solver.termination_condition}")
+    # print(f"Estado de la solución: {results.solver.status}")
+    # print(f"Resultado de la solución: {results.solver.termination_condition}")
 
-    return instance
+    # return instance
+
+    # Verificar el estado de la solución
+    if results.solver.termination_condition == TerminationCondition.optimal:
+        print("Se encontró una solución óptima. Cargando la solución...")
+        instance.solutions.load_from(results)
+        return instance
+    elif results.solver.termination_condition == TerminationCondition.feasible:
+        print("Se encontró una solución factible (no óptima). Cargando la solución...")
+        instance.solutions.load_from(results)
+        return instance
+    elif results.solver.termination_condition == TerminationCondition.infeasible:
+        print("El modelo es infactible. Registrando restricciones infactibles...")
+        log_infeasible_constraints(instance, log_expression=True)
+        log_file_path = os.path.join(os.path.dirname(input_file), "infeasible_constraints.txt")
+        with open(log_file_path, "w") as log_file:
+            log_stream = io.StringIO()
+            log_infeasible_constraints(instance, log_expression=True, ostream=log_file)
+            log_file.write(log_stream.getvalue())
+        print(f"Restricciones infactibles registradas en: {log_file_path}")
+
+        # Generar archivo IIS si el solver es Gurobi
+        if solver_name == "gurobi":
+            print("Generando archivo IIS con Gurobi...")
+            solver._solver_model.computeIIS()
+            iis_file = os.path.join(os.path.dirname(input_file), "model.ilp")
+            solver._solver_model.write(iis_file)
+            print(f"Archivo IIS generado: {iis_file}")
+    else:
+        print(f"El solver terminó con la condición: {results.solver.termination_condition}")
+
+    # Registrar el mejor objetivo factible encontrado (si está disponible)
+    if hasattr(results, "best_feasible_objective"):
+        print(f"Mejor objetivo factible encontrado: {results.best_feasible_objective}")
+
+    print("No se encontró una solución factible.")
+    return None
 
 
 def export_results(instance, results_folder):
@@ -105,6 +182,132 @@ def export_results(instance, results_folder):
             output_file = os.path.join(results_folder, f"{var_name}.csv")
             df.to_csv(output_file, index=False)
             print(f"Solución guardada: {output_file}")
+# ...existing code...
+
+def compute_lcoe(instance, results_folder, discount_energy=False, fuel_filter=None):
+    """
+    Calcula LCOE anual y del período por (REGION, TECHNOLOGY) usando
+    v_TotalDiscountedCostByTechnology y v_ProductionByTechnologyAnnual.
+    NOTA: Se ignora fuel_filter (ya no se filtra por FUEL). Si la variable
+    de producción tiene FUEL se suma sobre todos los combustibles.
+    """
+    import math, os
+    import pandas as pd
+
+    years = sorted(list(instance.YEAR))
+    year_pos = {y:i for i,y in enumerate(years)}
+
+    # Tasa de descuento (promedio si está indexada)
+    disc_rate = None
+    if hasattr(instance, 'p_DiscountRate'):
+        dr = getattr(instance, 'p_DiscountRate')
+        try:
+            vals = [dr[i] for i in dr]
+            if vals:
+                disc_rate = sum(vals)/len(vals)
+        except:
+            try:
+                disc_rate = float(dr.value)
+            except:
+                pass
+
+    def val(v):
+        return float(v.value) if (v is not None and v.value is not None) else 0.0
+
+    cost_var = instance.v_TotalDiscountedCostByTechnology
+    prod_var = getattr(instance, 'v_ProductionByTechnologyAnnual', None)
+    # Fallback si no existiera (no recomendado, pero evita crash)
+    act_var  = getattr(instance, 'v_TotalTechnologyAnnualActivity', None)
+
+    rows_year = []
+    agg_cost, agg_energy = {}, {}
+
+    # Pre-index producción para acceso rápido (opcional)
+    # Detectar dimensionalidad de producción
+    prod_dim = None
+    if prod_var is not None:
+        # Tomar primer índice
+        try:
+            first_idx = next(iter(prod_var))
+            prod_dim = len(first_idx) if isinstance(first_idx, tuple) else 1
+        except StopIteration:
+            prod_dim = None
+
+    for (r,t,y) in cost_var:
+        cost = val(cost_var[r,t,y])
+        # Energía
+        energy = 0.0
+        if prod_var is not None:
+            if prod_dim == 4:
+                # (REGION, TECHNOLOGY, FUEL, YEAR)
+                for f in instance.FUEL:
+                    key = (r,t,f,y)
+                    if key in prod_var:
+                        energy += val(prod_var[key])
+            elif prod_dim == 3:
+                # (REGION, TECHNOLOGY, YEAR)
+                key = (r,t,y)
+                if key in prod_var:
+                    energy += val(prod_var[key])
+            else:
+                # Dim inesperada -> intentar cualquier coincidencia (más lento)
+                for idx in prod_var:
+                    if isinstance(idx, tuple):
+                        if len(idx) == 4:
+                            rr,tt,f,yy = idx
+                            if rr==r and tt==t and yy==y:
+                                energy += val(prod_var[idx])
+                        elif len(idx) == 3:
+                            rr,tt,yy = idx
+                            if rr==r and tt==t and yy==y:
+                                energy += val(prod_var[idx])
+        elif act_var is not None:
+            # Solo si no hay producción anual explícita
+            key = (r,t,y)
+            if key in act_var:
+                energy = val(act_var[key])
+
+        # Descuento opcional de energía (PV LCOE)
+        if discount_energy and disc_rate is not None:
+            energy /= (1+disc_rate)**year_pos[y]
+
+        lcoe = cost/energy if energy > 0 else math.nan
+
+        rows_year.append({
+            'REGION': r,
+            'TECHNOLOGY': t,
+            'YEAR': y,
+            'DiscountedCost': cost,
+            'Energy': energy,
+            'LCOE_Annual': lcoe
+        })
+
+        agg_cost[(r,t)] = agg_cost.get((r,t),0.0) + cost
+        agg_energy[(r,t)] = agg_energy.get((r,t),0.0) + energy
+
+    df_year = pd.DataFrame(rows_year)
+
+    period_rows = []
+    for (r,t), ctot in agg_cost.items():
+        etot = agg_energy.get((r,t),0.0)
+        period_rows.append({
+            'REGION': r,
+            'TECHNOLOGY': t,
+            'TotalDiscountedCost': ctot,
+            'TotalEnergy': etot,
+            'LCOE_ModelPeriod': (ctot/etot if etot>0 else math.nan)
+        })
+    df_period = pd.DataFrame(period_rows)
+
+    os.makedirs(results_folder, exist_ok=True)
+    df_year.to_csv(os.path.join(results_folder, 'LCOE_Annual.csv'), index=False)
+    df_period.to_csv(os.path.join(results_folder, 'LCOE_ModelPeriod.csv'), index=False)
+    print("LCOE exportado: LCOE_Annual.csv y LCOE_ModelPeriod.csv")
+    return df_year, df_period
+
+# ...existing code...
+
+
 def get_variable_dependencies(instance):
     """
     Determina los conjuntos de los que depende cada variable en el modelo.

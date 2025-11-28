@@ -31,6 +31,7 @@ def define_model(file_path):
     """Reading excel Default parameter values  """
     Default, *_ = load_sets(file_path)
     discountrate = Default.loc['DiscountRate', 'Defaul value']
+    print(discountrate)
     daysplit = Default.loc['DaySplit', 'Defaul value']
     conversionls = Default.loc['Conversionls', 'Defaul value']
     conversionld = Default.loc['Conversionld', 'Defaul value']
@@ -96,7 +97,16 @@ def define_model(file_path):
     model.p_DaysInDayType = Param(model.SEASON,model.DAYTYPE,model.YEAR, default = daysindaytype) # [ls,ld,y]Number of days for each day type, within one week (natural number, ranging from 1 to 7)
     model.p_TradeRoute = Param(model.REGION,model.REGION,model.FUEL,model.YEAR, default = traderoute)  #[r,rr,f,y] Binary parameter defining the links between region r and region rr, to enable or disable trading of a specific commodity. It has value 1 when two regions are linked, 0 otherwise
     model.p_DepreciationMethod = Param(model.REGION, default=depreciation) # [r] Binary parameter defining the type of depreciation to be applied. It has value 1 for sinking fund depreciation, value 2 for straight-line depreciation.
+    def _discount_factor_init(model, r, y):
+        y0 = model.YEAR.first()            # año inicial
+        return (1 + model.p_DiscountRate[r]) ** ((y - y0) + 0.0)
 
+    def _discount_factor_mid_init(model, r, y):
+        y0 = model.YEAR.first()
+        return (1 + model.p_DiscountRate[r]) ** ((y - y0) + 0.5)
+    model.p_DiscountRateIdv = Param(model.REGION,model.TECHNOLOGY, default = discountrate) # [r,t] Technology and region specific value for the discount rate, expressed in decimals (e.g. 0.05). It is used for calculating the capital recovery factor (CRF).
+    model.p_DiscountFactor = Param(model.REGION,model.YEAR, initialize=_discount_factor_init, mutable=True) # [r,y] Discount factor for a specific year and region, calculated from the discount rate.
+    model.p_DiscountFactorMid = Param(model.REGION,model.YEAR, initialize=_discount_factor_mid_init, mutable=True) # [r,y] Discount factor for a specific year and region, calculated from the discount rate.
     ###### Demands in (PJ) 1GWh - 0.0036 PJ ###########
     """SpecifiedAnnualDemand[r,f,y] - Total specified demand for the year, 
     linked to a specific ‘time of use’ during the year."""
@@ -126,7 +136,7 @@ def define_model(file_path):
     model.p_AvailabilityFactor = Param(model.REGION,model.TECHNOLOGY,model.YEAR, default = af)
 
     """OperationalLife[r,t] - Useful lifetime of a technology, expressed in years."""
-    model.p_OperationalLife = Param(model.REGION,model.TECHNOLOGY, default =ol)
+    model.p_OperationalLife = Param(model.REGION,model.TECHNOLOGY, default =ol, within = NonNegativeIntegers)
 
     """ResidualCapacity[r,t,y]- Remained capacity available from before the modelling period."""
     model.p_ResidualCapacity  = Param(model.REGION,model.TECHNOLOGY,model.YEAR, default= rc)
@@ -572,9 +582,11 @@ def define_model(file_path):
     model.v_ResidualCapacity  = Var(model.REGION,model.TECHNOLOGY,model.YEAR, initialize  = 0.0)
     model.v_AccumulatedRecoveredUnits = Var(model.REGION, model.TECHNOLOGY, model.YEAR)
     model.v_AccumulatedRecoveredCapacity = Var(model.REGION, model.TECHNOLOGY, model.YEAR)
+    model.v_AccumulatedRecoveredNewCapacity = Var(model.REGION, model.TECHNOLOGY, model.YEAR)
     # model.v_Recuperadas = Var(model.REGION, model.TECHNOLOGY, model.YEAR, domain = NonNegativeReals, initialize=0.0)
-    model.v_RecoveredExistingUnits = Var(model.REGION, model.TECHNOLOGY, model.YEAR, domain = NonNegativeIntegers, initialize = 0)
-    model.v_RecoveredCapacity      = Var(model.REGION, model.TECHNOLOGY, model.YEAR, domain = NonNegativeReals, initialize = 0)
+    model.v_RecoveredExistingUnits = Var(model.REGION, model.TECHNOLOGY, model.YEAR, domain = NonNegativeIntegers)
+    model.v_RecoveredCapacity      = Var(model.REGION, model.TECHNOLOGY, model.YEAR, domain = NonNegativeReals)
+    model.v_RecoveredNewCapacity   = Var(model.REGION, model.TECHNOLOGY, model.YEAR, domain = NonNegativeReals)
     #model.v_UnidadesFinVida = Var(model.REGION, model.TECHNOLOGY, model.YEAR, domain=NonNegativeIntegers, initialize=0.0)
     """ Exporting a commodity"""
     model.v_Export = Var(model.REGION, model.TIMESLICE, model.FUEL, model.YEAR, domain = NonNegativeReals)
@@ -714,7 +726,8 @@ def define_model(file_path):
     #     model.YEAR,
     #     rule = CAa1R_Recuperadas
     # )
-    from OSeMOSYS.constraints.RecoveredUnits import Recovered_Existing_Units, Accumulated_Recovered_Existing_Units, Recovered_Residual_Aggregated, Accumulated_Recovered_Capacity
+    from OSeMOSYS.constraints.RecoveredUnits import Recovered_Existing_Units, Accumulated_Recovered_Existing_Units, Recovered_Residual_Aggregated,\
+        Accumulated_Recovered_Capacity, Accumulated_Recovered_New_Capacity, Recovered_New_Capacity
     model.Recovered_Existing_Units = Constraint(
         model.REGION,
         model.TECHNOLOGY,
@@ -738,6 +751,18 @@ def define_model(file_path):
         model.TECHNOLOGY,
         model.YEAR,
        rule = Accumulated_Recovered_Capacity 
+    )
+    model.Recovered_New_Capacity = Constraint(
+        model.REGION,
+        model.TECHNOLOGY,
+        model.YEAR,
+       rule = Recovered_New_Capacity
+    )
+    model.Accumulated_Recovered_New_Capacity = Constraint(
+        model.REGION,
+        model.TECHNOLOGY,
+        model.YEAR,
+       rule = Accumulated_Recovered_New_Capacity 
     )
 
 
@@ -1402,6 +1427,7 @@ def define_model(file_path):
     from OSeMOSYS.constraints.MustRun import (Must_Run)
     model.Must_Run = Constraint(
         model.REGION,
+        model.TECHNOLOGY,
         model.TIMESLICE,
         # model.FUEL,
         model.YEAR,

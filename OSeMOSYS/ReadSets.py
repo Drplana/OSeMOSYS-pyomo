@@ -16,11 +16,16 @@ def load_sets(INPUT_FILE_PATH):
     final_year = pd.read_excel(DataExcel, sheet_name='Y')['FINAL_YEAR'][0]
     YEAR = list(range(int(initial_year), int(final_year) + 1))
 
+
     tech_df = pd.read_excel(DataExcel, sheet_name='T')
     TECHNOLOGY = list(tech_df[tech_df['Group'].isna()]['TECHNOLOGY'])  # Excluir tecnologías con algo escrito en 'group'
 
     # TECHNOLOGY = list(pd.read_excel(DataExcel, sheet_name='T')['TECHNOLOGY'])
-    FUEL = list(pd.read_excel(DataExcel, sheet_name='F')['FUEL'])
+    fuel_df = pd.read_excel(DataExcel, sheet_name='F')
+    FUEL = list(fuel_df[fuel_df['Group'].isna()]['FUEL'])  # Excluir combustibles con algo escrito en 'group'
+
+
+    # FUEL = list(pd.read_excel(DataExcel, sheet_name='F')['FUEL'])
     SEASON = list(pd.read_excel(DataExcel, sheet_name='LS')['SEASON'])
     DAYTYPE = list(pd.read_excel(DataExcel, sheet_name='LD')['DAYTYPE'])
     DAILYTIMEBRACKET = list(pd.read_excel(DataExcel, sheet_name='LH')['DAILYTIMEBRACKET'])

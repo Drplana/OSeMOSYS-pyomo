@@ -8,7 +8,7 @@ import plotly.express as px
 from plotly.subplots import make_subplots
 import plotly.graph_objects as go
 # from OSeMOSYS.config import INPUT_FILE_PATH, RESULTS_FOLDER, configure_paths
-from OSeMOSYS.postprocessing.charts import create_line_chart, create_stacked_bar_chart, create_donut_charts, create_line_chart_app4, create_combined_line_chart, create_heatmap,create_horizontal_bar_chart, create_bar_chart
+from OSeMOSYS.postprocessing.charts import create_line_chart, create_stacked_bar_chart, create_donut_charts, create_line_chart_app4, create_combined_line_chart, create_heatmap,create_horizontal_bar_chart, create_bar_chart, create_stacked_area_chart
 from OSeMOSYS.utils import COLOR_VARIATIONS, DEPENDENCIES_VAR_DICT, assign_colors_to_technologies, dependency_key_app1, dependency_key_app2, dependency_key_app4, dependency_key_app5
 # ROOT_FOLDER = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from dash import Dash, dcc, html, Input, Output, State, callback, ctx
@@ -276,7 +276,11 @@ def get_hourly_files(base_folder="results"):
         dict: Diccionario con los nombres de los escenarios como claves y los archivos correspondientes como valores.
     """
     hourly_files = {}
-
+    results_root = base_folder if os.path.isabs(base_folder) else os.path.join(root_folder, base_folder)
+    print(f"[App5] Buscando hourly en: {results_root}")
+    if not os.path.isdir(results_root):
+        print(f"[App5] Carpeta no encontrada: {results_root}")
+        return hourly_files
     # Recorrer las carpetas de resultados
     for scenario_folder in os.listdir(base_folder):
         scenario_path = os.path.join(base_folder, scenario_folder)
@@ -291,6 +295,24 @@ def get_hourly_files(base_folder="results"):
                     file: os.path.join(scenario_path, file) for file in files
                 }
 
+    return hourly_files
+def get_hourly_files_from_results_list(results_folders):
+    """
+    Busca *_hourly.csv solo dentro de las carpetas explícitas en results_folders.
+    Devuelve: { escenario: { nombre_base: ruta_csv } }
+    """
+    hourly_files = {}
+    for results_folder in results_folders:
+        if not os.path.isdir(results_folder):
+            print(f"[App5] Carpeta no encontrada: {results_folder}")
+            continue
+        scenario_name = os.path.basename(results_folder)
+        files = [f for f in os.listdir(results_folder) if f.endswith("_hourly.csv")]
+        if files:
+            hourly_files[scenario_name] = {
+                f[:-len("_hourly.csv")]: os.path.join(results_folder, f)
+                for f in files
+            }
     return hourly_files
 
 
@@ -477,6 +499,9 @@ def process_single_file(file_name, file_path, yearsplit, specified_demand_profil
     try:
         if file_name != "ProductionByTechnology":
             return f"Archivo {file_name} no procesado (no es 'ProductionByTechnology')."
+        allowed= {"ProductionByTechnology", "Demand"}
+        if file_name not in allowed:
+            return f"Archivo {file_name} no procesado (no está en la lista permitida)."
 
         df = pd.read_csv(file_path)
         if df.empty:
@@ -495,7 +520,7 @@ def process_single_file(file_name, file_path, yearsplit, specified_demand_profil
         # Transformar los datos a formato horario
         hourly_results = transform_to_hourly(df, bracket_mapping, daytype_mapping, season_mapping)
 
-        # Exportar los resultados a CSV
+        # Exportar los resultados a CSVprocess_single_file
         output_file = os.path.join(os.path.dirname(file_path), f"{file_name}_hourly.csv")
         hourly_results.to_csv(output_file, index=False)
         return f"Archivo procesado y guardado en: {output_file}"
@@ -922,6 +947,8 @@ def create_comparison_dashboard_with_options(files_by_scenario, COLOR_VARIATIONS
     Returns:
         Dash: Aplicación Dash configurada.
     """
+
+
     app = Dash(__name__)
 
     # Layout de la aplicación
@@ -952,13 +979,14 @@ def create_comparison_dashboard_with_options(files_by_scenario, COLOR_VARIATIONS
                     {'label': 'Gráfico de Dona 1', 'value': 'donut-charts-1'},
                     {'label': 'Gráfico de Barras 2', 'value': 'stacked-bar-chart-2'},
                     {'label': 'Gráfico de Dona 2', 'value': 'donut-charts-2'}
+
                 ],
                 value=[],  # Ningún gráfico seleccionado por defecto
                 style={'font-size': '16px'}
             ),
             html.Button("Descargar Gráficos Seleccionados", id='download-button', n_clicks=0, style={'margin-top': '10px'}),
             dcc.Download(id="download-graphs")
-        ], style={'margin-bottom': '20px'}),
+        ], style={'margin-bottom': '30px'}),
 
 
         html.Div([
@@ -975,6 +1003,19 @@ def create_comparison_dashboard_with_options(files_by_scenario, COLOR_VARIATIONS
             inline=True,
             style={'font-size': '16px'}
         )
+        ], style={'margin-bottom': '20px'}),
+        html.Div([
+            html.Label("Tipo de gráfico (apilado):", style={'font-size': '20px'}),
+            dcc.RadioItems(
+                id='chart-type',
+                options=[
+                    {'label': 'Barras', 'value': 'bar'},
+                    {'label': 'Área', 'value': 'area'}
+                ],
+                value='bar',
+                inline=True,
+                style={'font-size': '16px'}
+            )
         ], style={'margin-bottom': '20px'}),
   
 
@@ -1070,7 +1111,7 @@ def create_comparison_dashboard_with_options(files_by_scenario, COLOR_VARIATIONS
             zip_buffer.seek(0)
             return dcc.send_bytes(zip_buffer.getvalue(), "selected_graphs.zip")
 
-        return dash.no_update
+        return Dash.no_update
     # Cargar todos los datos al inicio
     def load_all_data(files_by_scenario):
         data_cache = {}
@@ -1161,9 +1202,10 @@ def create_comparison_dashboard_with_options(files_by_scenario, COLOR_VARIATIONS
         Input('scenario-dropdown-2', 'value'),
         Input('file-dropdown-2', 'value'),
         Input('technology-filter', 'value'),
-        Input('unit-selector', 'value')]
+        Input('unit-selector', 'value'),
+        Input('chart-type', 'value')]
     )
-    def update_graphs(scenario1, file1, scenario2, file2, selected_techs, unit):
+    def update_graphs(scenario1, file1, scenario2, file2, selected_techs, unit, chart_type):
         # Leer datos
         data1 = data_cache[scenario1][file1].copy()
         data2 = data_cache[scenario2][file2].copy()
@@ -1182,10 +1224,21 @@ def create_comparison_dashboard_with_options(files_by_scenario, COLOR_VARIATIONS
         data1['value'] = data1['value'] * factor
         data2['value'] = data2['value'] * factor # Asegurarse de que los valores sean numéricos
         # Crear gráficos de barras apiladas
-        bar_chart_1 = create_stacked_bar_chart(data1, f"{scenario1}-{file1}", COLOR_VARIATIONS)
-        bar_chart_2 = create_stacked_bar_chart(data2, f"Barras Apiladas - {scenario2}", COLOR_VARIATIONS)
-        bar_chart_1.update_layout(yaxis_title=f"Energy Production ({unit})")
-        bar_chart_2.update_layout(yaxis_title=f"Energy Production ({unit})")
+        if chart_type == 'area':
+            fig1 = create_stacked_area_chart(data1, f"{scenario1}-{file1}", COLOR_VARIATIONS)
+            fig2 = create_stacked_area_chart(data2, f"{scenario2}-{file2}", COLOR_VARIATIONS)
+        else:
+            fig1 = create_stacked_bar_chart(data1, f"{scenario1}-{file1}", COLOR_VARIATIONS)
+            fig2 = create_stacked_bar_chart(data2, f"{scenario2}-{file2}", COLOR_VARIATIONS)
+            fig1.update_layout(barmode='stack')
+            fig2.update_layout(barmode='stack')
+        fig1.update_layout(yaxis_title=f"Energy Production ({unit})")
+        fig2.update_layout(yaxis_title=f"Energy Production ({unit})")
+
+        # bar_chart_1 = create_stacked_bar_chart(data1, f"{scenario1}-{file1}", COLOR_VARIATIONS)
+        # bar_chart_2 = create_stacked_bar_chart(data2, f"Barras Apiladas - {scenario2}", COLOR_VARIATIONS)
+        # bar_chart_1.update_layout(yaxis_title=f"Energy Production ({unit})")
+        # bar_chart_2.update_layout(yaxis_title=f"Energy Production ({unit})")
 
         # Crear gráficos de dona
         donut_charts_1 = create_donut_charts(data1, years, COLOR_VARIATIONS, selected_techs, unit)
@@ -1204,7 +1257,7 @@ def create_comparison_dashboard_with_options(files_by_scenario, COLOR_VARIATIONS
         donut_charts_2 = [dcc.Graph(figure=chart) for chart in donut_charts_2]
 
 
-        return bar_chart_1, donut_charts_1, bar_chart_2, donut_charts_2
+        return fig1, donut_charts_1, fig2, donut_charts_2
 
     return app
 
@@ -1630,6 +1683,19 @@ def create_app_5(hourly_data, color_variations):
                 style={'font-size': '16px'}
             )
         ], style={'margin-bottom': '20px'}),
+                html.Div([
+            dcc.Graph(id='hourly-stacked-area-chart-1', style={'width': '48%', 'display': 'inline-block'}),
+            dcc.Graph(id='hourly-stacked-area-chart-2', style={'width': '48%', 'display': 'inline-block'})
+        ]),
+       html.Div([
+           html.Button("Descargar Gráfico 1 (SVG)", id='hourly-dl-1', n_clicks=0, style={'margin-right': '10px'}),
+           html.Button("Descargar Gráfico 2 (SVG)", id='hourly-dl-2', n_clicks=0),
+           dcc.Download(id='hourly-dl-1-file'),
+           dcc.Download(id='hourly-dl-2-file'),
+       ], style={'margin-top': '12px'})
+       ,
+
+
         html.Div([
             html.Div([
                 html.Label("Selecciona el escenario:", style={'font-size': '16px'}),
@@ -1821,6 +1887,33 @@ def create_app_5(hourly_data, color_variations):
             Input('checkall-button-1', 'n_clicks')],
             [State('timeslice-checklist-1', 'value')]
         )
+    @app.callback(
+    Output('hourly-dl-1-file', 'data'),
+    Input('hourly-dl-1', 'n_clicks'),
+    State('hourly-stacked-area-chart-1', 'figure'),
+    State('scenario-dropdown-1', 'value'),
+    prevent_initial_call=True
+    )
+    def dl_hourly_1(n, fig, scen):
+       if n and fig:
+           buf = io.BytesIO()
+           pio.write_image(fig, buf, format='svg')
+           buf.seek(0)
+           return dcc.send_bytes(buf.getvalue(), f"{scen}_hourly_chart_1.svg")
+    @app.callback(
+    Output('hourly-dl-2-file', 'data'),
+    Input('hourly-dl-2', 'n_clicks'),
+    State('hourly-stacked-area-chart-2', 'figure'),
+    State('scenario-dropdown-2', 'value'),
+    prevent_initial_call=True
+   )
+    def dl_hourly_2(n, fig, scen):
+        if n and fig:
+            buf = io.BytesIO()
+            pio.write_image(fig, buf, format='svg')
+            buf.seek(0)
+            return dcc.send_bytes(buf.getvalue(), f"{scen}_hourly_chart_2.svg")
+    
     def update_timeslice_checklist_1(selected_scenario, selected_file, search_value, n_clicks, current_selection):
             if selected_scenario and selected_file:
                 data = hourly_data[selected_scenario][selected_file]
@@ -2054,8 +2147,9 @@ def create_app_5(hourly_data, color_variations):
             template = 'presentation'
         )
         chart1.update_traces(
-        line=dict(width=2),
-        opacity=0.8
+        # line=dict(width=2),
+        opacity=0.8,
+        line=dict(width=0), 
     )   
 
         chart2 = create_area_chart(scenario2, file2, timeslices2, year2, technologies2)
@@ -2104,11 +2198,478 @@ def create_app_5(hourly_data, color_variations):
             template = 'presentation'
         )
         chart2.update_traces(
-        line=dict(width=2),
-        opacity=0.8
+        # line=dict(width=2),
+        opacity=0.8,
+        line=dict(width=0), 
     )      
         return chart1, chart2
     return app
+
+# ...existing code...
+
+# ...existing code...
+
+def create_app_capacity_decomposition_simple(files_by_scenario, COLOR_VARIATIONS, scenarios):
+    """
+    Ajustes solicitados:
+    1. Leyenda muestra SOLO tecnologías (no componentes) y cada tecnología una sola vez.
+    2. El término de unidades recuperadas se deriva por resta:
+       RecoveredUnitsDerived = TotalCapacityAnnual
+                               - AccumulatedNewCapacity
+                               - ResidualCapacity
+                               - AccumulatedRecoveredCapacity
+                               - AccumulatedRecoveredNewCapacity
+       (sin usar CapacityOfOneTechnologyUnit).
+    """
+    from dash import Dash, dcc, html, Input, Output, State, ctx
+    import plotly.graph_objects as go
+    import plotly.express as px
+    import pandas as pd
+
+    app = Dash(__name__)
+
+    TOTAL = "TotalCapacityAnnual"
+    # Componentes que se leen directamente si existen
+    DIRECT_COMPONENTS = [
+        "AccumulatedNewCapacity",
+        "ResidualCapacity",
+        "AccumulatedRecoveredCapacity",
+        "AccumulatedRecoveredNewCapacity"
+    ]
+    DERIVED_NAME = "RecoveredUnitsDerived"  # nuevo nombre
+
+    # ---------- CARGA ----------
+    cache = {}
+    for scen, files in files_by_scenario.items():
+        cache[scen] = {}
+        for name, path in files.items():
+            try:
+                df = pd.read_csv(path)
+                for c in ['TECHNOLOGY','REGION']:
+                    if c in df.columns:
+                        df[c] = df[c].astype(str).str.strip()
+                cache[scen][name] = df
+            except Exception as e:
+                print(f"[CapSimple] Error leyendo {path}: {e}")
+
+    def assign_base_colors(df_tech):
+        return assign_colors_to_technologies(df_tech, 'TECHNOLOGY', COLOR_VARIATIONS)
+
+    # ---------- BUILD COMPONENTS (modificado) ----------
+    def build_components(scenario, techs_sel, mode_gap_target, aggregate_regions, derive_gap):
+        """
+        Construye DataFrame con:
+          - TOTAL
+          - DIRECT_COMPONENTS (si existen)
+          - DERIVED_NAME (si todos los insumos necesarios existen)
+        El cálculo de DERIVED_NAME ignora CapacityOfOneTechnologyUnit.
+        """
+        scen_files = cache.get(scenario, {})
+        if TOTAL not in scen_files:
+            return pd.DataFrame()
+
+        # Base Total
+        total_df = scen_files[TOTAL].copy()
+        if techs_sel:
+            total_df = total_df[total_df['TECHNOLOGY'].isin(techs_sel)]
+        if total_df.empty:
+            return pd.DataFrame()
+
+        rows = []
+
+        def add_component(name, label=None):
+            if name not in scen_files:
+                return None
+            dfc = scen_files[name].copy()
+            if techs_sel:
+                dfc = dfc[dfc['TECHNOLOGY'].isin(techs_sel)]
+            if dfc.empty:
+                return None
+            gcols = ['YEAR','TECHNOLOGY'] if aggregate_regions or 'REGION' not in dfc.columns else ['REGION','YEAR','TECHNOLOGY']
+            comp = dfc.groupby(gcols, as_index=False)['value'].sum()
+            comp['Component'] = label or name
+            rows.append(comp)
+            return comp
+
+        # Añadir Total + directos existentes
+        total_comp = add_component(TOTAL)
+        direct_added = {}
+        for cname in DIRECT_COMPONENTS:
+            res = add_component(cname)
+            if res is not None:
+                direct_added[cname] = res
+
+        # Calcular DERIVED_NAME sólo si todos los directos + total existen
+        needed = {TOTAL, *DIRECT_COMPONENTS}
+        if needed.issubset(set(scen_files.keys())):
+            if all(k in direct_added for k in DIRECT_COMPONENTS) and total_comp is not None:
+                # Preparar merges
+                all_direct = pd.concat([direct_added[c] for c in DIRECT_COMPONENTS], ignore_index=True)
+                gcols_base = ['YEAR','TECHNOLOGY']
+                if not aggregate_regions and 'REGION' in total_comp.columns:
+                    gcols_base.insert(0,'REGION')
+                sum_direct = all_direct.groupby(gcols_base, as_index=False)['value'].sum()
+                sum_total = total_comp.groupby(gcols_base, as_index=False)['value'].sum().rename(columns={'value':'total_val'})
+                diff = sum_total.merge(sum_direct, on=gcols_base, how='left')
+                diff['value'] = (diff['total_val'] - diff['value']).clip(lower=0)
+                diff['Component'] = DERIVED_NAME
+                rows.append(diff[gcols_base+['Component','value']])
+
+        if not rows:
+            return pd.DataFrame()
+        out = pd.concat(rows, ignore_index=True)
+        if 'REGION' not in out.columns:
+            out['REGION'] = 'ALL'
+        out['SCENARIO'] = scenario
+        return out
+
+    # ---------- ESTILOS ----------
+    opacity_map = {
+        'AccumulatedNewCapacity': 0.95,
+        'ResidualCapacity': 0.70,
+        'AccumulatedRecoveredCapacity': 0.40,
+        'AccumulatedRecoveredNewCapacity': 0.30,
+        DERIVED_NAME: 0.55,
+        'RecoveredBundle(calc)': 0.45,
+        'ResidualCapacity(calc)': 0.70,
+        'AccumulatedNewCapacity(calc)': 0.95
+    }
+    pattern_map = {
+        'AccumulatedNewCapacity': '',
+        'ResidualCapacity': '/',
+        'AccumulatedRecoveredCapacity': '\\',
+        'AccumulatedRecoveredNewCapacity': 'x',
+        DERIVED_NAME: '.',
+        'ResidualCapacity(calc)': '/',
+        'AccumulatedNewCapacity(calc)': '',
+        'RecoveredBundle(calc)': '.'
+    }
+    CHART_HEIGHT = 650
+    # ---------- LAYOUT ----------
+    app.layout = html.Div([
+        html.H2("Descomposición de Capacidad (Comparación de Escenarios)", style={'textAlign':'center'}),
+        # -------- Controles --------
+        html.Div([
+            # Escenario 1
+            html.Div([
+                html.Label("Escenario 1:", style={'font-size':'14px'}),
+                dcc.Dropdown(
+                    id='capC-scen-1',
+                    options=[{'label': s, 'value': s} for s in scenarios],
+                    value=scenarios[0] if scenarios else None,
+                    style={'width':'95%'}
+                )
+            ], style={'width':'20%','display':'inline-block','verticalAlign':'top'}),
+            # Escenario 2
+            html.Div([
+                html.Label("Escenario 2:", style={'font-size':'14px'}),
+                dcc.Dropdown(
+                    id='capC-scen-2',
+                    options=[{'label': s, 'value': s} for s in scenarios],
+                    value=scenarios[1] if len(scenarios)>1 else (scenarios[0] if scenarios else None),
+                    style={'width':'95%'}
+                )
+            ], style={'width':'20%','display':'inline-block','verticalAlign':'top'}),
+            # Tecnologías
+            html.Div([
+                html.Label("Tecnologías:", style={'font-size':'14px'}),
+                dcc.Checklist(
+                    id='capC-techs',
+                    options=[], value=[],
+                    inline=False,
+                    style={'display':'flex','flex-wrap':'wrap','gap':'6px','max-height':'140px','overflow':'auto',
+                           'border':'1px solid #ccc','padding':'6px'}
+                ),
+                html.Button("Sel/Deselec Todas", id='capC-toggle-techs', n_clicks=0,
+                            style={'margin-top':'4px','font-size':'12px'})
+            ], style={'width':'32%','display':'inline-block','verticalAlign':'top'}),
+            # Opciones
+            html.Div([
+                html.Label("Opciones:", style={'font-size':'14px'}),
+                html.Div([
+                    html.Span("Regiones:", style={'margin-right':'6px'}),
+                    dcc.RadioItems(
+                        id='capC-region-mode',
+                        options=[{'label':'Agrupar','value':'agg'},{'label':'Separar','value':'split'}],
+                        value='agg', inline=True, style={'font-size':'12px'}
+                    )
+                ], style={'margin-bottom':'6px'}),
+                html.Div([
+                    html.Span("Calcular por resta:", style={'margin-right':'6px'}),
+                    dcc.RadioItems(
+                        id='capC-gap-target',
+                        options=[
+                            {'label':'Nada','value':'none'},
+                            {'label':'Residual','value':'ResidualCapacity'},
+                            {'label':'Nueva','value':'AccumulatedNewCapacity'},
+                            {'label':'Recovered Bundle','value':'RecoveredBundle'}
+                        ],
+                        value='none', inline=True, style={'font-size':'12px'}
+                    )
+                ], style={'margin-bottom':'6px'}),
+                html.Div([
+                    html.Span("Mostrar Total (líneas):", style={'margin-right':'6px'}),
+                    dcc.RadioItems(
+                        id='capC-show-total',
+                        options=[{'label':'Sí','value':'yes'},{'label':'No','value':'no'}],
+                        value='yes', inline=True, style={'font-size':'12px'}
+                    )
+                ])
+            ], style={'width':'28%','display':'inline-block','verticalAlign':'top'})
+        ], style={'margin-bottom':'12px'}),
+        # -------- Gráficos (Escenario 1 y 2 lado a lado) --------
+        html.Div([
+            # Columna Escenario 1
+            html.Div([
+                dcc.Graph(id='capC-bar-1', style={'height': f'{CHART_HEIGHT}px'}),
+                dcc.Graph(id='capC-line-1', style={'height': f'{int(CHART_HEIGHT*0.55)}px'}),
+                html.Div([
+                    html.Button("Descargar Barras Esc 1 (SVG)", id='capC-dl-bar-1', n_clicks=0,
+                                style={'font-size':'12px','margin-right':'6px'}),
+                    html.Button("Descargar Líneas Esc 1 (SVG)", id='capC-dl-line-1', n_clicks=0,
+                                style={'font-size':'12px'})
+                ], style={'margin-top':'6px'}),
+                dcc.Download(id='capC-dl-bar-1-file'),
+                dcc.Download(id='capC-dl-line-1-file')
+            ], style={'width':'49%','display':'inline-block','verticalAlign':'top'}),
+
+            # Columna Escenario 2
+            html.Div([
+                dcc.Graph(id='capC-bar-2', style={'height': f'{CHART_HEIGHT}px'}),
+                dcc.Graph(id='capC-line-2', style={'height': f'{int(CHART_HEIGHT*0.55)}px'}),
+                html.Div([
+                    html.Button("Descargar Barras Esc 2 (SVG)", id='capC-dl-bar-2', n_clicks=0,
+                                style={'font-size':'12px','margin-right':'6px'}),
+                    html.Button("Descargar Líneas Esc 2 (SVG)", id='capC-dl-line-2', n_clicks=0,
+                                style={'font-size':'12px'})
+                ], style={'margin-top':'6px'}),
+                dcc.Download(id='capC-dl-bar-2-file'),
+                dcc.Download(id='capC-dl-line-2-file')
+            ], style={'width':'49%','display':'inline-block','verticalAlign':'top'})
+        ])
+    ])
+
+    #     html.Div([
+    #         html.Div([
+    #             dcc.Graph(id='capC-bar-1'),
+    #             dcc.Graph(id='capC-line-1')
+    #         ], style={'width':'49%','display':'inline-block','verticalAlign':'top'}),
+    #         html.Div([
+    #             dcc.Graph(id='capC-bar-2'),
+    #             dcc.Graph(id='capC-line-2')
+    #         ], style={'width':'49%','display':'inline-block','verticalAlign':'top'})
+    #     ])
+    # ])
+
+    # ---------- CHECKLIST TECHS ----------
+    @app.callback(
+        [Output('capC-techs','options'),
+         Output('capC-techs','value')],
+        [Input('capC-scen-1','value'),
+         Input('capC-scen-2','value'),
+         Input('capC-toggle-techs','n_clicks')],
+        [State('capC-techs','value')]
+    )
+    def update_tech_list(s1, s2, n_clicks, current):
+        techs = set()
+        for s in [s1,s2]:
+            if s and s in cache and TOTAL in cache[s]:
+                techs.update(cache[s][TOTAL]['TECHNOLOGY'].unique())
+        techs = sorted(techs)
+        opts = [{'label': t, 'value': t} for t in techs]
+        if ctx.triggered and 'capC-toggle-techs' in ctx.triggered[0]['prop_id']:
+            if n_clicks % 2 == 1:
+                return opts, techs
+            else:
+                return opts, []
+        selected = [t for t in (current or []) if t in techs] or techs
+        return opts, selected
+
+    # ---------- FIGURAS ----------
+    def make_bar_figure(df, region_mode, scenario):
+        if df.empty:
+            return px.bar(title=f"Sin datos ({scenario})")
+        parts_df = df[df.Component != TOTAL]
+        if parts_df.empty:
+            return px.bar(title=f"Sin componentes ({scenario})")
+        tech_colors = assign_base_colors(df[['TECHNOLOGY']].drop_duplicates())
+
+        # Orden fijo
+        comp_order = [c for c in [
+            'AccumulatedNewCapacity','ResidualCapacity',DERIVED_NAME,
+            'AccumulatedRecoveredCapacity','AccumulatedRecoveredNewCapacity',
+            'RecoveredBundle(calc)','ResidualCapacity(calc)','AccumulatedNewCapacity(calc)'
+        ] if c in parts_df.Component.unique()]
+
+        group_cols = ['YEAR','TECHNOLOGY']
+        if region_mode == 'split' and parts_df['REGION'].nunique()>1:
+            group_cols.insert(0,'REGION')
+
+        fig = go.Figure()
+
+        # Para leyenda única por tecnología: primer componente showlegend=True, resto False
+        for tech in sorted(parts_df['TECHNOLOGY'].unique()):
+            tech_slice = parts_df[parts_df['TECHNOLOGY']==tech]
+            first_for_legend = True
+            for comp in comp_order:
+                sc = tech_slice[tech_slice.Component==comp]
+                if sc.empty:
+                    continue
+                grouped = sc.groupby(group_cols, as_index=False)['value'].sum()
+                fig.add_bar(
+                    x=grouped['YEAR'],
+                    y=grouped['value'],
+                    name=tech,
+                    legendgroup=tech,
+                    showlegend=first_for_legend,
+                    marker_color=tech_colors[tech],
+                    marker_opacity=opacity_map.get(comp,0.8),
+                    marker_pattern_shape=pattern_map.get(comp,''),
+                    hovertemplate=(
+                        f"Escenario: {scenario}"
+                        f"<br>Tecnología: {tech}"
+                        f"<br>Componente: {comp}"
+                        "<br>Año: %{x}<br>Valor: %{y:.2f}<extra></extra>"
+                    )
+                )
+                first_for_legend = False
+
+        fig.update_layout(
+            title=f"Descomposición (Barras) - {scenario}",
+            barmode='stack',
+            plot_bgcolor='white',
+            margin=dict(t=50,l=50,r=15,b=40),
+            xaxis_title="Año",
+            yaxis_title="Capacidad",
+            legend=dict(font=dict(size=11)),
+            height=CHART_HEIGHT
+        )
+        return fig
+
+    def make_line_figure(df, region_mode, scenario, show_total):
+        if df.empty or show_total=='no':
+            return px.line(title=f"TotalCapacityAnnual - {scenario} (oculto)")
+        total_df = df[df.Component==TOTAL]
+        if total_df.empty:
+            return px.line(title=f"Sin TotalCapacityAnnual ({scenario})")
+        tech_colors = assign_base_colors(total_df[['TECHNOLOGY']].drop_duplicates())
+        group_cols = ['YEAR','TECHNOLOGY']
+        if region_mode == 'split' and total_df['REGION'].nunique()>1:
+            group_cols.insert(0,'REGION')
+        grp = total_df.groupby(group_cols, as_index=False)['value'].sum()
+        fig = go.Figure()
+        for tech in sorted(grp['TECHNOLOGY'].unique()):
+            g = grp[grp['TECHNOLOGY']==tech].sort_values('YEAR')
+            fig.add_scatter(
+                x=g['YEAR'],
+                y=g['value'],
+                mode='lines+markers',
+                name=tech,
+                legendgroup=tech,
+                line=dict(color=tech_colors[tech], width=3),
+                marker=dict(color='white', line=dict(color=tech_colors[tech], width=2), size=6),
+                hovertemplate=f"Escenario: {scenario}<br>Tecnología: {tech}<br>Año %{{x}}: %{{y:.2f}}<extra></extra>"
+            )
+        fig.update_layout(
+            title=f"TotalCapacityAnnual (Líneas) - {scenario}",
+            plot_bgcolor='white',
+            margin=dict(t=50,l=50,r=15,b=40),
+            xaxis_title="Año",
+            yaxis_title="Capacidad",
+            legend=dict(font=dict(size=11)),
+            height=int(CHART_HEIGHT*0.55)
+        )
+        return fig
+
+    # ---------- CALLBACK PRINCIPAL ----------
+    @app.callback(
+        [Output('capC-bar-1','figure'),
+         Output('capC-line-1','figure'),
+         Output('capC-bar-2','figure'),
+         Output('capC-line-2','figure')],
+        [Input('capC-scen-1','value'),
+         Input('capC-scen-2','value'),
+         Input('capC-techs','value'),
+         Input('capC-region-mode','value'),
+         Input('capC-gap-target','value'),
+         Input('capC-show-total','value')]
+    )
+    def update_charts(s1, s2, techs, region_mode, gap_target, show_total):
+        if not s1 or not s2 or not techs:
+            empty = px.bar(title="Seleccione escenarios/tecnologías")
+            return empty, empty, empty, empty
+        derive_gap = gap_target != 'none'
+        df1 = build_components(s1, techs, None if gap_target=='none' else gap_target, region_mode=='agg', derive_gap)
+        df2 = build_components(s2, techs, None if gap_target=='none' else gap_target, region_mode=='agg', derive_gap)
+        bar1 = make_bar_figure(df1, region_mode, s1)
+        line1 = make_line_figure(df1, region_mode, s1, show_total)
+        bar2 = make_bar_figure(df2, region_mode, s2)
+        line2 = make_line_figure(df2, region_mode, s2, show_total)
+        return bar1, line1, bar2, line2
+    # ---------- CALLBACKS DESCARGA SVG ----------
+    import io
+    import plotly.io as pio
+
+    @app.callback(
+        Output('capC-dl-bar-1-file','data'),
+        Input('capC-dl-bar-1','n_clicks'),
+        State('capC-bar-1','figure'),
+        State('capC-scen-1','value'),
+        prevent_initial_call=True
+    )
+    def download_bar1(n, fig, scen):
+        if n and fig:
+            buf = io.BytesIO()
+            pio.write_image(fig, buf, format='svg')
+            buf.seek(0)
+            return dcc.send_bytes(buf.getvalue(), f"{scen}_barras.svg")
+
+    @app.callback(
+        Output('capC-dl-line-1-file','data'),
+        Input('capC-dl-line-1','n_clicks'),
+        State('capC-line-1','figure'),
+        State('capC-scen-1','value'),
+        prevent_initial_call=True
+    )
+    def download_line1(n, fig, scen):
+        if n and fig:
+            buf = io.BytesIO()
+            pio.write_image(fig, buf, format='svg')
+            buf.seek(0)
+            return dcc.send_bytes(buf.getvalue(), f"{scen}_lineas.svg")
+
+    @app.callback(
+        Output('capC-dl-bar-2-file','data'),
+        Input('capC-dl-bar-2','n_clicks'),
+        State('capC-bar-2','figure'),
+        State('capC-scen-2','value'),
+        prevent_initial_call=True
+    )
+    def download_bar2(n, fig, scen):
+        if n and fig:
+            buf = io.BytesIO()
+            pio.write_image(fig, buf, format='svg')
+            buf.seek(0)
+            return dcc.send_bytes(buf.getvalue(), f"{scen}_barras.svg")
+
+    @app.callback(
+        Output('capC-dl-line-2-file','data'),
+        Input('capC-dl-line-2','n_clicks'),
+        State('capC-line-2','figure'),
+        State('capC-scen-2','value'),
+        prevent_initial_call=True
+    )
+    def download_line2(n, fig, scen):
+        if n and fig:
+            buf = io.BytesIO()
+            pio.write_image(fig, buf, format='svg')
+            buf.seek(0)
+            return dcc.send_bytes(buf.getvalue(), f"{scen}_lineas.svg")
+    
+
+
+    return app
+
 
 # def run_app_1():
 #     print("Ejecutando la App 1 en el puerto 8050...")
@@ -2136,69 +2697,136 @@ def create_app_5(hourly_data, color_variations):
 #     webbrowser.open("http://127.0.0.1:8053/")
 #     app4 = create_app_4(dependency_files_app4)
 #     app4.run(debug=False, port=8053)
+import socket
+def _server_ip():
+    # Obtiene la IP local preferida (no-loopback)
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    try:
+        s.connect(("8.8.8.8", 80))
+        return s.getsockname()[0]
+    except Exception:
+        return "127.0.0.1"
+    finally:
+        s.close()
+def _maybe_open_browser(port):
+    """
+    Abre el navegador local si OPEN_BROWSER=1 (por defecto).
+    Usa la IP real (no 0.0.0.0). Útil solo en uso local.
+    """
+    ip = _server_ip()
+    url = f"http://{ip}:{port}/"
+    print(f"URL: {url}")
+    if os.environ.get("OPEN_BROWSER", "1") == "1":
+        try:
+            webbrowser.open(url)
+        except Exception as e:
+            print(f"No se pudo abrir el navegador: {e}")
 
 
 def run_app_1(dependency_files_app1, color_variations, scenarios):
     print("Ejecutando la App 1 en el puerto 8050...")
+    port = 8050
+    ip= _server_ip()
+    print(f"Abriendo en http://{ip}:{port}")
     app1 = create_first_app(dependency_files_app1, color_variations, scenarios)
-    webbrowser.open("http://127.0.0.1:8050/")
-    app1.run(debug=False, port=8050)
+    _maybe_open_browser(port)
+    app1.run(debug=False, host = "0.0.0.0", port=port)
 
 def run_app_2(dependency_files_app2, color_variations, years, scenarios):
     print("Ejecutando la App 2 en el puerto 8051...")
+    port = 8051
     app2 = create_comparison_dashboard_with_options(dependency_files_app2, color_variations, years, scenarios)
-    webbrowser.open("http://127.0.0.1:8051/")
-    app2.run(debug=False, port=8051)
+    _maybe_open_browser(port)
+    app2.run(debug=False, host = "0.0.0.0", port=8051)
 
 def run_app_3(dependency_files_app1, scenarios):
     print("Ejecutando la App 3 en el puerto 8052...")
+    port = 8052
     app3 = create_heatmap_app(dependency_files_app1, scenarios)
-    webbrowser.open("http://127.0.0.1:8052/")
-    app3.run(debug=False, port=8052)
+    _maybe_open_browser(port)
+    app3.run(debug=False, host= "0.0.0.0",port=8052)
 
 def run_app_4(dependency_files_app4):
     print("Ejecutando la App 4 en el puerto 8053...")
+    port = 8053
     app4 = create_app_4(dependency_files_app4)
-    webbrowser.open("http://127.0.0.1:8053/")
-    app4.run(debug=False, port=8053)
-def run_app_5(base_folder="results", color_variations=COLOR_VARIATIONS):
+    # webbrowser.open("http://0.0.0.0:8053/")
+    _maybe_open_browser(port)
+    app4.run(debug=False, host = "0.0.0.0", port=8053)
+
+
+
+
+def run_app_5(results_folders, color_variations=COLOR_VARIATIONS):
     """
     Ejecuta la App 5 para visualizar datos horarios.
-
-    Args:
-        base_folder (str): Carpeta base donde se encuentran los resultados.
     """
+    # results_root = base_folder if os.path.isabs(base_folder) else os.path.join(root_folder, base_folder)
     print("Buscando archivos 'hourly' en las carpetas de resultados...")
-    hourly_files = get_hourly_files(base_folder)
-
+    hourly_files = get_hourly_files_from_results_list(results_folders)
     if not hourly_files:
         print("No se encontraron archivos 'hourly'. Verifica las carpetas de resultados.")
         return
+    print(f"Archivos encontrados: {list(hourly_files.keys())}")
 
-    print(f"Archivos encontrados: {hourly_files.keys()}")
-
-    # Cargar los datos desde los archivos encontrados
+    # Cargar a memoria los CSV encontrados -> hourly_data esperado por la App 5
     hourly_data = {}
-    for scenario, files in hourly_files.items():
-        scenario_data = {}
-        for file_name, file_path in files.items():
+    for scen, files in hourly_files.items():
+        scen_data = {}
+        for base_name, path in files.items():
             try:
-                scenario_data[file_name] = pd.read_csv(file_path)
+                scen_data[base_name] = pd.read_csv(path)
             except Exception as e:
-                print(f"Error al cargar el archivo {file_path}: {e}")
-        if scenario_data:
-            hourly_data[scenario] = scenario_data
+                print(f"[App5] Error al cargar {path}: {e}")
+        if scen_data:
+            hourly_data[scen] = scen_data
 
     if not hourly_data:
-        print("No se pudieron cargar los datos desde los archivos 'hourly'.")
+        print("[App5] No se pudieron cargar datos horarios.")
         return
 
-    # Crear y ejecutar la aplicación Dash
-    app5 = create_app_5(hourly_data, COLOR_VARIATIONS)
-    print("Ejecutando la App 5 en el puerto 8055...")
-    webbrowser.open("http://127.0.0.1:8055/")
-    app5.run(debug=False, port=8055, use_reloader=False)
 
+    # print("Buscando archivos 'hourly' en las carpetas de resultados...")
+    # hourly_files = get_hourly_files(base_folder)
+
+    # if not hourly_files:
+    #     print("No se encontraron archivos 'hourly'. Verifica las carpetas de resultados.")
+    #     return
+
+    # print(f"Archivos encontrados: {hourly_files.keys()}")
+
+    # # Cargar los datos desde los archivos encontrados
+    # hourly_data = {}
+    # results_root = base_folder if os.path.isabs(base_folder) else os.path.join(root_folder, base_folder)
+    # for scenario, files in hourly_files.items():
+    #     scenario_data = {}
+    #     for file_name, file_path in files.items():
+    #         try:
+    #             scenario_data[file_name] = pd.read_csv(file_path)
+    #         except Exception as e:
+    #             print(f"Error al cargar el archivo {file_path}: {e}")
+    #     if scenario_data:
+    #         hourly_data[scenario] = scenario_data
+
+    # if not hourly_data:
+    #     print("No se pudieron cargar los datos desde los archivos 'hourly'.")
+    #     return
+
+    # # Crear y ejecutar la aplicación Dash
+    port = 8057
+    app5 = create_app_5(hourly_data, COLOR_VARIATIONS)
+    print("Ejecutando la App 5 en el puerto 8057...")
+    # webbrowser.open("http://0.0.0.0:8057/")
+    _maybe_open_browser(port)
+    app5.run(debug=False, host = "0.0.0.0",port=8057, use_reloader=False)
+
+def run_app_capacity_decomposition_simple(files_by_scenario, COLOR_VARIATIONS, scenarios, port=8056):
+    port = port
+    app = create_app_capacity_decomposition_simple(files_by_scenario, COLOR_VARIATIONS, scenarios)
+    print(f"Ejecutando App (simple) de capacidad en http://127.0.0.1:{port}")
+    # webbrowser.open(f"http://0.0.0.0:{port}")
+    _maybe_open_browser(port)
+    app.run(debug=False, port=port, use_reloader=False)
 # def run_app_5(dependency_files, bracket_mapping, daytype_mapping, season_mapping):
 #     print("Ejecutando la App 5 en el puerto 8055...")
 
@@ -2226,7 +2854,9 @@ if __name__ == '__main__':
 
     if use_results_folder:
         results_folders = [
-        os.path.join(root_folder, 'results/01-BaseScenarioBS'),
+        # os.path.join(root_folder, 'results/01-BaseScenario'),
+        # os.path.join(root_folder, 'results/01-BaseScenarioBS'),
+
         # os.path.join(root_folder, 'results/02-BaseScenarioWind'),
         # os.path.join(root_folder, 'results/03-BaseScenarioWindBiomass'),
         # os.path.join(root_folder, 'results/04-BaseScenarioWindBiomassPV'),
@@ -2253,8 +2883,38 @@ if __name__ == '__main__':
         # os.path.join(root_folder, 'results/07-BaseSectors'),
 
 
+        # os.path.join(root_folder, 'results/01-BaseScenarioVOLL02'),
+        # os.path.join(root_folder, 'results/02-BaseScenarioVOLL-WIND-LIMITED'),
+        # os.path.join(root_folder, 'results/03-BaseScenarioVOLL-WIND-BIO-LIMITED'),
+        # os.path.join(root_folder, 'results/04-BaseScenarioVOLL-WIND-BIO-LIMITED-CR400'),
+        # os.path.join(root_folder, 'results/05-BaseScenarioVOLL-WIND-NOBIO'),
 
-    ]
+        os.path.join(root_folder, 'results/05-BaseScenarioVOLL-NationalProgram55NEReal'),
+        # os.path.join(root_folder, 'results/06-BaseScenarioVOLL-NationalProgram55RC50%'),
+        # os.path.join(root_folder, 'results/07-BaseScenarioVOLL-NationalProgram55RC35%'),
+        # os.path.join(root_folder, 'results/08-BaseScenarioVOLL-NationalProgram55RC20%'),
+        # os.path.join(root_folder, 'results/06-BaseScenarioVOLL-NationalProgram55RC50NOPWRFO'),
+        # os.path.join(root_folder, 'results/09-BaseScenarioVOLL-NationalProgram55RC35%Real'),
+        # os.path.join(root_folder, 'results/11-BaseScenarioVOLL-NationalProgram55RC50%Real'),
+        # os.path.join(root_folder, 'results/10-BaseScenarioVOLL-NationalProgram55RC35%Real'),
+        # os.path.join(root_folder, 'results/09-BaseScenarioVOLL-NationalProgram55RC20%Real'), 
+        # os.path.join(root_folder, 'results/12-BaseScenarioVOLL-NationalProgram55RC15%Real'),
+        # os.path.join(root_folder, 'results/13-BaseScenarioVOLL-NationalProgram55RC10%Real'),
+        # os.path.join(root_folder, 'results/14-BaseScenarioVOLL-NationalProgram55RC20%Real'),
+        # os.path.join(root_folder, 'results/13-BaseScenarioVOLL-NationalProgram55RC15%RealPositiv'),
+           
+
+        # os.path.join(root_folder, 'results/06-BaseScenarioVOLL-NationalProgramCR400'),
+        # os.path.join(root_folder, 'results/06-BaseScenarioVOLL-NationalProgramCR500'),
+        # os.path.join(root_folder, 'results/06-BaseScenarioVOLL-NationalProgramCR1000'),
+        # os.path.join(root_folder, 'results/06-BaseScenarioVOLL-NationalProgramV2'),
+        # os.path.join(root_folder, 'results/07-BaseScenarioVOLL-NationalProgramNoBIO'),
+        # os.path.join(root_folder, 'results/07-BaseScenarioVOLL-NationalProgramNoBIO2030'),
+        # os.path.join(root_folder, 'results/08-BaseScenarioVOLL-RenewableTargets'),
+        # os.path.join(root_folder, 'results/08-BaseScenarioVOLL-RenewableTargetsCapLimit'),
+        ]
+
+    
         dependency_files_app1 = get_dependency_files_from_results(results_folders, dependency_key_app1)
         dependency_files_app2 = get_dependency_files_from_results(results_folders, dependency_key_app2)
         dependency_files_app4 = get_dependency_files_from_results(results_folders, dependency_key_app4)
@@ -2286,7 +2946,7 @@ if __name__ == '__main__':
 
 
     scenarios = list(dependency_files_app1.keys())
-    years = [2020, 2030, 2050]
+    years = [2020,2030, 2035, 2055]
 
     from multiprocessing import Process
     threads = []
@@ -2294,9 +2954,14 @@ if __name__ == '__main__':
     threads.append(Thread(target=run_app_2, args=(dependency_files_app2, COLOR_VARIATIONS, years, scenarios)))
     threads.append(Thread(target=run_app_3, args=(dependency_files_app1, scenarios)))
     threads.append(Thread(target=run_app_4, args=(dependency_files_app4,)))
+    threads.append(Thread(
+        target=run_app_capacity_decomposition_simple,
+        args=(dependency_files_app1, COLOR_VARIATIONS, scenarios, 8056)
+    ))
+    
 
     # Run App 5 in a separate process
-    app5_process = Process(target=run_app_5, args=("results", COLOR_VARIATIONS))
+    app5_process = Process(target=run_app_5, args=(results_folders, COLOR_VARIATIONS))
     for thread in threads:
         thread.start()
     app5_process.start()

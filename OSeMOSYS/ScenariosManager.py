@@ -5,7 +5,7 @@ sys.path.append(root_folder)
 import traceback
 from concurrent.futures import ProcessPoolExecutor
 from OSeMOSYS.utils import dataframe_metadata
-from OSeMOSYS.SolveSolutions import solve_model, export_results
+from OSeMOSYS.SolveSolutions import solve_model, export_results, compute_lcoe
 from OSeMOSYS.readXlsData import load_dataframes, transform_all_dataframes, save_dataframes_to_csv, dict_to_json, adjust_json_for_pyomo, export_to_json
 from OSeMOSYS.config import configure_paths
 
@@ -24,7 +24,8 @@ def generate_task(task):
     return scenario_manager.generate_json_file_2(parameters, subscenario_name)
 
 class ScenarioManager:
-    def __init__(self, input_file, root_folder, dimension_manager):
+    def __init__(self, input_file, root_folder, dimension_manager,
+                  lcoe_enabled=True, lcoe_discount_energy=True):
         """
         Inicializa el gestor de escenarios.
 
@@ -37,6 +38,16 @@ class ScenarioManager:
         self.root_folder = root_folder
         self.dimension_manager = dimension_manager
         self.dataframe_metadata = dataframe_metadata
+        self.lcoe_enabled = lcoe_enabled
+        self.lcoe_discount_energy = lcoe_discount_energy
+
+    def _maybe_compute_lcoe(self, instance, results_folder):
+        if self.lcoe_enabled and instance is not None:
+            try:
+                compute_lcoe(instance, results_folder, discount_energy=self.lcoe_discount_energy)
+            except Exception as e:
+                print(f"[LCOE] Error: {e}")
+
 
     def generate_json_file(self, parameter_name, value, subscenario_name):
         """
@@ -275,6 +286,7 @@ class ScenarioManager:
 
             # Exportar resultados
             export_results(instance, results_folder)
+            self._maybe_compute_lcoe(instance, results_folder) 
             return f"Modelo resuelto exitosamente para el subescenario: {subscenario_name}"
 
         except Exception as e:
@@ -315,9 +327,14 @@ class ScenarioManager:
                 solver_options=None,
                 tee=True
             )
+             # Verificar si se encontró una solución válida
+            if instance is None:
+                # print(f"No se encontró una solución válida para el archivo: {input_file}")
+                return f"No se encontró una solución válida para el archivo: {input_file}"
 
             # Exportar resultados
             export_results(instance, results_folder)
+            self._maybe_compute_lcoe(instance, results_folder) 
             return f"Modelo ejecutado exitosamente para: {input_file}"
 
         except Exception as e:
@@ -472,6 +489,7 @@ class ScenarioManager:
 
             # Exportar resultados
             export_results(instance, results_folder)
+            self._maybe_compute_lcoe(instance, results_folder) 
             print(f"Archivo base ejecutado exitosamente: {input_file}")
 
         except Exception as e:

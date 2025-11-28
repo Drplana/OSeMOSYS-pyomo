@@ -12,7 +12,7 @@ def create_variable_mapping(REGION, YEAR, TECHNOLOGY, FUEL, SEASON, DAYTYPE, DAI
         Listas que representan los conjuntos.
 
     Returns:
-        dict: Diccionario que mapea nombres de conjuntos a sus valores.
+        dict: Diccionario que mapea nombres de conjuntos a sus valores.s
     """
     return {
         'REGION': REGION,
@@ -238,8 +238,10 @@ DEPENDENCIES_VAR_DICT = {
         "ResidualCapacity",
         "AccumulatedRecoveredUnits",
         "AccumulatedRecoveredCapacity",
+        "AccumulatedRecoveredNewCapacity",
         "RecoveredExistingUnits",
-        "RecoveredCapacity"
+        "RecoveredCapacity",
+        "RecoveredNewCapacity"
     ],
     "['REGION','TIMESLICE','TECHNOLOGY','MODE_OF_OPERATION','YEAR']": [
         "RateOfActivity"

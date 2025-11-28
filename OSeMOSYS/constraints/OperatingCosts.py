@@ -38,8 +38,8 @@ s.t. OC4_DiscountedOperatingCostsTotalAnnual{r in REGION, t in TECHNOLOGY, y in 
 OperatingCost[r,t,y]/((1+DiscountRate[r])^(y-min{yy in YEAR} min(yy)+0.5)) = DiscountedOperatingCost[r,t,y];
     """    
     return(
-        model.v_OperatingCost[r,t,y]
-        /((1+model.p_DiscountRate[r])**(y-min(model.YEAR)+0.5))
+        model.v_OperatingCost[r,t,y]/model.p_DiscountFactorMid[r,y]
+        # /((1+model.p_DiscountRate[r])**(y-min(model.YEAR)+0.5))
         == model.v_DiscountedOperatingCost[r,t,y]
     )
 

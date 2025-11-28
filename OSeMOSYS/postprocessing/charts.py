@@ -75,6 +75,73 @@ def create_stacked_bar_chart(data, title, COLOR_VARIATIONS):
     )
 
     return fig
+def create_stacked_area_chart(data, title, COLOR_VARIATIONS,  area_opacity=0.8):
+    """
+    Stacked area limpia sobre YEAR continuo.
+    - Asegura YEAR numérico
+    - Agrupa por YEAR y TECHNOLOGY
+    - Rellena años faltantes con 0 por tecnología
+    """
+    if data.empty:
+        return px.area(title=f"{title} (sin datos)")
+
+    # Filtrar columnas necesarias
+    needed_cols = {'YEAR', 'TECHNOLOGY', 'value'}
+    missing = needed_cols - set(data.columns)
+    if missing:
+        return px.area(title=f"{title} (faltan columnas: {missing})")
+
+    df = data[['YEAR', 'TECHNOLOGY', 'value']].copy()
+
+    # Asegurar numérico
+    df['YEAR'] = pd.to_numeric(df['YEAR'], errors='coerce')
+    df = df.dropna(subset=['YEAR'])
+
+    # Agregar (por si hay duplicados)
+    df = df.groupby(['YEAR', 'TECHNOLOGY'], as_index=False)['value'].sum()
+
+    # Rango completo de años
+    full_years = range(int(df['YEAR'].min()), int(df['YEAR'].max()) + 1)
+    technologies = df['TECHNOLOGY'].unique()
+
+    # Crear grid completo y fusionar
+    full_index = pd.MultiIndex.from_product([full_years, technologies], names=['YEAR', 'TECHNOLOGY'])
+    df_full = df.set_index(['YEAR', 'TECHNOLOGY']).reindex(full_index, fill_value=0).reset_index()
+
+    # Colores
+    tech_colors = assign_colors_to_technologies(df_full, 'TECHNOLOGY', COLOR_VARIATIONS)
+
+    fig = px.area(
+        df_full,
+        x='YEAR',
+        y='value',
+        color='TECHNOLOGY',
+        title=title,
+        color_discrete_map=tech_colors
+    )
+    for tr in fig.data:
+        col = tr.line.color
+        # Forzar alfa en fillcolor
+        if isinstance(col, str) and col.startswith('rgba'):
+            parts = col[5:-1].split(',')
+            col = f"rgba({parts[0]},{parts[1]},{parts[2]},{area_opacity})"
+        elif isinstance(col, str) and col.startswith('#'):
+            # Convertir hex a rgba con alfa
+            h = col.lstrip('#')
+            r,g,b = tuple(int(h[i:i+2],16) for i in (0,2,4))
+            col = f"rgba({r},{g},{b},{area_opacity})"
+        tr.update(fillcolor=col, opacity=area_opacity, line=dict(width=0.6))
+
+    fig.update_traces(line=dict(width=0.5), hovertemplate='%{x}<br>%{fullData.name}: %{y:.2f}<extra></extra>')
+    fig.update_layout(
+        xaxis_title="Año",
+        yaxis_title="Producción",
+        plot_bgcolor='white',
+        legend=dict(font=dict(size=12)),
+        margin=dict(t=50, b=50, l=50, r=50),
+        xaxis=dict(type='linear', dtick=5)  # Ajusta dtick según tus años
+    )
+    return fig
 
 
 # def create_donut_charts(data, years, COLOR_VARIATIONS):

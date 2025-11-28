@@ -18,26 +18,38 @@ def CAa2_TotalAnnualCapacity(model, r, t, y):
     """
 s.t. CAa2_TotalAnnualCapacity{r in REGION, t in TECHNOLOGY, y in YEAR}: 
 AccumulatedNewCapacity[r,t,y]+ ResidualCapacity[r,t,y] = TotalCapacityAnnual[r,t,y];
-    """    
-    if model.p_NumberOfExistingUnits[ r, t, y] != 0:
-        return (model.v_AccumulatedNewCapacity[r,t,y] 
-            + model.v_ResidualCapacity[r,t,y] 
-            + model.v_AccumulatedRecoveredUnits[r,t,y]*model.p_CapacityOfOneTechnologyUnit[r,t,min(model.YEAR)]
-            + model.v_AccumulatedRecoveredCapacity[r,t,y]
-            == model.v_TotalCapacityAnnual[r,t,y]
-            )
+    """
+    return (
+        model.v_AccumulatedNewCapacity[r, t, y]
+      + model.v_ResidualCapacity[r, t, y]
+      + model.v_AccumulatedRecoveredUnits[r, t, y] * model.p_CapacityOfOneTechnologyUnit[r,t,min(model.YEAR)]
+      + model.v_AccumulatedRecoveredCapacity[r, t, y]
+      + model.v_AccumulatedRecoveredNewCapacity[r, t, y]
+      ==model.v_TotalCapacityAnnual[r, t, y]
+    )
+    # if model.p_NumberOfExistingUnits[ r, t, y] != 0:
+    #     return (model.v_AccumulatedNewCapacity[r,t,y] 
+    #         + model.v_ResidualCapacity[r,t,y] 
+    #         + model.v_AccumulatedRecoveredUnits[r,t,y]*model.p_CapacityOfOneTechnologyUnit[r,t,min(model.YEAR)]
+    #         + model.v_AccumulatedRecoveredCapacity[r,t,y]
+    #         + model.v_AccumulatedRecoveredNewCapacity[r,t,y]
+    #         == model.v_TotalCapacityAnnual[r,t,y]
+    #         )
         
-    else:return (model.v_AccumulatedNewCapacity[r,t,y] 
-            + model.p_ResidualCapacity[r,t,y]
-            + model.v_AccumulatedRecoveredUnits[r,t,y]*model.p_CapacityOfOneTechnologyUnit[r,t,min(model.YEAR)]
-            + model.v_AccumulatedRecoveredCapacity[r,t,y]
-            # + model.v_RecoveredCapacity[r,t,y]
-            == model.v_TotalCapacityAnnual[r,t,y]
-            )
+    # else:return (model.v_AccumulatedNewCapacity[r,t,y] 
+    #         + model.p_ResidualCapacity[r,t,y]
+    #         + model.v_AccumulatedRecoveredUnits[r,t,y]*model.p_CapacityOfOneTechnologyUnit[r,t,min(model.YEAR)]
+    #         + model.v_AccumulatedRecoveredCapacity[r,t,y]
+    #         + model.v_AccumulatedRecoveredNewCapacity[r,t,y]
+    #         # + model.v_RecoveredCapacity[r,t,y]
+    #         == model.v_TotalCapacityAnnual[r,t,y]
+    #         )
+
+
 def CAa1n_TotalResidualCapacity(model,r,t,y):
     return(
         model.v_ResidualCapacity[r,t,y]
-        == model.p_NumberOfExistingUnits[r,t,y]*model.p_CapacityOfOneTechnologyUnit[r,t,min(model.YEAR)]
+        == model.p_ResidualCapacity[r, t, y] + model.p_NumberOfExistingUnits[r,t,y]*model.p_CapacityOfOneTechnologyUnit[r,t,min(model.YEAR)]
     )
   
 def CAa3_TotalActivityOfEachTechnology(model, r, t, l, y):
@@ -94,9 +106,7 @@ RateOfTotalActivity[r,t,l,y]*YearSplit[l,y] <= sum{l in TIMESLICE}
     """    
     return (sum( model.v_RateOfTotalActivity[r,t,l,y]
                 *model.p_YearSplit[l,y] for l in model.TIMESLICE )
-    <=sum(model.v_TotalCapacityAnnual[r,t,y]
-    *(model.p_CapacityFactor[r,t,l,y]
-    *model.p_YearSplit[l,y]) for l in model.TIMESLICE)
+    <=sum(model.v_TotalCapacityAnnual[r,t,y]*model.p_CapacityFactor[r,t,l,y]*model.p_YearSplit[l,y] for l in model.TIMESLICE)
     *model.p_AvailabilityFactor[r,t,y]
     *model.p_CapacityToActivityUnit[r,t] 
     )

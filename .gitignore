@@ -161,3 +161,5 @@ cython_debug/
 
 results/
 OSeMOSYS/postprocessing/ExampleInteractiveChart.ipynb
+*.~lock.*
+*.sync*

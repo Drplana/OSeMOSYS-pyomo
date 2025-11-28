@@ -89,33 +89,33 @@ class DimensionManager:
 
 input_files_simple = [
 
-    os.path.join(root_folder, 'data/SuperSimpleExpanded.xlsx'),
-    ## Variante para forzar el modelo a producir hasta una cierta cantidad de energía renovable. 
-    # Se cambia el sentido de la desigualdad.
-    os.path.join(root_folder, 'data/SuperSimpleExpandedReTag.xlsx'),
+    # os.path.join(root_folder, 'data/SuperSimpleExpanded.xlsx'),
+    # ## Variante para forzar el modelo a producir hasta una cierta cantidad de energía renovable. 
+    # # Se cambia el sentido de la desigualdad.
+    # os.path.join(root_folder, 'data/SuperSimpleExpandedReTag.xlsx'),
 
-    ## En esta variante inyecto con tbatt a la red de transmisión 
-    # y recibo la energía de la red de transmisión
-    os.path.join(root_folder, 'data/SuperSimpleExpandedReTagStorage.xlsx'),
-    ## En esta variante inyecto con tbatt directamente a la demanda de electricidad 
-    # y recibo la energía de paneles solares solamente. No puede invertir en nada que no sea solar
-    os.path.join(root_folder, 'data/SuperSimpleExpandedReTagStorage2.xlsx'),
-    ### En esta variante inyecto con tbatt directamente a la demanda de electricidad
-    # y recibo la energía de paneles solares y eólica 
-    os.path.join(root_folder, 'data/SuperSimpleExpandedReTagStorage2a.xlsx'),
+    # ## En esta variante inyecto con tbatt a la red de transmisión 
+    # # y recibo la energía de la red de transmisión
+    # os.path.join(root_folder, 'data/SuperSimpleExpandedReTagStorage.xlsx'),
+    # ## En esta variante inyecto con tbatt directamente a la demanda de electricidad 
+    # # y recibo la energía de paneles solares solamente. No puede invertir en nada que no sea solar
+    # os.path.join(root_folder, 'data/SuperSimpleExpandedReTagStorage2.xlsx'),
+    # ### En esta variante inyecto con tbatt directamente a la demanda de electricidad
+    # # y recibo la energía de paneles solares y eólica 
+    # os.path.join(root_folder, 'data/SuperSimpleExpandedReTagStorage2a.xlsx'),
 
-    ### Recibo la energía de paneles solares y eólica pero puede bypasear el almacenamiento.
-    os.path.join(root_folder, 'data/SuperSimpleExpandedReTagStorage3.xlsx'),
-    ### Recibo la energía de paneles solares y eólica limitada a 50 MW.
-    os.path.join(root_folder, 'data/SuperSimpleExpandedReTagStorage4.xlsx'),
+    # ### Recibo la energía de paneles solares y eólica pero puede bypasear el almacenamiento.
+    # os.path.join(root_folder, 'data/SuperSimpleExpandedReTagStorage3.xlsx'),
+    # ### Recibo la energía de paneles solares y eólica limitada a 50 MW.
+    # os.path.join(root_folder, 'data/SuperSimpleExpandedReTagStorage4.xlsx'),
 
 
 
-    #### Discusión con manuel de resultados de almacenamiento
-    os.path.join(root_folder, 'data/SuperSimpleExpandedReTagStorageDiscussion.xlsx'), # Capital Cost del panel solar a 300 $/kW
-    os.path.join(root_folder, 'data/SuperSimpleExpandedReTagStorageDiscussionNoStg.xlsx'), # No puede almacenar
-    os.path.join(root_folder, 'data/SuperSimpleExpandedReTagStorageDiscussion400.xlsx'), # Capital Cost del panel solar a 400 $/kW
-    os.path.join(root_folder, 'data/SuperSimpleExpandedReTagStorageDiscussionBatt10.xlsx') # Bajar el precio de la batería conectada a la linea de PV a 10 $/kWh
+    # #### Discusión con manuel de resultados de almacenamiento
+    # os.path.join(root_folder, 'data/SuperSimpleExpandedReTagStorageDiscussion.xlsx'), # Capital Cost del panel solar a 300 $/kW
+    # os.path.join(root_folder, 'data/SuperSimpleExpandedReTagStorageDiscussionNoStg.xlsx'), # No puede almacenar
+    # os.path.join(root_folder, 'data/SuperSimpleExpandedReTagStorageDiscussion400.xlsx'), # Capital Cost del panel solar a 400 $/kW
+    # os.path.join(root_folder, 'data/SuperSimpleExpandedReTagStorageDiscussionBatt10.xlsx') # Bajar el precio de la batería conectada a la linea de PV a 10 $/kWh
 
 
 ]
@@ -142,7 +142,7 @@ input_files_base_scenarios = [
     # os.path.join(root_folder, 'data/04-BaseScenarioWindBiomassPV.xlsx'),
     # os.path.join(root_folder, 'data/05-BaseScenarioWindBiomassPVAnnualInvLimit.xlsx'),
 
-    os.path.join(root_folder, 'data/06-MustRunTechBase.xlsx'),
+    os.path.join(root_folder, 'data/01-BaseScenarioVOLL02.xlsx'),
 ]
 
 
@@ -151,7 +151,7 @@ input_files_base_scenarios = [
 ###################################################################### 
 """Recapitalización de unidades y uso de la restriccion de MustRun"""
 #######################################################################
-input_files2 = [
+"""input_files2 = [
     os.path.join(root_folder, 'data/RecapMustRun.xlsx'),
     os.path.join(root_folder, 'data/RecapitalizarUnidades.xlsx'),
 ]
@@ -173,26 +173,26 @@ input_files5 = [os.path.join(root_folder, 'data/RetroffUnits700-24RE-NoBio.xlsx'
                 os.path.join(root_folder, 'data/RetroffUnits700-24REBio2025.xlsx'),
 
                 ]       
-
+"""
 
 ########################
 """paper"""
 #########################
-input_files_paper = [
-    os.path.join(root_folder, 'data/BaseScenario.xlsx'),
-    os.path.join(root_folder, 'data/BaseScenarioWind.xlsx'),
-    os.path.join(root_folder, 'data/BaseScenarioWindBiomass.xlsx'),
-    os.path.join(root_folder, 'data/BaseScenarioAnualCapLim.xlsx'),
-    os.path.join(root_folder, 'data/RecapitalizarUnidades500.xlsx'),
-    os.path.join(root_folder, 'data/RecapitalizarUnidades600.xlsx'),
-                os.path.join(root_folder, 'data/RecapitalizarUnidades700.xlsx'),
-                os.path.join(root_folder, 'data/RecapitalizarUnidades800.xlsx'),
+# input_files_paper = [
+#     os.path.join(root_folder, 'data/BaseScenario.xlsx'),
+#     os.path.join(root_folder, 'data/BaseScenarioWind.xlsx'),
+#     os.path.join(root_folder, 'data/BaseScenarioWindBiomass.xlsx'),
+#     os.path.join(root_folder, 'data/BaseScenarioAnualCapLim.xlsx'),
+#     os.path.join(root_folder, 'data/RecapitalizarUnidades500.xlsx'),
+#     os.path.join(root_folder, 'data/RecapitalizarUnidades600.xlsx'),
+#                 os.path.join(root_folder, 'data/RecapitalizarUnidades700.xlsx'),
+#                 os.path.join(root_folder, 'data/RecapitalizarUnidades800.xlsx'),
     
     
     
 
 
-]
+# ]
 
 
 #####################################################################
@@ -1397,22 +1397,74 @@ if __name__ == "__main__":
 
     # # Lista de archivos de entrada
     input_files = [
-        # os.path.join(root_folder, 'data/01-BaseScenario.xlsx'),
-        # os.path.join(root_folder, 'data/02-BaseScenarioWind.xlsx'),
-        # os.path.join(root_folder, 'data/03-BaseScenarioWindBiomass.xlsx'),
-        # os.path.join(root_folder, 'data/04-BaseScenarioWindBiomassPV.xlsx'),
-        # os.path.join(root_folder, 'data/05-BaseScenarioWindBiomassPVAnnualInvLimit.xlsx'),
-        # os.path.join(root_folder, 'data/06-MustRunTechBase.xlsx'),
-        # os.path.join(root_folder, 'data/08-MustRunTechBaseAnnualInvLimit.xlsx'),
-        # os.path.join(root_folder, 'data/11-PumpedStorage.xlsx'),
-        # os.path.join(root_folder, 'data/01-BaseSectors.xlsx'),
-        # os.path.join(root_folder, 'data/02-BaseSectorsNoBio.xlsx'),
-        # os.path.join(root_folder, 'data/07-BaseSectors.xlsx'),
-        os.path.join(root_folder, 'data/01-BaseScenarioBS.xlsx'),
+
+        os.path.join(root_folder, 'data/01-BaseScenarioVOLL02.xlsx'),
+        os.path.join(root_folder, 'data/02-BaseScenarioVOLL-WIND-LIMITED.xlsx'),   #1GW per year
+         # 1GW per year and 0.5 GW biomass
 
     ]
+
+    input_files2 = [
+ #1GW per year
+        os.path.join(root_folder, 'data/03-BaseScenarioVOLL-WIND-BIO-LIMITED.xlsx'),
+        os.path.join(root_folder, 'data/04-BaseScenarioVOLL-WIND-BIO-LIMITED-CR400.xlsx'), # 1GW per year and 0.5 GW biomass
+        os.path.join(root_folder, 'data/05-BaseScenarioVOLL-WIND-NOBIO.xlsx'), # 1GW per year and 0.5 GW biomass
+    ]
+
+    """ 
+    input files3 
+    0.160 GW per year for wind   
+    0.125 GW per year for bio  
+    0.500 GW per year for solar
+    """
+    input_files3 = [
+        # Two files with national program. First with biomass and second without biomass
+        
+        # os.path.join(root_folder, 'data/05-BaseScenarioVOLL-NationalProgram55NE.xlsx'),
+        # os.path.join(root_folder, 'data/06-BaseScenarioVOLL-NationalProgram55RC50%.xlsx'),
+        # os.path.join(root_folder, 'data/07-BaseScenarioVOLL-NationalProgram55RC35%.xlsx'),
+        # os.path.join(root_folder, 'data/08-BaseScenarioVOLL-NationalProgram55RC20%.xlsx'),
+        # os.path.join(root_folder, 'data/06-BaseScenarioVOLL-NationalProgram55RC50NOPWRFO.xlsx'),
+
+
+        # os.path.join(root_folder, 'data/09-BaseScenarioVOLL-NationalProgram55RC20%Real.xlsx'),
+        # os.path.join(root_folder, 'data/10-BaseScenarioVOLL-NationalProgram55RC35%Real.xlsx'),
+        # os.path.join(root_folder, 'data/11-BaseScenarioVOLL-NationalProgram55RC50%Real.xlsx'),
+        # os.path.join(root_folder, 'data/12-BaseScenarioVOLL-NationalProgram55RC15%Real.xlsx'),
+        # os.path.join(root_folder, 'data/13-BaseScenarioVOLL-NationalProgram55RC10%Real.xlsx'),
+        os.path.join(root_folder, 'data/14-BaseScenarioVOLL-NationalProgram55RC20%Real.xlsx'),
+        # os.path.join(root_folder, 'data/05-BaseScenarioVOLL-NationalProgram55NEReal.xlsx'),
+
+
+
+        # os.path.join(root_folder, 'data/13-BaseScenarioVOLL-NationalProgram55RC15%RealPositiv.xlsx'),
+        # # os.path.join(root_folder, 'data/06-BaseScenarioVOLL-NationalProgramCR1000.xlsx'),
+        # os.path.join(root_folder, 'data/06-BaseScenarioVOLL-NationalProgramV2.xlsx'),
+        # os.path.join(root_folder, 'data/07-BaseScenarioVOLL-NationalProgramNoBIO.xlsx'), 
+        # os.path.join(root_folder, 'data/07-BaseScenarioVOLL-NationalProgramNoBIO2030.xlsx')
+    ]
+
+    input_files4 = [
+
+
+        os.path.join(root_folder, 'data/08-BaseScenarioVOLL-RenewableTargets.xlsx'), # 400$/kW for wind recovery cost 10 years extension
+        os.path.join(root_folder, 'data/08-BaseScenarioVOLL-RenewableTargetsCapLimit.xlsx'), 
+        # os.path.join(root_folder, 'data/05-BaseScenarioVOLL-WIND-NOBIO.xlsx'), # 1GW per year and 0.5 GW biomass
+    ]
+
+    input_files5 = [
+        # Two files with national program. First with biomass and second without biomass
+        
+        os.path.join(root_folder, 'data/06-BaseScenarioVOLL-NationalProgramCR400.xlsx'),
+        os.path.join(root_folder, 'data/06-BaseScenarioVOLL-NationalProgramCR500.xlsx'),
+        # os.path.join(root_folder, 'data/06-BaseScenarioVOLL-NationalProgramV2.xlsx'),
+        # os.path.join(root_folder, 'data/07-BaseScenarioVOLL-NationalProgramNoBIO.xlsx'), 
+        # os.path.join(root_folder, 'data/07-BaseScenarioVOLL-NationalProgramNoBIO2030.xlsx')
+    ]
+
     # Ejecutar los archivos en paralelo de 3 en 3. Batch_size define el número de instancias a correr.
-    scenario_manager.run_files_in_batches(input_files=input_files, batch_size=3, solver_name="gurobi")
+    scenario_manager.run_files_in_batches(input_files=input_files3, batch_size=3, solver_name="gurobi")
+
 
 
     # dimension_manager = DimensionManager(sets)

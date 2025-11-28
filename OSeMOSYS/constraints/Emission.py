@@ -26,7 +26,8 @@ def E4_EmissionsPenaltyByTechnology(model, r,t,y):
 def E5_DiscountedEmissionsPenaltyByTechnology(model,r,t,y):
     return(
         model.v_AnnualTechnologyEmissionsPenalty[r,t,y]
-        /(1+model.p_DiscountRate[r])**(y-min(model.YEAR)+0.5)
+        # /(1+model.p_DiscountRate[r])**(y-min(model.YEAR)+0.5)
+        /model.p_DiscountFactorMid[r,y]
         == model.v_DiscountedTechnologyEmissionsPenalty[r,t,y]
     )
 def E6_EmissionsAccounting1(model, r,e,y):

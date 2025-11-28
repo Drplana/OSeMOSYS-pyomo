@@ -169,13 +169,37 @@ def calculate_daysplit(bracket_mapping, year):
     day_split_df = pd.DataFrame(day_split)
     return day_split_df
 
+def round_and_adjust(df, column_name):
+    """
+    Redondea los valores de una columna a dos decimales y ajusta el último valor
+    para garantizar que la suma sea exactamente 1.
+
+    Args:
+        df (pd.DataFrame): DataFrame que contiene los datos.
+        column_name (str): Nombre de la columna a redondear y ajustar.
+
+    Returns:
+        pd.DataFrame: DataFrame con los valores ajustados.
+    """
+    # Redondear todos los valores a dos decimales
+    df[column_name] = df[column_name].round(3)
+
+    # Calcular la diferencia para ajustar
+    diff = 1.0 - df[column_name].sum()
+
+    # Ajustar el último valor para que la suma sea exactamente 1
+    if abs(diff) > 1e-6:  # Evitar ajustes innecesarios por errores numéricos muy pequeños
+        df.loc[df.index[-1], column_name] += diff
+
+    return df
+
 # Main script
 if __name__ == "__main__":
     # Leer datos
     year = 2023
-    data = pd.read_excel('/home/david/Documents/001 - Proyectos/Variantes/DatosCub.xlsx', sheet_name="DEMAND")
-    cfwind = pd.read_excel('/home/david/Documents/001 - Proyectos/Variantes/DatosCub.xlsx', sheet_name="CFWIND")
-    cfpv = pd.read_excel('/home/david/Documents/001 - Proyectos/Variantes/DatosCub.xlsx', sheet_name="CFSOL")
+    data = pd.read_excel('/home/david/Documents/001 - Proyectos/CubaOSeMOSYS/DatosCub.xlsx', sheet_name="DEMAND")
+    cfwind = pd.read_excel('/home/david/Documents/001 - Proyectos/CubaOSeMOSYS/DatosCub.xlsx', sheet_name="CFWIND")
+    cfpv = pd.read_excel('/home/david/Documents/001 - Proyectos/CubaOSeMOSYS/DatosCub.xlsx', sheet_name="CFSOL")
     # cfpv = cfpv['Average'].astype(float)
     # print(cfpv)
     data['Total'] =data.loc[:,'Node1':].sum(axis=1)
@@ -187,8 +211,6 @@ if __name__ == "__main__":
         date_range = pd.date_range(start=start_date, end=end_date, freq='h')
         data['Date'] = date_range
         # print(data)
-    
-
 
     ##############################################################################
     # Configuración de las estaciones, días tipo y bloques horarios
@@ -300,6 +322,13 @@ if __name__ == "__main__":
     # Normalizar datos horarios
     total_sum = data['Total'].sum()
     normalized_hourly_sum = data.groupby(['Season', 'DayType', 'DaylyTimeBracket'])['Total'].sum() / total_sum
+
+    # Redondear los valores a dos decimales antes de exportar
+    cf_timeslices_pv['Average_CF'] = cf_timeslices_pv['Average_CF'].round(3)
+    cf_timeslices_wind['Average_CF'] = cf_timeslices_wind['Average_CF'].round(3)
+    yearsplit = round_and_adjust(yearsplit, "YearSplit")
+    specified_demand_profile['SpecifiedDemandProfile'] = specified_demand_profile['SpecifiedDemandProfile'].round(3)
+    data = data.round(3) 
 
 
     # Exportar resultados

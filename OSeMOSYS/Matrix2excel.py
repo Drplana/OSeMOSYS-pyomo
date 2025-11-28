@@ -208,7 +208,7 @@ def generate_excel_file_new(parameters, INPUT_FILE_PATH):
 
 if __name__ == "__main__":   # if the file is run in standalone
     # Load the sets and create the DataFrames
-    INPUT_FILE_PATH = os.path.join(root_folder, 'data', '01-BaseScenarioBS.xlsx')
+    INPUT_FILE_PATH = os.path.join(root_folder, 'data', '01-BaseScenarioVOLL.xlsx')
     Default, REGION, YEAR, TECHNOLOGY, FUEL, SEASON, DAYTYPE, DAILYTIMEBRACKET, TIMESLICE, MODE_OF_OPERATION, STORAGE, EMISSION = load_sets(INPUT_FILE_PATH)
     # Create the variable mapping
     variable_mapping = create_variable_mapping(
