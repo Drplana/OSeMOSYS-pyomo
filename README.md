@@ -1,4 +1,4 @@
-# OSeMOSYS-pyomo
+# Cuba Energy Transition Roadmap Optimization (CETRO)
 
 ### Description
 This model is an adapted Python implementation of the OSeMOSYS model
