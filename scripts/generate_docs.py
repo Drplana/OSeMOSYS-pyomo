@@ -42,6 +42,7 @@ def parse_main_model(file_path):
     param_pattern = re.compile(r"model\.p_(\w+)\s*=\s*Param")
     var_pattern = re.compile(r"model\.v_(\w+)\s*=\s*Var")
     constraint_pattern = re.compile(r"model\.(\w+)\s*=\s*Constraint")
+    objective_pattern = re.compile(r"model\.(\w+)\s*=\s*Objective")
     import_pattern = re.compile(r"from\s+([\w\.]+)\s+import\s+(.+)")
     
     # Helper to extract comment
@@ -136,6 +137,21 @@ def parse_main_model(file_path):
                 source_code = get_function_source(imports[rule_name], rule_name)
             
             constraints.append({'name': name, 'rule': rule_name, 'source': source_code})
+            continue
+
+        # Objectives
+        m = objective_pattern.search(line)
+        if m:
+            name = "ObjectiveFunction" # Hardcode name for display if generic, or extract
+            # In MainModel.py: model.objectivefunction = Objective(rule = ObjectiveFunction)
+            # The regex captures 'objectivefunction'
+            captured_name = m.group(1)
+            
+            rule_match = re.search(r"rule\s*=\s*(\w+)", line)
+            rule_name = rule_match.group(1) if rule_match else captured_name
+            
+            # We want to document it as 'ObjectiveFunction'
+            constraints.append({'name': "ObjectiveFunction", 'rule': rule_name, 'source': None})
             continue
 
     return sets, params, vars_, constraints
