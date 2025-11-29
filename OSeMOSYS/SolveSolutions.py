@@ -1,5 +1,6 @@
 #%%
 import os, sys
+import time
 root_folder = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 sys.path.append(root_folder)
 import json
@@ -19,7 +20,7 @@ import io
 #%%
 # from vincent.colors import brews
 
-def solve_model(input_file, solver_name ,  json_file_path_or_dict, solver_options=None, tee=True):
+def solve_model(input_file, solver_name ,  json_file_path_or_dict, solver_options=None, tee=True, logfile=None):
     """
     Resuelve el modelo Pyomo utilizando el archivo JSON de entrada.
 
@@ -29,14 +30,18 @@ def solve_model(input_file, solver_name ,  json_file_path_or_dict, solver_option
         json_file_path (str): Ruta al archivo JSON generado.
         solver_options (dict, optional): Opciones específicas para el solver.
         tee (bool, optional): Mostrar la salida del solver en la consola.
+        logfile (str, optional): Ruta del archivo de log para la salida del solver.
 
     Returns:
         instance: Instancia del modelo resuelto.
     """
     print("Definiendo el modelo...")
+    start_time_def = time.time()
     model = define_model(input_file)
+    print(f"Modelo definido en {time.time() - start_time_def:.2f} s")
 
     print("Creando la instancia del modelo...")
+    start_time_inst = time.time()
     if isinstance(json_file_path_or_dict, dict):
         # Si es un diccionario, usarlo directamente
         instance = model.create_instance(json_file_path_or_dict)
@@ -45,6 +50,7 @@ def solve_model(input_file, solver_name ,  json_file_path_or_dict, solver_option
         instance = model.create_instance(json_file_path_or_dict)
     else:
         raise ValueError("El argumento 'json_file_path_or_dict' debe ser una ruta (str) o un diccionario (dict).")
+    print(f"Instancia creada en {time.time() - start_time_inst:.2f} s")
     
     # verbose_file = "model_verbose.txt"
     # with open(verbose_file, "w") as f:
@@ -84,13 +90,20 @@ def solve_model(input_file, solver_name ,  json_file_path_or_dict, solver_option
 
 
     print("Resolviendo el modelo...")
+    start_time_solve = time.time()
     solver = SolverFactory(solver_name)  # Cambia "gurobi" por el solver que estés usando
     if solver_options:
         for option, value in solver_options.items():
             solver.options[option] = value
 
 
-    results = solver.solve(instance, tee=True, load_solutions=False)
+    if logfile:
+        print(f"Salida del solver redirigida a: {logfile}")
+        results = solver.solve(instance, tee=tee, load_solutions=False, logfile=logfile)
+    else:
+        results = solver.solve(instance, tee=tee, load_solutions=False)
+
+    print(f"Modelo resuelto en {time.time() - start_time_solve:.2f} s")
 
     # print(f"Estado de la solución: {results.solver.status}")
     # print(f"Resultado de la solución: {results.solver.termination_condition}")

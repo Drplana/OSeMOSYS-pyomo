@@ -1463,7 +1463,8 @@ if __name__ == "__main__":
     ]
 
     # Ejecutar los archivos en paralelo de 3 en 3. Batch_size define el número de instancias a correr.
-    scenario_manager.run_files_in_batches(input_files=input_files3, batch_size=3, solver_name="gurobi")
+    # Set parallel=False to see verbose output (solver logs, timing, etc.)
+    scenario_manager.run_files_in_batches(input_files=input_files3, batch_size=3, solver_name="gurobi", parallel=False)
 
 
 

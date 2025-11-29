@@ -276,12 +276,14 @@ class ScenarioManager:
             print(f"Resultados se guardarán en: {results_folder}")
 
             # Resolver el modelo
+            logfile = os.path.join(results_folder, "solver_log.txt")
             instance = solve_model(
                 input_file=self.input_file,
                 solver_name=solver_name,
                 json_file_path_or_dict=json_file_path,
                 solver_options=None,
-                tee=True
+                tee=True,
+                logfile=logfile
             )
 
             # Exportar resultados
@@ -342,22 +344,28 @@ class ScenarioManager:
             traceback.print_exc()
             return error_message
 
-    def run_files_in_parallel(self, input_files, solver_name="gurobi"):
+    def run_files_in_parallel(self, input_files, solver_name="gurobi", parallel=True):
         """
         Ejecuta múltiples archivos de entrada en paralelo.
 
         Args:
             input_files (list): Lista de rutas de archivos de entrada.
             solver_name (str): Nombre del solver a utilizar.
+            parallel (bool): Si es True, ejecuta en paralelo. Si es False, ejecuta secuencialmente.
 
         Returns:
             None
         """
-        with ProcessPoolExecutor() as executor:
-            results = executor.map(self.process_file, input_files, [solver_name] * len(input_files))
-            for result in results:
-                print(result)
-    def run_files_in_batches(self, input_files, batch_size=3, solver_name="gurobi"):
+        if parallel:
+            with ProcessPoolExecutor() as executor:
+                results = executor.map(self.process_file, input_files, [solver_name] * len(input_files))
+                for result in results:
+                    print(result)
+        else:
+            for input_file in input_files:
+                print(self.process_file(input_file, solver_name))
+
+    def run_files_in_batches(self, input_files, batch_size=3, solver_name="gurobi", parallel=True):
         """
         Ejecuta los archivos de entrada en lotes secuenciales.
 
@@ -365,6 +373,7 @@ class ScenarioManager:
             input_files (list): Lista de rutas de archivos de entrada.
             batch_size (int): Tamaño del lote (número de archivos por grupo).
             solver_name (str): Nombre del solver a utilizar.
+            parallel (bool): Si es True, ejecuta en paralelo. Si es False, ejecuta secuencialmente.
 
         Returns:
             None
@@ -372,7 +381,7 @@ class ScenarioManager:
         for i in range(0, len(input_files), batch_size):
             batch = input_files[i:i + batch_size]
             print(f"Ejecutando lote {i // batch_size + 1}: {batch}")
-            self.run_files_in_parallel(batch, solver_name)   
+            self.run_files_in_parallel(batch, solver_name, parallel)   
 
 
     def run_hybrid_scenarios_with_custom_parameters(self, input_files, batch_size, scenarios_config, solver_name="gurobi"):
