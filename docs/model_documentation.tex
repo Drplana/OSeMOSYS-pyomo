@@ -1,0 +1,997 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{geometry}
+\geometry{a4paper, margin=1in}
+\usepackage{longtable}
+\usepackage{hyperref}
+\usepackage{amsmath}
+\usepackage{array}
+\title{OSeMOSYS-Pyomo Model Documentation}
+\author{Generated automatically}
+\date{\today}
+\begin{document}
+\maketitle
+\tableofcontents
+\newpage
+\section{General Description}
+This document describes the sets, parameters, variables, and equations of the OSeMOSYS-Pyomo model.
+\section{Sets}
+\begin{longtable}{|p{0.3\textwidth}|p{0.65\textwidth}|}
+\hline
+\textbf{Set Name} & \textbf{Description} \\
+\hline
+\endhead
+YEAR & y \\
+\hline
+TECHNOLOGY & t \\
+\hline
+TIMESLICE & l \\
+\hline
+FUEL & f \\
+\hline
+EMISSION & e \\
+\hline
+MODE\_OF\_OPERATION & m \\
+\hline
+REGION & r \\
+\hline
+SEASON & ls \\
+\hline
+DAYTYPE & ld \\
+\hline
+DAILYTIMEBRACKET & lh \\
+\hline
+STORAGE &  \\
+\hline
+\end{longtable}
+\section{Parameters}
+\begin{longtable}{|p{0.35\textwidth}|p{0.6\textwidth}|}
+\hline
+\textbf{Parameter Name} & \textbf{Description} \\
+\hline
+\endhead
+p\_YearSplit & Parameters are defined with a p in front of the name of each parameter \\
+\hline
+p\_DiscountRate & [r] Region specific value for the discount rate, expressed in decimals (e.g. 0.05) \\
+\hline
+p\_DaySplit & [lh,y] Length of one DailyTimeBracket in one specific day as a fraction of the year (e.g., when distinguishing between days and night: 12h/(24h*365d)). \\
+\hline
+p\_Conversionls & [ls,l] Binary parameter linking one TimeSlice to a certain Season. It has value 0 if the TimeSlice does not pertain to the specific season, 1 if it does. \\
+\hline
+p\_Conversionld & [ld,l] Binary parameter linking one TimeSlice to a certain DayType. It has value 0 if the TimeSlice does not pertain to the specific DayType, 1 if it does. \\
+\hline
+p\_Conversionlh & [lh,l]Binary parameter linking one TimeSlice to a certain DaylyTimeBracket. It has value 0 if the TimeSlice does not pertain to the specific DaylyTimeBracket, 1 if it does. \\
+\hline
+p\_DaysInDayType & [ls,ld,y]Number of days for each day type, within one week (natural number, ranging from 1 to 7) \\
+\hline
+p\_TradeRoute & [r,rr,f,y] Binary parameter defining the links between region r and region rr, to enable or disable trading of a specific commodity. It has value 1 when two regions are linked, 0 otherwise \\
+\hline
+p\_DepreciationMethod & [r] Binary parameter defining the type of depreciation to be applied. It has value 1 for sinking fund depreciation, value 2 for straight-line depreciation. \\
+\hline
+p\_DiscountRateIdv & [r,t] Technology and region specific value for the discount rate, expressed in decimals (e.g. 0.05). It is used for calculating the capital recovery factor (CRF). \\
+\hline
+p\_DiscountFactor & [r,y] Discount factor for a specific year and region, calculated from the discount rate. \\
+\hline
+p\_DiscountFactorMid & [r,y] Discount factor for a specific year and region, calculated from the discount rate. \\
+\hline
+p\_SpecifiedAnnualDemand & SpecifiedAnnualDemand[r,f,y] - Total specified demand for the year, linked to a specific ‘time of use’ during the year. \\
+\hline
+p\_SpecifiedDemandProfile & SpecifiedDemandProfile[r,f,l,y] - Annual fraction of energy-service or commodity demand that is required in each time slice. For each year, all the defined SpecifiedDemandProfile input values should sum up to 1. \\
+\hline
+p\_AccumulatedAnnualDemand & AccumulatedAnnualDemand[r,f,y] - Accumulated Demand for a certain commodity in one specific year. It cannot be defined for a commodity if its SpecifiedAnnualDemand for the same year is already defined and vice versa. \\
+\hline
+p\_CapacityToActivityUnit & CapacityToActivityUnit[r,t] - Conversion factor relating the energy that would be produced when one unit of capacity is fully used in one year. \\
+\hline
+p\_CapacityFactor & CapacityFactor[r,t,l,y] - Capacity available per each TimeSlice expressed as a fraction of the total installed capacity, with values ranging from 0 to 1. It gives the possibility to account for forced outages. \\
+\hline
+p\_AvailabilityFactor & AvailabilityFactor[r,t,y] - Maximum time a technology can run in the whole year, as a fraction of the year ranging from 0 to 1. It gives the possibility to account for planned outages. \\
+\hline
+p\_OperationalLife & OperationalLife[r,t] - Useful lifetime of a technology, expressed in years. \\
+\hline
+p\_ResidualCapacity & ResidualCapacity[r,t,y]- Remained capacity available from before the modelling period. \\
+\hline
+p\_InputActivityRatio & InputActivityRatio[r,t,f,m,y] - Rate of use of a commodity by a technology, as a ratio of the rate of activity. \\
+\hline
+p\_OutputActivityRatio & OutputActivityRatio[r,t,f,m,y] - Rate of commodity output from a technology, as a ratio of the rate of activity. \\
+\hline
+p\_CapitalCost & CapitalCost[r,t,y]-Capital investment cost of a technology, per unit of capacity. \$/kW \\
+\hline
+p\_VariableCost & VariableCost[r,t,m,y] - Cost of a technology for a given mode of operation (Variable O\&M cost), per unit of activity.\$/GJ \\
+\hline
+p\_FixedCost & FixedCost[r,t,y] - Fixed O\&M cost of a technology, per unit of capacity.\$/kW/yr \\
+\hline
+p\_TechnologyToStorage & TechnologyToStorage[r,t,s,m] - Binary parameter linking a technology to the storage facility it charges. It has value 1 if the technology and the storage facility are linked, 0 otherwise. \\
+\hline
+p\_TechnologyFromStorage & TechnologyFromStorage[r,t,s,m] - Binary parameter linking a storage facility to the technology it feeds. It has value 1 if the technology and the storage facility are linked, 0 otherwise. \\
+\hline
+p\_StorageLevelStart & StorageLevelStart[r,s] - Level of storage at the beginning of first modelled year, in units of activity. \\
+\hline
+p\_StorageMaxChargeRate & StorageMaxChargeRate[r,s]-Maximum charging rate for the storage, in units of activity per year. \\
+\hline
+p\_StorageMaxDischargeRate & StorageMaxDischargeRate[r,s] - Maximum discharging rate for the storage, in units of activity per year. \\
+\hline
+p\_MinStorageCharge & MinStorageCharge[r,s,y] - It sets a lower bound to the amount of energy stored, as a fraction of the maximum, with a number reanging between 0 and 1. The storage facility cannot be emptied below this level. \\
+\hline
+p\_OperationalLifeStorage & OperationalLifeStorage[r,s] - Useful lifetime of the storage facility. \\
+\hline
+p\_CapitalCostStorage & CapitalCostStorage[r,s,y] - Investment costs of storage additions, defined per unit of storage capacity. \\
+\hline
+p\_ResidualStorageCapacity & ResidualStorageCapacity[r,s,y] - Exogenously defined storage capacities. \\
+\hline
+p\_CapacityOfOneTechnologyUnit & CapacityOfOneTechnologyUnit[r,t,y] - Capacity of one new unit of a technology. In case the user sets this parameter, the related technology will be installed only in batches of the specified capacity and the problem will turn into a Mixed Integer Linear Problem. \\
+\hline
+p\_TotalAnnualMaxCapacity & TotalAnnualMaxCapacity[r,t,y] - Total maximum existing (residual plus cumulatively installed) capacity allowed for a technology in a specified year. \\
+\hline
+p\_TotalAnnualMinCapacity & TotalAnnualMinCapacity[r,t,y]  - Total minimum existing (residual plus cumulatively installed) capacity allowed for a technology in a specified year. \\
+\hline
+p\_TotalAnnualMaxCapacityInvestment & TotalAnnualMaxCapacityInvestment[r,t,y]-Maximum capacity of a technology, expressed in power units. \\
+\hline
+p\_TotalAnnualMinCapacityInvestment & TotalAnnualMinCapacityInvestment[r,t,y]-Minimum capacity of a technology, expressed in power units. \\
+\hline
+p\_TotalTechnologyAnnualActivityUpperLimit & TotalTechnologyAnnualActivityUpperLimit[r,t,y]-Total maximum level of activity allowed for a technology in one year. \\
+\hline
+p\_TotalTechnologyAnnualActivityLowerLimit & TotalTechnologyAnnualActivityLowerLimit[r,t,y] - Total minimum level of activity allowed for a technology in one year. \\
+\hline
+p\_TotalTechnologyModelPeriodActivityUpperLimit & TotalTechnologyModelPeriodActivityUpperLimit[r,t]-Total maximum level of activity allowed for a technology in the entire modelled period. \\
+\hline
+p\_TotalTechnologyModelPeriodActivityLowerLimit & TotalTechnologyModelPeriodActivityLowerLimit[r,t]-Total minimum level of activity allowed for a technology in the entire modelled period. \\
+\hline
+p\_ReserveMarginTagTechnology & ReserveMarginTagTechnology[r,t,y] - Binary parameter tagging the technologies that are allowed to contribute to the reserve margin. It has value 1 for the technologies allowed, 0 otherwise. \\
+\hline
+p\_ReserveMarginTagFuel & ReserveMarginTagFuel[r,f,y]	Binary parameter tagging the fuels to which the reserve margin applies. It has value 1 if the reserve margin applies to the fuel, 0 otherwise. \\
+\hline
+p\_ReserveMargin & ReserveMargin[r,y]	Minimum level of the reserve margin required to be provided for all the tagged commodities, by the tagged technologies. If no reserve margin is required, the parameter will have value 1; if, for instance, 20\% reserve margin is required, the parameter will have value 1.2. \\
+\hline
+p\_RETagTechnology & RETagTechnology[r,t,y] -	Binary parameter tagging the renewable technologies that must contribute to reaching the indicated minimum renewable production target. It has value 1 for thetechnologies contributing, 0 otherwise. \\
+\hline
+p\_RETagFuel & RETagFuel[r,f,y] - Binary parameter tagging the fuels to which the renewable target applies to. It has value 1 if the target applies, 0 otherwise. \\
+\hline
+p\_REMinProductionTarget & REMinProductionTarget[r,y] - Minimum ratio of all renewable commodities tagged in the RETagCommodity parameter, to be produced by the technologies tagged with the RETechnology parameter. \\
+\hline
+p\_EmissionActivityRatio & EmissionActivityRatio[r,t,e,m,y] - Emission factor of a technology per unit of activity, per mode of operation. \\
+\hline
+p\_EmissionsPenalty & EmissionsPenalty[r,e,y] - Penalty per unit of emission. \\
+\hline
+p\_AnnualExogenousEmission & AnnualExogenousEmission[r,e,y]	It allows the user to account for additional annual emissions, on top of those computed endogenously by the model (e.g. emissions generated outside the region). \\
+\hline
+p\_AnnualEmissionLimit & AnnualEmissionLimit[r,e,y] - Annual upper limit for a specific emission generated in the whole modelled region. \\
+\hline
+p\_ModelPeriodExogenousEmission & ModelPeriodExogenousEmission[r,e] - It allows the user to account for additional emissions over the entire modelled period, on top of those computed endogenously by the model (e.g. generated outside the region). \\
+\hline
+p\_ModelPeriodEmissionLimit & ModelPeriodEmissionLimit[r,e]	Annual upper limit for a specific emission generated in the whole modelled region, over the entire modelled period. \\
+\hline
+p\_CostoNoAsociado & Costo no asociado a la generacion \\
+\hline
+p\_MinimumOperatingLoad & MinimunOperatingLoad[r,t,y] - Minimum load could operate a technology \\
+\hline
+p\_Availability & De las unidades existentes cuales estan disponibles para instalar \\
+\hline
+p\_NumberOfExistingUnits & Unidades que estan operando \\
+\hline
+p\_CostoRecuperacion & Costo de re-invertir en una tecnologia \\
+\hline
+p\_VidaUtilRecuperada & Vida Util despues de recuperadas \\
+\hline
+p\_Mantenimiento & Período de mantenimiento en años \\
+\hline
+p\_ExportPrice & Export price \\
+\hline
+p\_MustRun &  \\
+\hline
+p\_MustRunTech &  \\
+\hline
+p\_MustRunFuel &  \\
+\hline
+\end{longtable}
+\section{Variables}
+\begin{longtable}{|p{0.35\textwidth}|p{0.6\textwidth}|}
+\hline
+\textbf{Variable Name} & \textbf{Description} \\
+\hline
+\endhead
+v\_RateOfDemand & RateOfDemand[r,l,f,y]>=0 Intermediate variable. It represents the energy that would be demanded in one time slice l if the latter lasted the whole year. It is a function of the parameters SpecifiedAnnualDemand and SpecifiedDemandProfile. | Energy (per year) \\
+\hline
+v\_Demand & Demand[r,l,f,y]>=0 -	Demand for one fuel in one time slice.	Energy \\
+\hline
+v\_RateOfStorageCharge & RateOfStorageCharge[r,s,ls,ld,lh,y]	Intermediate variable. It represents the commodity that would be charged to the storage facility s in one time slice if the latter lasted the whole year. It is a function of the RateOfActivity and the parameter TechnologyToStorage. | Energy (per year) \\
+\hline
+v\_RateOfStorageDischarge & RateOfStorageDischarge[r,s,ls,ld,lh,y]	Intermediate variable. It represents the commodity that would be discharged from storage facility s in one time slice if the latter lasted the whole year. It is a function of the RateOfActivity and the parameter TechnologyFromStorage.	Energy (per year) \\
+\hline
+v\_NetChargeWithinYear & NetChargeWithinYear[r,s,ls,ld,lh,y]	Net quantity of commodity charged to storage facility s in year y. It is a function of the RateOfStorageCharge and the RateOfStorageDischarge and it can be negative.	Energy \\
+\hline
+v\_NetChargeWithinDay & NetChargeWithinDay[r,s,ls,ld,lh,y]	Net quantity of commodity charged to storage facility s in daytype ld. It is a function of the RateOfStorageCharge and the RateOfStorageDischarge and can be negative.	Energy \\
+\hline
+v\_StorageLevelYearStart & StorageLevelYearStart[r,s,y]>=0	Level of stored commodity in storage facility s in the first time step of year y.	Energy \\
+\hline
+v\_StorageLevelYearFinish & StorageLevelYearFinish[r,s,y]>=0	Level of stored commodity in storage facility s in the last time step of year y.	Energy \\
+\hline
+v\_StorageLevelSeasonStart & StorageLevelSeasonStart[r,s,ls,y]>=0	Level of stored commodity in storage facility s in the first time step of season ls.	Energy \\
+\hline
+v\_StorageLevelDayTypeStart & StorageLevelDayTypeStart[r,s,ls,ld,y]>=0	Level of stored commodity in storage facility s in the first time step of daytype ld.	Energy \\
+\hline
+v\_StorageLevelDayTypeFinish & StorageLevelDayTypeFinish[r,s,ls,ld,y]>=0	Level of stored commodity in storage facility s in the last time step of daytype ld.	Energy \\
+\hline
+v\_StorageLevel & StorageLowerLimit[r,s,y]>=0	Minimum allowed level of stored commodity in storage facility s, as a function of the storage capacity and the user-defined MinStorageCharge ratio.	Energy \\
+\hline
+v\_StorageLowerLimit &  \\
+\hline
+v\_StorageUpperLimit & StorageUpperLimit[r,s,y]>=0	Maximum allowed level of stored commodity in storage facility s. It corresponds to the total existing capacity of storage facility s (summing newly installed and pre-existing capacities).	Energy \\
+\hline
+v\_AccumulatedNewStorageCapacity & AccumulatedNewStorageCapacity[r,s,y]>=0	Cumulative capacity of newly installed storage from the beginning of the time domain to year y.	Energy \\
+\hline
+v\_NewStorageCapacity & NewStorageCapacity[r,s,y]>=0	Capacity of newly installed storage in year y.	Energy \\
+\hline
+v\_CapitalInvestmentStorage & CapitalInvestmentStorage[r,s,y]>=0	Undiscounted investment in new capacity for storage facility s. Derived from the NewStorageCapacity and the parameter CapitalCostStorage.Monetary units \\
+\hline
+v\_DiscountedCapitalInvestmentStorage & DiscountedCapitalInvestmentStorage[r,s,y]>=0	Investment in new capacity for storage facility s, discounted through the parameter DiscountRate.	Monetary units \\
+\hline
+v\_SalvageValueStorage & SalvageValueStorage[r,s,y]>=0	Salvage value of storage facility s in year y, as a function of the parameters OperationalLifeStorage and DepreciationMethod.	Monetary units \\
+\hline
+v\_DiscountedSalvageValueStorage & DiscountedSalvageValueStorage[r,s,y]>=0	Salvage value of storage facility s, discounted through the parameter DiscountRate.	Monetary units \\
+\hline
+v\_TotalDiscountedStorageCost & TotalDiscountedStorageCost[r,s,y]>=0	Difference between the discounted capital investment in new storage facilities and the salvage value in year y. Monetary units \\
+\hline
+v\_NumberOfNewTechnologyUnits & NumberOfNewTechnologyUnits[r,t,y]>=0, integer	Number of newly installed units of technology t in year y, as a function of the parameter CapacityOfOneTechnologyUnit. | No unit \\
+\hline
+v\_NewCapacity & NewCapacity[r,t,y]>=0 Newly installed capacity of technology t in year y. Power \\
+\hline
+v\_AccumulatedNewCapacity & AccumulatedNewCapacity[r,t,y]>=0	Cumulative newly installed capacity of technology t from the beginning of the time domain to year y. Power \\
+\hline
+v\_TotalCapacityAnnual & TotalCapacityAnnual[r,t,y]>=0 - Total existing capacity of technology t in year y (sum of cumulative newly installed and pre-existing capacity). Power \\
+\hline
+v\_RateOfActivity & RateOfActivity[r,l,t,m,y] >=0	Intermediate variable. It represents the activity of technology t in one mode of operation and in time slice l, if the latter lasted the whole year. | Energy (per year) \\
+\hline
+v\_RateOfTotalActivity & RateOfTotalActivity[r,t,l,y] >=0	Sum of the RateOfActivity of a technology over the modes of operation.	Energy (per year) \\
+\hline
+v\_TotalTechnologyAnnualActivity & TotalTechnologyAnnualActivity[r,t,y] >=0	Total annual activity of technology t.	Energy \\
+\hline
+v\_TotalAnnualTechnologyActivityByMode & TotalAnnualTechnologyActivityByMode[r,t,m,y] >=0	Annual activity of technology t in mode of operation m.	Energy \\
+\hline
+v\_TotalTechnologyModelPeriodActivity & TotalTechnologyModelPeriodActivity[r,t]	Sum of the TotalTechnologyAnnualActivity over the years of the modelled period.	Energy \\
+\hline
+v\_RateOfProductionByTechnologyByMode & RateOfProductionByTechnologyByMode[r,l,t,m,f,y] >=0	Intermediate variable. It represents the quantity of fuel f that technology t would produce in one mode of operation and in time slice l, if the latter lasted the whole year. It is a function of the variable RateOfActivity and the parameter OutputActivityRatio. Energy (per year) \\
+\hline
+v\_RateOfProductionByTechnology & RateOfProductionByTechnology[r,l,t,f,y] >=0	Sum of the RateOfProductionByTechnologyByMode over the modes of operation.	Energy (per year) \\
+\hline
+v\_ProductionByTechnology & ProductionByTechnology[r,l,t,f,y] >=0	Production of fuel f by technology t in time slice l. Energy \\
+\hline
+v\_ProductionByTechnologyAnnual & ProductionByTechnologyAnnual[r,t,f,y] >=0	Annual production of fuel f by technology t. Energy \\
+\hline
+v\_RateOfProduction & RateOfProduction[r,l,f,y] >=0 Sum of the RateOfProductionByTechnology over all the technologies.	Energy (per year) \\
+\hline
+v\_Production & Production[r,l,f,y] >=0	Total production of fuel f in time slice l. It is the sum of the ProductionByTechnology over all technologies. Energy \\
+\hline
+v\_RateOfUseByTechnologyByMode & RateOfUseByTechnologyByMode[r,l,t,m,f,y] >=0	Intermediate variable. It represents the quantity of fuel f that technology t would use in one mode of operation and in time slice l, if the latter lasted the whole year. It is the function of the variable RateOfActivity and the parameter InputActivityRatio.	Energy (per year) \\
+\hline
+v\_RateOfUseByTechnology & RateOfUseByTechnology[r,l,t,f,y] >=0	Sum of the RateOfUseByTechnologyByMode over the modes of operation.	Energy (per year) \\
+\hline
+v\_RateOfUse &  \\
+\hline
+v\_UseByTechnologyAnnual & UseByTechnologyAnnual[r,t,f,y] >=0 Annual use of fuel f by technology t. Energy \\
+\hline
+v\_UseByTechnology & UseByTechnology[r,l,t,f,y] >=0	Use of fuel f by technology t in time slice l. Energy \\
+\hline
+v\_Use & Use[r,l,f,y] >=0	Total use of fuel f in time slice l. It is the sum of the UseByTechnology over all technologies. Energy \\
+\hline
+v\_Trade & Trade[r,rr,l,f,y] Quantity of fuel f traded be@tween region r and rr in time slice l. Energy \\
+\hline
+v\_TradeAnnual & TradeAnnual[r,rr,f,y] Annual quantity of fuel f traded between region r and rr. It is the sum of the variable Trade over all the time slices.	Energy \\
+\hline
+v\_ProductionAnnual & ProductionAnnual[r,f,y] >=0	Total annual production of fuel f. It is the sum of the variable Production over all technologies. Energy \\
+\hline
+v\_UseAnnual & UseAnnual[r,f,y] >=0	Total annual use of fuel f. It is the sum of the variable Use over all technologies. Energy \\
+\hline
+v\_CapitalInvestment & CapitalInvestment[r,t,y] >=0	Undiscounted investment in new capacity of technology t. It is a function of the NewCapacity and the parameter CapitalCost. | Monetary units \\
+\hline
+v\_DiscountedCapitalInvestment & DiscountedCapitalInvestment[r,t,y] >=0	Investment in new capacity of technology t, discounted through the parameter DiscountRate.	Monetary units \\
+\hline
+v\_SalvageValue & SalvageValue[r,t,y] >=0	Salvage value of technology t in year y, as a function of the parameters OperationalLife and DepreciationMethod. Monetary units \\
+\hline
+v\_DiscountedSalvageValue & DiscountedSalvageValue[r,t,y] >=0 Salvage value of technology t, discounted through the parameter DiscountRate. Monetary units \\
+\hline
+v\_OperatingCost & OperatingCost[r,t,y] >=0	Undiscounted sum of the annual variable and fixed operating costs of technology t.	Monetary units \\
+\hline
+v\_DiscountedOperatingCost & DiscountedOperatingCost[r,t,y] >=0 Annual OperatingCost of technology t, discounted through the parameter DiscountRate. Monetary units \\
+\hline
+v\_AnnualVariableOperatingCost & AnnualVariableOperatingCost[r,t,y] >=0	Annual variable operating cost of technology t. Derived from the TotalAnnualTechnologyActivityByMode and the parameter VariableCost. Monetary units \\
+\hline
+v\_AnnualFixedOperatingCost & AnnualFixedOperatingCost[r,t,y] >=0	Annual fixed operating cost of technology t. Derived from the TotalCapacityAnnual and the parameter FixedCost.	Monetary units \\
+\hline
+v\_TotalDiscountedCostByTechnology & TotalDiscountedCostByTechnology[r,t,y] >=0 Difference between the sum of discounted operating cost / capital cost / emission penalties and the salvage value. Monetary units \\
+\hline
+v\_TotalDiscountedCost & TotalDiscountedCost[r,y] >=0	Sum of the TotalDiscountedCostByTechnology over all the technologies. Monetary units \\
+\hline
+v\_ModelPeriodCostByRegion & ModelPeriodCostByRegion[r] >=0 Sum of the TotalDiscountedCost over all modelled years. Monetary units \\
+\hline
+v\_TotalCapacityInReserveMargin & TotalCapacityInReserveMargin[r,y] >=0 Total available capacity of the technologies required to provide reserve margin. It is derived from the TotalCapacityAnnual and the parameter ReserveMarginTagTechnology. | Energy \\
+\hline
+v\_DemandNeedingReserveMargin & DemandNeedingReserveMargin[r,l,y] >=0 Quantity of fuel produced that is assigned to a target of reserve margin. Derived from the RateOfProduction and the parameter ReserveMarginTagFuel. Energy (per year) \\
+\hline
+v\_TotalREProductionAnnual & TotalREProductionAnnual[r,y]	Annual production by all technologies tagged as renewable in the model. Derived from the ProductionByTechnologyAnnual and the parameter RETagTechnology. Energy \\
+\hline
+v\_RETotalProductionOfTargetFuelAnnual & RETotalProductionOfTargetFuelAnnual[r,y]	Annual production of fuels tagged as renewable in the model. Derived from the RateOfProduction and the parameter RETagFuel.	Energy \\
+\hline
+v\_AnnualTechnologyEmissionByMode & AnnualTechnologyEmissionByMode[r,t,e,m,y] >=0 Annual emission of agent e by technology t in mode of operation m. Derived from the RateOfActivity and the parameter EmissionActivityRatio. Quantity of emission \\
+\hline
+v\_AnnualTechnologyEmission & AnnualTechnologyEmission[r,t,e,y] >=0 Sum of the AnnualTechnologyEmissionByMode over the modes of operation. Quantity of emission \\
+\hline
+v\_AnnualTechnologyEmissionPenaltyByEmission & AnnualTechnologyEmissionPenaltyByEmission[r,t,e,y] >=0 Undiscounted annual cost of emission e by technology t. It is a function of the AnnualTechnologyEmission and the parameter EmissionPenalty.	Monetary units \\
+\hline
+v\_AnnualTechnologyEmissionsPenalty & AnnualTechnologyEmissionsPenalty[r,t,y] >=0 Total undiscounted annual cost of all emissions generated by technology t. Sum of the AnnualTechnologyEmissionPenaltyByEmission over all the emitted agents. Monetary units \\
+\hline
+v\_DiscountedTechnologyEmissionsPenalty & DiscountedTechnologyEmissionsPenalty[r,t,y] >=0	Annual cost of emissions by technology t, discounted through the DiscountRate. Monetary units \\
+\hline
+v\_AnnualEmissions & AnnualEmissions[r,e,y] >=0 Sum of the AnnualTechnologyEmission over all technologies. Quantity of emission \\
+\hline
+v\_ModelPeriodEmissions & ModelPeriodEmissions[r,e] >=0	Total system emissions of agent e in the model period, accounting for both the emissions by technologies and the user defined ModelPeriodExogenousEmission. Quantity of emission \\
+\hline
+v\_ConnectedUnits & ConnectedUnits[r,t,l,y] - Number of Conected Units in each TimeSlice \\
+\hline
+v\_ResidualCapacity & "probando nueva capacidad residual \\
+\hline
+v\_AccumulatedRecoveredUnits &  \\
+\hline
+v\_AccumulatedRecoveredCapacity &  \\
+\hline
+v\_AccumulatedRecoveredNewCapacity &  \\
+\hline
+v\_RecoveredExistingUnits &  \\
+\hline
+v\_RecoveredCapacity &  \\
+\hline
+v\_RecoveredNewCapacity &  \\
+\hline
+v\_Export & Exporting a commodity \\
+\hline
+\end{longtable}
+\section{Equations}
+The following constraints are defined in the model. Where available, the mathematical formulation is provided.
+\subsection{SpecifiedDemand\_EQ}
+\begin{equation}
+\begin{split}
+ \textit{RateOfDemand}_{r,l,f,y} &= \frac{\text{SpecifiedAnnualDemand}_{r,f,y} \cdot \text{SpecifiedDemandProfile}_{r,f,l,y}}{\text{YearSplit}_{l,y}}
+\end{split}
+\end{equation}
+\subsection{CAa1\_TotalNewCapacity}
+\begin{equation}
+\begin{split}
+ \textit{AccumulatedNewCapacity}_{r,t,y} &= \sum\limits_{yy \in YEAR: (y-yy < \text{OperationalLife}_{r,t}) \land (y-yy \geq 0)} \textit{NewCapacity}_{r,t,yy}
+\end{split}
+\end{equation}
+\subsection{CAa2\_TotalAnnualCapacity}
+\begin{equation}
+\begin{split}
+ \textit{AccumulatedNewCapacity}_{r,t,y} &+ \textit{ResidualCapacity}_{r,t,y} \\
+ &= \textit{TotalCapacityAnnual}_{r,t,y}
+\end{split}
+\end{equation}
+\subsection{CAa3\_TotalActivityOfEachTechnology}
+\begin{equation}
+\begin{split}
+ \sum\limits_{m} \textit{RateOfActivity}_{r,l,t,m,y} &= \textit{RateOfTotalActivity}_{r,t,l,y}
+\end{split}
+\end{equation}
+\subsection{CAa4\_ConstraintCapacity}
+\begin{equation}
+\begin{split}
+ \textit{RateOfTotalActivity}_{r,t,l,y} &\leq \textit{TotalCapacityAnnual}_{r,t,y} \cdot \text{CapacityFactor}_{r,t,l,y} \cdot \text{CapacityToActivityUnit}_{r,t}
+\end{split}
+\end{equation}
+\subsection{CAa1n\_TotalResidualCapacity}
+\begin{equation}
+\begin{split}
+ \textit{ResidualCapacity}_{r,t,y} &= \text{NumberOfExistingUnits}_{r,t,y} \cdot \text{CapacityOfOneTechnologyUnit}_{r,t,y}
+\end{split}
+\end{equation}
+\subsection{CAa5\_TotalNewCapacity}
+\begin{equation}
+\begin{split}
+ \text{CapacityOfOneTechnologyUnit}_{r,t,y} \cdot \textit{NumberOfNewTechnologyUnits}_{r,t,y} \cdot \text{Availability}_{r,t,y} &= \textit{NewCapacity}_{r,t,y}
+\end{split}
+\end{equation}
+\subsection{CAb1\_PlannedMaintenance}
+\begin{equation}
+\begin{split}
+ \sum\limits_{l} \textit{RateOfTotalActivity}_{r,t,l,y} \cdot \text{YearSplit}_{l,y} &\leq \sum\limits_{l} ( \textit{TotalCapacityAnnual}_{r,t,y} \cdot \text{CapacityFactor}_{r,t,l,y} \cdot \text{YearSplit}_{l,y} \\
+ &\quad \cdot \text{AvailabilityFactor}_{r,t,y} \cdot \text{CapacityToActivityUnit}_{r,t} )
+\end{split}
+\end{equation}
+\subsection{Recovered\_Existing\_Units}
+\begin{equation}
+\begin{split}
+ \textit{RecoveredExistingUnits}_{r,t,y} &\leq \text{NumberOfExistingUnits}_{r,t,y-1} \\
+ &- \text{NumberOfExistingUnits}_{r,t,y} \\
+ &+ \textit{RecoveredExistingUnits}_{r,t,y-\text{VidaUtilRecuperada}_{r,t}}
+\end{split}
+\end{equation}
+\subsection{Accumulated\_Recovered\_Existing\_Units}
+\begin{equation}
+\begin{split}
+ \textit{AccumulatedRecoveredUnits}_{r,t,y} &= \sum\limits_{yy \in YEAR: (y-yy < \text{VidaUtilRecuperada}_{r,t}) \land (y-yy \geq 0)} \textit{RecoveredExistingUnits}_{r,t,yy}
+\end{split}
+\end{equation}
+\subsection{Recovered\_Residual\_Aggregated}
+\begin{equation}
+\begin{split}
+ \textit{RecoveredCapacity}_{r,t,y} &\leq \text{ResidualCapacity}_{r,t,y-1} \\
+ &- \text{ResidualCapacity}_{r,t,y} \\
+ &+ \textit{RecoveredCapacity}_{r,t,y-\text{VidaUtilRecuperada}_{r,t}}
+\end{split}
+\end{equation}
+\subsection{Accumulated\_Recovered\_Capacity}
+\begin{equation}
+\begin{split}
+ \textit{AccumulatedRecoveredCapacity}_{r,t,y} &= \sum\limits_{yy \in YEAR: (y-yy < \text{VidaUtilRecuperada}_{r,t}) \land (y-yy \geq 0)} \textit{RecoveredCapacity}_{r,t,yy}
+\end{split}
+\end{equation}
+\subsection{Recovered\_New\_Capacity}
+\begin{equation}
+\begin{split}
+ \textit{RecoveredNewCapacity}_{r,t,y} &\leq \textit{NewCapacity}_{r,t,y-\text{OperationalLife}_{r,t}}
+\end{split}
+\end{equation}
+\subsection{Accumulated\_Recovered\_New\_Capacity}
+\begin{equation}
+\begin{split}
+ \textit{AccumulatedRecoveredNewCapacity}_{r,t,y} &= \sum\limits_{yy \in YEAR: 0 \leq y-yy < \text{VidaUtilRecuperada}_{r,t}} \textit{RecoveredNewCapacity}_{r,t,yy}
+\end{split}
+\end{equation}
+\subsection{EBa1\_RateOfFuelProduction1}
+\begin{equation}
+\begin{split}
+ \textit{RateOfActivity}_{r,l,t,m,y} \cdot \text{OutputActivityRatio}_{r,t,f,m,y} &= \textit{RateOfProductionByTechnologyByMode}_{r,l,t,m,f,y}
+\end{split}
+\end{equation}
+\subsection{EBa2\_RateOfFuelProduction2}
+\begin{equation}
+\begin{split}
+ \sum\limits_{m: \text{OutputActivityRatio}_{r,t,f,m,y} \neq 0} \textit{RateOfProductionByTechnologyByMode}_{r,l,t,m,f,y} &= \textit{RateOfProductionByTechnology}_{r,l,t,f,y}
+\end{split}
+\end{equation}
+\subsection{EBa3\_RateOfFuelProduction3}
+\begin{equation}
+\begin{split}
+ \sum\limits_{t} \textit{RateOfProductionByTechnology}_{r,l,t,f,y} &= \textit{RateOfProduction}_{r,l,f,y}
+\end{split}
+\end{equation}
+\subsection{EBa4\_RateOfFuelUse1}
+\begin{equation}
+\begin{split}
+ \textit{RateOfActivity}_{r,l,t,m,y} \cdot \text{InputActivityRatio}_{r,t,f,m,y} &= \textit{RateOfUseByTechnologyByMode}_{r,l,t,m,f,y}
+\end{split}
+\end{equation}
+\subsection{EBa5\_RateOfFuelUse2}
+\begin{equation}
+\begin{split}
+ \sum\limits_{m: \text{InputActivityRatio}_{r,t,f,m,y} \neq 0} \textit{RateOfUseByTechnologyByMode}_{r,l,t,m,f,y} &= \textit{RateOfUseByTechnology}_{r,l,t,f,y}
+\end{split}
+\end{equation}
+\subsection{EBa6\_RateOfFuelUse3}
+\begin{equation}
+\begin{split}
+ \sum\limits_{t} \textit{RateOfUseByTechnology}_{r,l,t,f,y} &= \textit{RateOfUse}_{r,l,f,y}
+\end{split}
+\end{equation}
+\subsection{EBa7\_EnergyBalanceEachTS1}
+\begin{equation}
+\begin{split}
+ \textit{RateOfProduction}_{r,l,f,y} \cdot \text{YearSplit}_{l,y} &= \textit{Production}_{r,l,f,y}
+\end{split}
+\end{equation}
+\subsection{EBa8\_EnergyBalanceEachTS2}
+\begin{equation}
+\begin{split}
+ \textit{RateOfUse}_{r,l,f,y} \cdot \text{YearSplit}_{l,y} &= \textit{Use}_{r,l,f,y}
+\end{split}
+\end{equation}
+\subsection{EBa9\_EnergyBalanceEachTS3}
+\begin{equation}
+\begin{split}
+ \textit{RateOfDemand}_{r,l,f,y} \cdot \text{YearSplit}_{l,y} &= \textit{Demand}_{r,l,f,y}
+\end{split}
+\end{equation}
+\subsection{EBa10\_EnergyBalanceEachTS4}
+\begin{equation}
+\begin{split}
+ \textit{Trade}_{r,rr,l,f,y} &= -\textit{Trade}_{rr,r,l,f,y}
+\end{split}
+\end{equation}
+\subsection{EBa11\_EnergyBalanceEachTS5}
+\begin{equation}
+\begin{split}
+ \textit{Production}_{r,l,f,y} &\geq \textit{Demand}_{r,l,f,y} + \textit{Use}_{r,l,f,y} \\
+ &+ \sum\limits_{rr} \textit{Trade}_{r,rr,l,f,y} \cdot \text{TradeRoute}_{r,rr,f,y} \\
+ &+ \textit{Export}_{r,l,f,y}
+\end{split}
+\end{equation}
+\subsection{EBb1\_EnergyBalanceEachYear1}
+\begin{equation}
+\begin{split}
+ \sum\limits_{l} \textit{Production}_{r,l,f,y} &= \textit{ProductionAnnual}_{r,f,y}
+\end{split}
+\end{equation}
+\subsection{EBb2\_EnergyBalanceEachYear2}
+\begin{equation}
+\begin{split}
+ \sum\limits_{l} \textit{Use}_{r,l,f,y} &= \textit{UseAnnual}_{r,f,y}
+\end{split}
+\end{equation}
+\subsection{EBb3\_EnergyBalanceEachYear3}
+\begin{equation}
+\begin{split}
+ \sum\limits_{l} \textit{Trade}_{r,rr,l,f,y} &= \textit{TradeAnnual}_{r,rr,f,y}
+\end{split}
+\end{equation}
+\subsection{EBb4\_EnergyBalanceEachYear4}
+\begin{equation}
+\begin{split}
+ \textit{ProductionAnnual}_{r,f,y} &\geq \textit{UseAnnual}_{r,f,y} \\
+ &+ \sum\limits_{rr} \textit{TradeAnnual}_{r,rr,f,y} \cdot \text{TradeRoute}_{r,rr,f,y} \\
+ &+ \text{AccumulatedAnnualDemand}_{r,f,y}
+\end{split}
+\end{equation}
+\subsection{Acc1\_FuelProductionByTechnology}
+\begin{equation}
+\begin{split}
+ \textit{RateOfProductionByTechnology}_{r,l,t,f,y} \cdot \text{YearSplit}_{l,y} &= \textit{ProductionByTechnology}_{r,l,t,f,y}
+\end{split}
+\end{equation}
+\subsection{Acc2\_FuelUseByTechnology}
+\begin{equation}
+\begin{split}
+ \textit{RateOfUseByTechnology}_{r,l,t,f,y} \cdot \text{YearSplit}_{l,y} &= \textit{UseByTechnology}_{r,l,t,f,y}
+\end{split}
+\end{equation}
+\subsection{Acc3\_AverageAnnualRateOfActivity}
+\begin{equation}
+\begin{split}
+ \sum\limits_{l} \textit{RateOfActivity}_{r,l,t,m,y} \cdot \text{YearSplit}_{l,y} &= \textit{TotalAnnualTechnologyActivityByMode}_{r,t,m,y}
+\end{split}
+\end{equation}
+\subsection{Acc4\_ModelPeriodCostByRegion}
+\begin{equation}
+\begin{split}
+ \sum\limits_{y} \textit{TotalDiscountedCost}_{r,y} &= \textit{ModelPeriodCostByRegion}_{r}
+\end{split}
+\end{equation}
+\subsection{S1\_RateOfStorageCharge}
+\begin{equation}
+\begin{split}
+ &\sum\limits_{\substack{t, m, l: \\ \text{TechnologyToStorage} > 0}} \textit{RateOfActivity}_{r,l,t,m,y} \cdot \text{TechnologyToStorage}_{r,t,s,m} \\
+ &\quad \cdot \text{Conversionls}_{l,ls} \cdot \text{Conversionld}_{l,ld} \cdot \text{Conversionlh}_{l,lh} \\
+ &= \textit{RateOfStorageCharge}_{r,s,ls,ld,lh,y}
+\end{split}
+\end{equation}
+\subsection{S2\_RateOfStorageDischarge}
+\begin{equation}
+\begin{split}
+ &\sum\limits_{\substack{t, m, l: \\ \text{TechnologyFromStorage} > 0}} \textit{RateOfActivity}_{r,l,t,m,y} \cdot \text{TechnologyFromStorage}_{r,t,s,m} \\
+ &\quad \cdot \text{Conversionls}_{l,ls} \cdot \text{Conversionld}_{l,ld} \cdot \text{Conversionlh}_{l,lh} \\
+ &= \textit{RateOfStorageDischarge}_{r,s,ls,ld,lh,y}
+\end{split}
+\end{equation}
+\subsection{S3\_NetChargeWithinYear}
+\begin{equation}
+\begin{split}
+ &\sum\limits_{l} (\textit{RateOfStorageCharge}_{r,s,ls,ld,lh,y} - \textit{RateOfStorageDischarge}_{r,s,ls,ld,lh,y}) \\
+ &\quad \cdot \text{YearSplit}_{l,y} \cdot \text{Conversionls}_{l,ls} \cdot \text{Conversionld}_{l,ld} \cdot \text{Conversionlh}_{l,lh} \\
+ &= \textit{NetChargeWithinYear}_{r,s,ls,ld,lh,y}
+\end{split}
+\end{equation}
+\subsection{S4\_NetChargeWithinDay}
+\begin{equation}
+\begin{split}
+ &(\textit{RateOfStorageCharge}_{r,s,ls,ld,lh,y} - \textit{RateOfStorageDischarge}_{r,s,ls,ld,lh,y}) \\
+ &\quad \cdot \text{DaySplit}_{lh,y} = \textit{NetChargeWithinDay}_{r,s,ls,ld,lh,y}
+\end{split}
+\end{equation}
+\subsection{S5\_and\_S6\_StorageLevelYearStart}
+\begin{equation}
+\begin{split}
+ \textit{StorageLevelYearStart}_{r,s,y-1} &+ \sum\limits_{ls, ld, lh} \textit{NetChargeWithinYear}_{r,s,ls,ld,lh,y-1} \\
+ &= \textit{StorageLevelYearStart}_{r,s,y}
+\end{split}
+\end{equation}
+\subsection{S7\_and\_S8\_StorageLevelYearFinish}
+\begin{equation}
+\begin{split}
+ \textit{StorageLevelYearStart}_{r,s,y} &+ \sum\limits_{ls, ld, lh} \textit{NetChargeWithinYear}_{r,s,ls,ld,lh,y} \\
+ &= \textit{StorageLevelYearFinish}_{r,s,y}
+\end{split}
+\end{equation}
+\subsection{S9\_and\_S10\_StorageLevelSeasonStart}
+\begin{equation}
+\begin{split}
+ \textit{StorageLevelSeasonStart}_{r,s,ls-1,y} &+ \sum\limits_{ld, lh} \textit{NetChargeWithinYear}_{r,s,ls-1,ld,lh,y} \\
+ &= \textit{StorageLevelSeasonStart}_{r,s,ls,y}
+\end{split}
+\end{equation}
+\subsection{S11\_and\_S12\_StorageLevelDayTypeStart}
+\begin{equation}
+\begin{split}
+ \textit{StorageLevelDayTypeStart}_{r,s,ls,ld-1,y} &+ \sum\limits_{lh} \textit{NetChargeWithinDay}_{r,s,ls,ld-1,lh,y} \cdot \text{DaysInDayType}_{ls,ld-1,y} \\
+ &= \textit{StorageLevelDayTypeStart}_{r,s,ls,ld,y}
+\end{split}
+\end{equation}
+\subsection{S13\_and\_S14\_and\_S15\_StorageLevelDayTypeFinish}
+\begin{equation}
+\begin{split}
+ \textit{StorageLevelDayTypeFinish}_{r,s,ls,ld+1,y} &- \sum\limits_{lh} \textit{NetChargeWithinDay}_{r,s,ls,ld+1,lh,y} \cdot \text{DaysInDayType}_{ls,ld+1,y} \\
+ &= \textit{StorageLevelDayTypeFinish}_{r,s,ls,ld,y}
+\end{split}
+\end{equation}
+\subsection{S16\_StorageLevel}
+\begin{equation}
+\begin{split}
+ \textit{StorageLevel}_{r,s,ls,ld,lh,y} &= \textit{StorageLevelDayTypeStart}_{r,s,ls,ld,y}
+\end{split}
+\end{equation}
+\subsection{SC1\_LowerLimit\_BeginningOfDailyTimeBracketOfFirstInstanceOfDayTypeInFirstWeekConstraint}
+\begin{equation}
+\begin{split}
+ 0 &\leq \textit{StorageLevelDayTypeStart}_{r,s,ls,ld,y} \\
+ &+ \sum\limits_{lhlh: lh-lhlh > 0} \textit{NetChargeWithinDay}_{r,s,ls,ld,lhlh,y} - \textit{StorageLowerLimit}_{r,s,y}
+\end{split}
+\end{equation}
+\subsection{SC1\_UpperLimit\_BeginningOfDailyTimeBracketOfFirstInstanceOfDayTypeInFirstWeekConstraint}
+\begin{equation}
+\begin{split}
+ \textit{StorageLevelDayTypeStart}_{r,s,ls,ld,y} &+ \sum\limits_{lhlh: lh-lhlh > 0} \textit{NetChargeWithinDay}_{r,s,ls,ld,lhlh,y} \\
+ &- \textit{StorageUpperLimit}_{r,s,y} \leq 0
+\end{split}
+\end{equation}
+\subsection{SC2\_LowerLimit\_EndOfDailyTimeBracketOfLastInstanceOfDayTypeInFirstWeekConstraint}
+\begin{equation}
+\begin{split}
+ 0 &\leq \textit{StorageLevelDayTypeStart}_{r,s,ls,ld,y} \\
+ &- \sum\limits_{lhlh: lh-lhlh < 0} \textit{NetChargeWithinDay}_{r,s,ls,ld-1,lhlh,y} \\
+ &- \textit{StorageLowerLimit}_{r,s,y}
+\end{split}
+\end{equation}
+\subsection{SC2\_UpperLimit\_EndOfDailyTimeBracketOfLastInstanceOfDayTypeInFirstWeekConstraint}
+\begin{equation}
+\begin{split}
+ \textit{StorageLevelDayTypeStart}_{r,s,ls,ld,y} \\
+ &- \sum\limits_{lhlh: lh-lhlh < 0} \textit{NetChargeWithinDay}_{r,s,ls,ld-1,lhlh,y} \\
+ &- \textit{StorageUpperLimit}_{r,s,y} \leq 0
+\end{split}
+\end{equation}
+\subsection{SC3\_LowerLimit\_EndOfDailyTimeBracketOfLastInstanceOfDayTypeInLastWeekConstraint}
+\begin{equation}
+\begin{split}
+ 0 &\leq \textit{StorageLevelDayTypeFinish}_{r,s,ls,ld,y} \\
+ &- \sum\limits_{lhlh: lh-lhlh < 0} \textit{NetChargeWithinDay}_{r,s,ls,ld,lhlh,y} \\
+ &- \textit{StorageLowerLimit}_{r,s,y}
+\end{split}
+\end{equation}
+\subsection{SC3\_UpperLimit\_EndOfDailyTimeBracketOfLastInstanceOfDayTypeInLastWeekConstraint}
+\begin{equation}
+\begin{split}
+ \textit{StorageLevelDayTypeFinish}_{r,s,ls,ld,y} \\
+ &- \sum\limits_{lhlh: lh-lhlh < 0} \textit{NetChargeWithinDay}_{r,s,ls,ld,lhlh,y} \\
+ &- \textit{StorageUpperLimit}_{r,s,y} \leq 0
+\end{split}
+\end{equation}
+\subsection{SC4\_LowerLimit\_BeginningOfDailyTimeBracketOfFirstInstanceOfDayTypeInLastWeekConstraint}
+\begin{equation}
+\begin{split}
+ 0 &\leq \textit{StorageLevelDayTypeFinish}_{r,s,ls,ld-1,y} \\
+ &+ \sum\limits_{lhlh: lh-lhlh > 0} \textit{NetChargeWithinDay}_{r,s,ls,ld,lhlh,y} \\
+ &- \textit{StorageUpperLimit}_{r,s,y}
+\end{split}
+\end{equation}
+\subsection{SC4\_UpperLimit\_BeginningOfDailyTimeBracketOfFirstInstanceOfDayTypeInLastWeekConstraint}
+\begin{equation}
+\begin{split}
+ \textit{StorageLevelDayTypeFinish}_{r,s,ls,ld-1,y} \\
+ &+ \sum\limits_{lhlh: lh-lhlh > 0} \textit{NetChargeWithinDay}_{r,s,ls,ld,lhlh,y} \\
+ &- \textit{StorageUpperLimit}_{r,s,y} \leq 0
+\end{split}
+\end{equation}
+\subsection{SC5\_MaxChargeConstraint}
+\begin{equation}
+\begin{split}
+ \textit{RateOfStorageCharge}_{r,s,ls,ld,lh,y} &\leq \text{StorageMaxChargeRate}_{r,s}
+\end{split}
+\end{equation}
+\subsection{SC6\_MaxDischargeConstraint}
+\begin{equation}
+\begin{split}
+ \textit{RateOfStorageDischarge}_{r,s,ls,ld,lh,y} &\leq \text{StorageMaxDischargeRate}_{r,s}
+\end{split}
+\end{equation}
+\subsection{SI1\_StorageUpperLimit}
+\begin{equation}
+\begin{split}
+ \textit{AccumulatedNewStorageCapacity}_{r,s,y} + \text{ResidualStorageCapacity}_{r,s,y} &= \textit{StorageUpperLimit}_{r,s,y}
+\end{split}
+\end{equation}
+\subsection{SI2\_StorageLowerLimit}
+\begin{equation}
+\begin{split}
+ \text{MinStorageCharge}_{r,s,y} \cdot \textit{StorageUpperLimit}_{r,s,y} &= \textit{StorageLowerLimit}_{r,s,y}
+\end{split}
+\end{equation}
+\subsection{SI3\_TotalNewStorage}
+\begin{equation}
+\begin{split}
+ \sum\limits_{\substack{yy \in YEAR: \\ (y-yy < \text{OperationalLifeStorage}_{r,s}) \\ \land (y-yy \geq 0)}} \textit{NewStorageCapacity}_{r,s,yy} &= \textit{AccumulatedNewStorageCapacity}_{r,s,y}
+\end{split}
+\end{equation}
+\subsection{SI4\_UndiscountedCapitalInvestmentStorage}
+\begin{equation}
+\begin{split}
+ \text{CapitalCostStorage}_{r,s,y} \cdot \textit{NewStorageCapacity}_{r,s,y} &= \textit{CapitalInvestmentStorage}_{r,s,y}
+\end{split}
+\end{equation}
+\subsection{SI5\_DiscountingCapitalInvestmentStorage}
+\begin{equation}
+\begin{split}
+ \frac{\textit{CapitalInvestmentStorage}_{r,s,y}}{(1 + \text{DiscountRate}_{r})^{y - \min(YEAR)}} &= \textit{DiscountedCapitalInvestmentStorage}_{r,s,y}
+\end{split}
+\end{equation}
+\subsection{SI6\_SalvageValueStorageAtEndOfPeriod1}
+\begin{equation}
+\begin{split}
+ 0 &= \textit{SalvageValueStorage}_{r,s,y}
+\end{split}
+\end{equation}
+\subsection{SI7\_SalvageValueStorageAtEndOfPeriod2}
+\begin{equation}
+\begin{split}
+ \textit{CapitalInvestmentStorage}_{r,s,y} \cdot \left(1 - \frac{\max(YEAR) - y + 1}{\text{OperationalLifeStorage}_{r,s}}\right) &= \textit{SalvageValueStorage}_{r,s,y}
+\end{split}
+\end{equation}
+\subsection{SI8\_SalvageValueStorageAtEndOfPeriod3}
+\begin{equation}
+\begin{split}
+ \textit{CapitalInvestmentStorage}_{r,s,y} \\
+ \cdot \left(1 - \frac{(1 + \text{DiscountRate}_{r})^{\max(YEAR) - y + 1} - 1}{(1 + \text{DiscountRate}_{r})^{\text{OperationalLifeStorage}_{r,s}} - 1}\right) &= \textit{SalvageValueStorage}_{r,s,y}
+\end{split}
+\end{equation}
+\subsection{SI9\_SalvageValueStorageDiscountedToStartYear}
+\begin{equation}
+\begin{split}
+ \frac{\textit{SalvageValueStorage}_{r,s,y}}{(1 + \text{DiscountRate}_{r})^{\max(YEAR) - \min(YEAR) + 1}} &= \textit{DiscountedSalvageValueStorage}_{r,s,y}
+\end{split}
+\end{equation}
+\subsection{SI10\_TotalDiscountedCostByStorage}
+\begin{equation}
+\begin{split}
+ \textit{DiscountedCapitalInvestmentStorage}_{r,s,y} - \textit{DiscountedSalvageValueStorage}_{r,s,y} &= \textit{TotalDiscountedStorageCost}_{r,s,y}
+\end{split}
+\end{equation}
+\subsection{CC1\_UndiscountedCapitalInvestment}
+\begin{equation}
+\begin{split}
+ \textit{CapitalInvestment}_{r,t,y} &= \textit{NewCapacity}_{r,t,y} \cdot \text{CapitalCost}_{r,t,y} \cdot CRF_{new} \cdot PV_{new} \\
+ &+ \textit{RecoveredCapacity}_{r,t,y} \cdot \text{CostoRecuperacion}_{r,t,y} \cdot CRF_{rec} \cdot PV_{rec} \\
+ &+ \textit{RecoveredNewCapacity}_{r,t,y} \cdot \text{CostoRecuperacion}_{r,t,y} \cdot CRF_{rec} \cdot PV_{rec} \\
+ &+ \textit{RecoveredExistingUnits}_{r,t,y} \cdot \text{CapacityOfOneTechnologyUnit}_{r,t,y_0} \\
+ &\quad \cdot \text{CostoRecuperacion}_{r,t,y} \cdot CRF_{rec} \cdot PV_{rec}
+\end{split}
+\end{equation}
+\subsection{CC2\_DiscountingCapitalInvestment}
+\begin{equation}
+\begin{split}
+ \textit{DiscountedCapitalInvestment}_{r,t,y} &= \frac{\textit{CapitalInvestment}_{r,t,y}}{\text{DiscountFactor}_{r,y}}
+\end{split}
+\end{equation}
+\subsection{SV123\_SalvageValueAtEndOfPeriod1}
+\begin{equation}
+\begin{split}
+ \textit{SalvageValue}_{r,t,y} &= \textit{NewCapacity}_{r,t,y} \cdot \text{CapitalCost}_{r,t,y} \cdot CRF_{new} \cdot PV_{new} \cdot f_{new} \\
+ &+ \textit{RecoveredNewCapacity}_{r,t,y} \cdot \text{CostoRecuperacion}_{r,t,y} \cdot CRF_{rec} \cdot PV_{rec} \cdot f_{rec} \\
+ &+ \textit{RecoveredCapacity}_{r,t,y} \cdot \text{CostoRecuperacion}_{r,t,y} \cdot CRF_{rec} \cdot PV_{rec} \cdot f_{rec} \\
+ &+ \textit{RecoveredExistingUnits}_{r,t,y} \cdot \text{CapacityOfOneTechnologyUnit}_{r,t,y_0} \\
+ &\quad \cdot \text{CostoRecuperacion}_{r,t,y} \cdot CRF_{rec} \cdot PV_{rec} \cdot f_{rec}
+\end{split}
+\end{equation}
+\subsection{SV4\_SalvageValueDiscountedToStarYear}
+\begin{equation}
+\begin{split}
+ \textit{DiscountedSalvageValue}_{r,t,y} &= \frac{\textit{SalvageValue}_{r,t,y}}{(1 + \text{DiscountRate}_{r})^{1 + (y_L - y_0)}}
+\end{split}
+\end{equation}
+\subsection{OC1\_OperatingCostVariable}
+\begin{equation}
+\begin{split}
+ \sum\limits_{m: \text{VariableCost}_{r,t,m,y} \neq 0} \textit{TotalAnnualTechnologyActivityByMode}_{r,t,m,y} \cdot \text{VariableCost}_{r,t,m,y} &= \textit{AnnualVariableOperatingCost}_{r,t,y}
+\end{split}
+\end{equation}
+\subsection{OC2\_OperatingCostsFixedAnnual}
+\begin{equation}
+\begin{split}
+ \textit{TotalCapacityAnnual}_{r,t,y} \cdot \text{FixedCost}_{r,t,y} &= \textit{AnnualFixedOperatingCost}_{r,t,y}
+\end{split}
+\end{equation}
+\subsection{OC3\_OperatingCostsTotalAnnual}
+\begin{equation}
+\begin{split}
+ \textit{AnnualFixedOperatingCost}_{r,t,y} + \textit{AnnualVariableOperatingCost}_{r,t,y} &= \textit{OperatingCost}_{r,t,y}
+\end{split}
+\end{equation}
+\subsection{OC4\_DiscountedOperatingCostsTotalAnnual}
+\begin{equation}
+\begin{split}
+ \frac{\textit{OperatingCost}_{r,t,y}}{\text{DiscountFactorMid}_{r,y}} &= \textit{DiscountedOperatingCost}_{r,t,y}
+\end{split}
+\end{equation}
+\subsection{TDC1\_TotalDiscountedCostByTechnology}
+\begin{equation}
+\begin{split}
+ \textit{DiscountedOperatingCost}_{r,t,y} &+ \textit{DiscountedCapitalInvestment}_{r,t,y} \\
+ &+ \textit{DiscountedTechnologyEmissionsPenalty}_{r,t,y} \\
+ &- \textit{DiscountedSalvageValue}_{r,t,y} \\
+ &= \textit{TotalDiscountedCostByTechnology}_{r,t,y}
+\end{split}
+\end{equation}
+\subsection{TDC2\_TotalDiscountedCost}
+\begin{equation}
+\begin{split}
+ \sum\limits_{t} \textit{TotalDiscountedCostByTechnology}_{r,t,y} &+ \sum\limits_{s} \textit{TotalDiscountedStorageCost}_{r,s,y} \\
+ &= \textit{TotalDiscountedCost}_{r,y}
+\end{split}
+\end{equation}
+\subsection{TCC1\_TotalAnnualMaxCapacityConstraint}
+\begin{equation}
+\begin{split}
+ \textit{TotalCapacityAnnual}_{r,t,y} &\leq \text{TotalAnnualMaxCapacity}_{r,t,y}
+\end{split}
+\end{equation}
+\subsection{TCC2\_TotalAnnualMinCapacityConstraint}
+\begin{equation}
+\begin{split}
+ \textit{TotalCapacityAnnual}_{r,t,y} &\geq \text{TotalAnnualMinCapacity}_{r,t,y}
+\end{split}
+\end{equation}
+\subsection{NCC1\_TotalAnnualMaxNewCapacityConstraint}
+\begin{equation}
+\begin{split}
+ \textit{NewCapacity}_{r,t,y} &\leq \text{TotalAnnualMaxCapacityInvestment}_{r,t,y}
+\end{split}
+\end{equation}
+\subsection{NCC2\_TotalAnnualMinNewCapacityConstraint}
+\begin{equation}
+\begin{split}
+ \textit{NewCapacity}_{r,t,y} &\geq \text{TotalAnnualMinCapacityInvestment}_{r,t,y}
+\end{split}
+\end{equation}
+\subsection{AAC1\_TotalAnnualTechnologyActivity}
+\begin{equation}
+\begin{split}
+ \sum\limits_{l} \textit{RateOfTotalActivity}_{r,t,l,y} \cdot \text{YearSplit}_{l,y} &= \textit{TotalTechnologyAnnualActivity}_{r,t,y}
+\end{split}
+\end{equation}
+\subsection{AAC2\_TotalAnnualTechnologyActivityUpperLimit}
+\begin{equation}
+\begin{split}
+ \textit{TotalTechnologyAnnualActivity}_{r,t,y} &\leq \text{TotalTechnologyAnnualActivityUpperLimit}_{r,t,y}
+\end{split}
+\end{equation}
+\subsection{AAC3\_TotalAnnualTechnologyActivityLowerLimit}
+\begin{equation}
+\begin{split}
+ \textit{TotalTechnologyAnnualActivity}_{r,t,y} &\geq \text{TotalTechnologyAnnualActivityLowerLimit}_{r,t,y}
+\end{split}
+\end{equation}
+\subsection{TAC1\_TotalModelHorizonTechnologyActivity}
+\begin{equation}
+\begin{split}
+ \sum\limits_{y} \textit{TotalTechnologyAnnualActivity}_{r,t,y} &= \textit{TotalTechnologyModelPeriodActivity}_{r,t}
+\end{split}
+\end{equation}
+\subsection{TAC2\_TotalModelHorizonTechnologyActivityUpperLimit}
+\begin{equation}
+\begin{split}
+ \textit{TotalTechnologyModelPeriodActivity}_{r,t} &\leq \text{TotalTechnologyModelPeriodActivityUpperLimit}_{r,t}
+\end{split}
+\end{equation}
+\subsection{TAC3\_TotalModelHorizenTechnologyActivityLowerLimit}
+\begin{equation}
+\begin{split}
+ \textit{TotalTechnologyModelPeriodActivity}_{r,t} &\geq \text{TotalTechnologyModelPeriodActivityLowerLimit}_{r,t}
+\end{split}
+\end{equation}
+\subsection{RM3\_ReserveMargin\_Constraint}
+\begin{equation}
+\begin{split}
+ &\sum\limits_{t,m,f: \text{OutputActivityRatio} \neq 0} \textit{RateOfActivity}_{r,l,t,m,y} \cdot \text{OutputActivityRatio}_{r,t,f,m,y} \\
+ &\quad \cdot \text{ReserveMarginTagFuel}_{r,f,y} \cdot \text{ReserveMargin}_{r,y} \\
+ &\leq \sum\limits_{t} \bigg( \sum\limits_{\substack{yy \in YEAR: \\ (y-yy < \text{OperationalLife}_{r,t}) \\ \land (y-yy \geq 0)}} \textit{NewCapacity}_{r,t,yy} + \text{ResidualCapacity}_{r,t,y} \bigg) \\
+ &\quad \cdot \text{ReserveMarginTagTechnology}_{r,t,y} \cdot \text{CapacityToActivityUnit}_{r,t}
+\end{split}
+\end{equation}
+\subsection{RE1\_FuelProductionByTechnologyAnnual}
+\begin{equation}
+\begin{split}
+ \sum\limits_{l} \textit{ProductionByTechnology}_{r,l,t,f,y} &= \textit{ProductionByTechnologyAnnual}_{r,t,f,y}
+\end{split}
+\end{equation}
+\subsection{RE2\_TechIncluded}
+\begin{equation}
+\begin{split}
+ \sum\limits_{t, f} \textit{ProductionByTechnologyAnnual}_{r,t,f,y} \cdot \text{RETagTechnology}_{r,t,y} &= \textit{TotalREProductionAnnual}_{r,y}
+\end{split}
+\end{equation}
+\subsection{RE3\_FuelIncluded}
+\begin{equation}
+\begin{split}
+ \sum\limits_{l, f} \textit{RateOfProduction}_{r,l,f,y} \cdot \text{YearSplit}_{l,y} \cdot \text{RETagFuel}_{r,f,y} &= \textit{RETotalProductionOfTargetFuelAnnual}_{r,y}
+\end{split}
+\end{equation}
+\subsection{RE4\_EnergyConstraint}
+\begin{equation}
+\begin{split}
+ \textit{RETotalProductionOfTargetFuelAnnual}_{r,y} \cdot \text{REMinProductionTarget}_{r,y} &\leq \textit{TotalREProductionAnnual}_{r,y}
+\end{split}
+\end{equation}
+\subsection{RE5\_FuelUseByTechnologyAnnual}
+\begin{equation}
+\begin{split}
+ \sum\limits_{l} \textit{RateOfUseByTechnology}_{r,l,t,f,y} \cdot \text{YearSplit}_{l,y} &= \textit{UseByTechnologyAnnual}_{r,t,f,y}
+\end{split}
+\end{equation}
+\subsection{E1\_AnnualEmissionProductionByMode}
+\begin{equation}
+\begin{split}
+ \text{EmissionActivityRatio}_{r,t,e,m,y} \cdot \textit{TotalAnnualTechnologyActivityByMode}_{r,t,m,y} &= \textit{AnnualTechnologyEmissionByMode}_{r,t,e,m,y}
+\end{split}
+\end{equation}
+\subsection{E2\_AnnualEmissionProduction}
+\begin{equation}
+\begin{split}
+ \sum\limits_{m} \textit{AnnualTechnologyEmissionByMode}_{r,t,e,m,y} &= \textit{AnnualTechnologyEmission}_{r,t,e,y}
+\end{split}
+\end{equation}
+\subsection{E3\_EmissionsPenaltyByTechAndEmission}
+\begin{equation}
+\begin{split}
+ \textit{AnnualTechnologyEmission}_{r,t,e,y} \cdot \text{EmissionsPenalty}_{r,e,y} &= \textit{AnnualTechnologyEmissionPenaltyByEmission}_{r,t,e,y}
+\end{split}
+\end{equation}
+\subsection{E4\_EmissionsPenaltyByTechnology}
+\begin{equation}
+\begin{split}
+ \sum\limits_{e} \textit{AnnualTechnologyEmissionPenaltyByEmission}_{r,t,e,y} &= \textit{AnnualTechnologyEmissionsPenalty}_{r,t,y}
+\end{split}
+\end{equation}
+\subsection{E5\_DiscountedEmissionsPenaltyByTechnology}
+\begin{equation}
+\begin{split}
+ \frac{\textit{AnnualTechnologyEmissionsPenalty}_{r,t,y}}{\text{DiscountFactorMid}_{r,y}} &= \textit{DiscountedTechnologyEmissionsPenalty}_{r,t,y}
+\end{split}
+\end{equation}
+\subsection{E6\_EmissionsAccounting1}
+\begin{equation}
+\begin{split}
+ \sum\limits_{t} \textit{AnnualTechnologyEmission}_{r,t,e,y} &= \textit{AnnualEmissions}_{r,e,y}
+\end{split}
+\end{equation}
+\subsection{E7\_EmissionsAccounting2}
+\begin{equation}
+\begin{split}
+ \sum\limits_{y} \textit{AnnualEmissions}_{r,e,y} &= \textit{ModelPeriodEmissions}_{r,e} - \text{ModelPeriodExogenousEmission}_{r,e}
+\end{split}
+\end{equation}
+\subsection{E8\_AnnualEmissionsLimit}
+\begin{equation}
+\begin{split}
+ \textit{AnnualEmissions}_{r,e,y} + \text{AnnualExogenousEmission}_{r,e,y} &\leq \text{AnnualEmissionLimit}_{r,e,y}
+\end{split}
+\end{equation}
+\subsection{E9\_ModelPeriodEmissionsLimit}
+\begin{equation}
+\begin{split}
+ \textit{ModelPeriodEmissions}_{r,e} &\leq \text{ModelPeriodEmissionLimit}_{r,e}
+\end{split}
+\end{equation}
+\subsection{Must\_Run}
+\begin{equation}
+\begin{split}
+ \textit{RateOfTotalActivity}_{r,t,l,y} &\geq \text{MustRunTech}_{r,t,y} \cdot \textit{TotalCapacityAnnual}_{r,t,y} \\
+ &\quad \cdot \text{CapacityFactor}_{r,t,l,y} \cdot \text{CapacityToActivityUnit}_{r,t} \\
+ &\quad \cdot \text{AvailabilityFactor}_{r,t,y}
+\end{split}
+\end{equation}
+\end{document}
