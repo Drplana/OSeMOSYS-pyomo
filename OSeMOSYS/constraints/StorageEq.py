@@ -182,22 +182,22 @@ def S13_and_S14_and_S15_StorageLevelDayTypeFinish(model, r,s,ls,ld,y):
                  for lh in model.DAILYTIMEBRACKET)
             == model.v_StorageLevelDayTypeFinish[r,s,ls,ld,y]
         )    
-def S16_StorageLevel(model, r, s, ls, ld,lh, y):
-    """
-    s.t. S16_StorageLevel{r in REGION, s in STORAGE, ls in SEASON, ld in DAYTYPE, lh in DAILYTIMEBRACKET, y in YEAR}: 
-    if lh = min{lhlh in DAILYTIMEBRACKET} min(lhlh) then StorageLevelDayTypeStart[r,s,ls,ld,y]
-    else if lh = max{lhlh in DAILYTIMEBRACKET} max(lhlh) then StorageLevelDayTypeFinish[r,s,ls,ld,y]
-= StorageLevel[r,s,ls,ld,lh,y];"""
-    if lh == min(model.DAILYTIMEBRACKET):
-        return(
-            model.v_StorageLevel[r, s, ls, ld, lh, y] == model.v_StorageLevelDayTypeStart[r, s, ls, ld, y]
-        )
-    elif lh == max(model.DAILYTIMEBRACKET):
-        return(
-            model.v_StorageLevel[r, s, ls, ld, lh, y] == model.v_StorageLevelDayTypeFinish[r, s, ls, ld, y]
-            )
-    else:
-        return Constraint.Skip
+# def S16_StorageLevel(model, r, s, ls, ld,lh, y):
+#     """
+#     s.t. S16_StorageLevel{r in REGION, s in STORAGE, ls in SEASON, ld in DAYTYPE, lh in DAILYTIMEBRACKET, y in YEAR}: 
+#     if lh = min{lhlh in DAILYTIMEBRACKET} min(lhlh) then StorageLevelDayTypeStart[r,s,ls,ld,y]
+#     else if lh = max{lhlh in DAILYTIMEBRACKET} max(lhlh) then StorageLevelDayTypeFinish[r,s,ls,ld,y]
+# = StorageLevel[r,s,ls,ld,lh,y];"""
+#     if lh == min(model.DAILYTIMEBRACKET):
+#         return(
+#             model.v_StorageLevel[r, s, ls, ld, lh, y] == model.v_StorageLevelDayTypeStart[r, s, ls, ld, y]
+#         )
+#     elif lh == max(model.DAILYTIMEBRACKET):
+#         return(
+#             model.v_StorageLevel[r, s, ls, ld, lh, y] == model.v_StorageLevelDayTypeFinish[r, s, ls, ld, y]
+#             )
+#     else:
+#         return Constraint.Skip
 
 
     

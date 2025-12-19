@@ -100,7 +100,7 @@ def transform_to_hourly(results, bracket_mapping, daytype_mapping, season_mappin
 
     return hourly_results_df
 
-def calculate_yearsplit(season_mapping, daytype_mapping, bracket_mapping, year):
+def calculate_yearsplit__(season_mapping, daytype_mapping, bracket_mapping, year):
     # Total de horas en un año
     total_hours = 8760
 
@@ -136,7 +136,75 @@ def calculate_yearsplit(season_mapping, daytype_mapping, bracket_mapping, year):
     yearsplit_df['YearSplit'] = yearsplit_df['YearSplit'] / yearsplit_df['YearSplit'].sum()
 
     return yearsplit_df
+def calculate_yearsplit(season_mapping, daytype_mapping, bracket_mapping, year):
+    # Total de horas base en OSeMOSYS (estándar suele ser 8760)
+    total_year_hours = 8760 
+    
+    # Preparamos diccionarios inversos para búsqueda rápida
+    # Mapping: Mes -> Estación
+    month_to_season = {}
+    for season, months in season_mapping.items():
+        for month in months:
+            month_to_season[month] = season
+            
+    # Mapping: DíaSemana (0-6) -> DayType
+    day_to_daytype = {}
+    for dtype, days in daytype_mapping.items():
+        for day in days:
+            day_to_daytype[day] = dtype
 
+    # Inicializamos contador de días: counts[Season][DayType] = número de días
+    counts = {s: {dt: 0 for dt in daytype_mapping} for s in season_mapping}
+
+    # Recorremos el calendario real del año para contar días exactos
+    # Esto soluciona el problema de proporciones 5/7 vs 2/7
+    start_date = pd.Timestamp(f'{year}-01-01')
+    end_date = pd.Timestamp(f'{year}-12-31')
+    
+    # Creamos un rango diario
+    for date in pd.date_range(start=start_date, end=end_date, freq='D'):
+        m = date.month
+        wd = date.dayofweek
+        
+        # Identificamos a qué Season y DayType pertenece este día específico
+        s = month_to_season.get(m)
+        dt = day_to_daytype.get(wd)
+        
+        # Si la configuración cubre este día, sumamos al contador
+        if s is not None and dt is not None:
+            counts[s][dt] += 1
+
+    # Crear lista para resultados
+    yearsplit = []
+
+    # Calcular fracciones
+    for season in season_mapping:
+        for daytype in daytype_mapping:
+            # Recuperamos cuántos días REALES existen para esta combinación
+            num_days = counts[season][daytype]
+            
+            for bracket, hours in bracket_mapping.items():
+                # Horas totales = Días * Horas que dura ese bracket
+                duration_hours = len(hours)
+                total_hours_in_slice = num_days * duration_hours
+                
+                # Fraction of Year
+                fraction = total_hours_in_slice / total_year_hours
+                
+                yearsplit.append({
+                    'Season': season,
+                    'DayType': daytype,
+                    'Bracket': bracket,
+                    'YearSplit': fraction
+                })
+
+    # Convertir a DataFrame
+    yearsplit_df = pd.DataFrame(yearsplit)
+
+    # Normalizar para asegurar que sume exactamente 1 (por temas de años bisiestos vs 8760)
+    yearsplit_df['YearSplit'] = yearsplit_df['YearSplit'] / yearsplit_df['YearSplit'].sum()
+
+    return yearsplit_df
 def calculate_specified_demand_profile(data):
     # Agrupar la demanda total por Season, DayType y DaylyTimeBracket
     grouped_demand = data.groupby(['Season', 'DayType', 'DaylyTimeBracket'])['Total'].sum().reset_index()
@@ -159,7 +227,8 @@ def calculate_daysplit(bracket_mapping, year):
         # Calcular la duración del bloque horario en horas
         bracket_hours = len(hours)
         # Calcular DaySplit como fracción del año
-        day_split_fraction = (bracket_hours / 24) / days_in_year
+        # day_split_fraction = (bracket_hours / 24) / days_in_year
+        day_split_fraction = (bracket_hours / total_hours_in_year)
         day_split.append({
             'Bracket': bracket,
             'DaySplit': day_split_fraction

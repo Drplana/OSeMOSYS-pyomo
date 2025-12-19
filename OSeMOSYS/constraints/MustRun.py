@@ -16,6 +16,8 @@ from pyomo.environ import *
             #    sum(model.v_RateOfDemand[r,l,f,y]*model.p_MustRun[r,y]*model.p_MustRunFuel[r,f,y])
     # else: return Constraint.Skip
 def Must_Run(model, r,t,l,y):
+    if model.p_MustRunTech[r,t,y] == 0: 
+        return Constraint.Skip
     return (model.v_RateOfTotalActivity[r,t,l,y] 
             >=
          model.p_MustRunTech[r,t,y]

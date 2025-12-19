@@ -9,7 +9,7 @@ import os,sys
 root_folder = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 sys.path.append(root_folder)
 import time
-
+import argparse
 
 #Two solution to import the library
 # (1) as a package (defined in __init__.py) => function calls are done through the lpackage (eg om.solve_model)
@@ -1432,8 +1432,11 @@ if __name__ == "__main__":
         # os.path.join(root_folder, 'data/11-BaseScenarioVOLL-NationalProgram55RC50%Real.xlsx'),
         # os.path.join(root_folder, 'data/12-BaseScenarioVOLL-NationalProgram55RC15%Real.xlsx'),
         # os.path.join(root_folder, 'data/13-BaseScenarioVOLL-NationalProgram55RC10%Real.xlsx'),
-        os.path.join(root_folder, 'data/14-BaseScenarioVOLL-NationalProgram55RC20%Real.xlsx'),
-        # os.path.join(root_folder, 'data/05-BaseScenarioVOLL-NationalProgram55NEReal.xlsx'),
+        # os.path.join(root_folder, 'data/14-BaseScenarioVOLL-NationalProgram55RC20%Real.xlsx'),
+        # os.path.join(root_folder, 'data/15-BaseScenarioVOLL-NationalProgram55RC35%Real.xlsx'),
+        # os.path.join(root_folder, 'data/16-BaseScenarioVOLL-NationalProgram55RC10%Real.xlsx'),
+
+ 
 
 
 
@@ -1442,31 +1445,59 @@ if __name__ == "__main__":
         # os.path.join(root_folder, 'data/06-BaseScenarioVOLL-NationalProgramV2.xlsx'),
         # os.path.join(root_folder, 'data/07-BaseScenarioVOLL-NationalProgramNoBIO.xlsx'), 
         # os.path.join(root_folder, 'data/07-BaseScenarioVOLL-NationalProgramNoBIO2030.xlsx')
+        # os.path.join(root_folder, 'data/05-BaseScenarioVOLL-NationalProgram55NEReal.xlsx'),
     ]
-
-    input_files4 = [
-
-
-        os.path.join(root_folder, 'data/08-BaseScenarioVOLL-RenewableTargets.xlsx'), # 400$/kW for wind recovery cost 10 years extension
-        os.path.join(root_folder, 'data/08-BaseScenarioVOLL-RenewableTargetsCapLimit.xlsx'), 
-        # os.path.join(root_folder, 'data/05-BaseScenarioVOLL-WIND-NOBIO.xlsx'), # 1GW per year and 0.5 GW biomass
-    ]
-
-    input_files5 = [
-        # Two files with national program. First with biomass and second without biomass
+    Discount_rate_12_import_crudeoil_30PJ = [
+        #########################################################################################
+        ####Scenarios were imported crude oil can be 30 PJ, Hystorical imported value.####
         
-        os.path.join(root_folder, 'data/06-BaseScenarioVOLL-NationalProgramCR400.xlsx'),
-        os.path.join(root_folder, 'data/06-BaseScenarioVOLL-NationalProgramCR500.xlsx'),
-        # os.path.join(root_folder, 'data/06-BaseScenarioVOLL-NationalProgramV2.xlsx'),
-        # os.path.join(root_folder, 'data/07-BaseScenarioVOLL-NationalProgramNoBIO.xlsx'), 
-        # os.path.join(root_folder, 'data/07-BaseScenarioVOLL-NationalProgramNoBIO2030.xlsx')
-    ]
+        # os.path.join(root_folder, 'data/20-BaseScenarioVOLL-NationalProgram55NEReal.xlsx'),
+        os.path.join(root_folder, 'data/17-BaseScenarioVOLL-NationalProgram55RC35%Real.xlsx'),
+        os.path.join(root_folder, 'data/18-BaseScenarioVOLL-NationalProgram55RC20%Real.xlsx'),
+        os.path.join(root_folder, 'data/19-BaseScenarioVOLL-NationalProgram55RC15%Real.xlsx'),
+        
+                                            ]
+
+    Discount_rate_12_import_crudeoil_100PJ = [
+        #########################################################################################
+        #### """ Scenarios were imported crude oil can be 100 PJ."""                         #### 
+
+        os.path.join(root_folder, 'data/21-BaseScenarioVOLL-NationalProgram55RC20%Real.xlsx'),
+        os.path.join(root_folder, 'data/22-BaseScenarioVOLL-NationalProgram55RC35%Real.xlsx'),
+        os.path.join(root_folder, 'data/23-BaseScenarioVOLL-NationalProgram55RC50%Real.xlsx'),
+        
+        ]
+
+
 
     # Ejecutar los archivos en paralelo de 3 en 3. Batch_size define el número de instancias a correr.
     # Set parallel=False to see verbose output (solver logs, timing, etc.)
-    scenario_manager.run_files_in_batches(input_files=input_files3, batch_size=3, solver_name="gurobi", parallel=False)
+    ###############################################
+    """scenario_manager.run_files_in_batches(input_files=Discount_rate_12_import_crudeoil_100PJ, batch_size=3, solver_name="gurobi", parallel=True)"""
+    ###############################################
+    input_data = {
+    "100PJ": Discount_rate_12_import_crudeoil_100PJ,
+    "30PJ":  Discount_rate_12_import_crudeoil_30PJ
+    }
+    
+    # 2. Configurar el lector de argumentos
+    parser = argparse.ArgumentParser(description="Ejecutar escenarios de Gurobi")
+    parser.add_argument(
+        "--scenario", 
+        type=str, 
+        choices=["100PJ", "30PJ"], 
+        required=True, 
+        help="Grupo de escenarios '100PJ' o '30PJ'"
+    )
 
-
+    args = parser.parse_args()
+    # print(f"Ejecutando escenario: {args.scenario}")
+    scenario_manager.run_files_in_batches(
+        input_files=input_data[args.scenario],  # Aquí ocurre la magia
+        batch_size=3, 
+        solver_name="gurobi", 
+        parallel=True
+    )
 
     # dimension_manager = DimensionManager(sets)
 ##########################################################################################################################

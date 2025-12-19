@@ -5,7 +5,7 @@ sys.path.append(root_folder)
 import traceback
 from concurrent.futures import ProcessPoolExecutor
 from OSeMOSYS.utils import dataframe_metadata
-from OSeMOSYS.SolveSolutions import solve_model, export_results, compute_lcoe
+from OSeMOSYS.SolveSolutions import solve_model, export_results, compute_lcoe, compute_curtailment_optimized
 from OSeMOSYS.readXlsData import load_dataframes, transform_all_dataframes, save_dataframes_to_csv, dict_to_json, adjust_json_for_pyomo, export_to_json
 from OSeMOSYS.config import configure_paths
 
@@ -47,6 +47,13 @@ class ScenarioManager:
                 compute_lcoe(instance, results_folder, discount_energy=self.lcoe_discount_energy)
             except Exception as e:
                 print(f"[LCOE] Error: {e}")
+    
+    def _maybe_compute_curtailment(self, instance, results_folder):
+        try:
+            print("[ScenarioManager] Computing Curtailment...")
+            compute_curtailment_optimized(instance, results_folder)
+        except Exception as e:
+            print(f"[ScenarioManager] Curtailment computation failed: {e}")
 
 
     def generate_json_file(self, parameter_name, value, subscenario_name):
@@ -288,7 +295,8 @@ class ScenarioManager:
 
             # Exportar resultados
             export_results(instance, results_folder)
-            self._maybe_compute_lcoe(instance, results_folder) 
+            self._maybe_compute_lcoe(instance, results_folder)
+            self._maybe_compute_curtailment(instance, results_folder) 
             return f"Modelo resuelto exitosamente para el subescenario: {subscenario_name}"
 
         except Exception as e:
@@ -315,6 +323,7 @@ class ScenarioManager:
             # Cargar y transformar los datos
             dataframe = load_dataframes(input_file)
             transf_data = transform_all_dataframes(dataframe)
+            save_dataframes_to_csv(transf_data, input_file)
             dict_to_be_adjusted = dict_to_json(transf_data, input_file)
             pyomo_dict = adjust_json_for_pyomo(dict_to_be_adjusted)
 
@@ -337,6 +346,7 @@ class ScenarioManager:
             # Exportar resultados
             export_results(instance, results_folder)
             self._maybe_compute_lcoe(instance, results_folder) 
+            self._maybe_compute_curtailment(instance, results_folder)
             return f"Modelo ejecutado exitosamente para: {input_file}"
 
         except Exception as e:
@@ -499,6 +509,7 @@ class ScenarioManager:
             # Exportar resultados
             export_results(instance, results_folder)
             self._maybe_compute_lcoe(instance, results_folder) 
+            self._maybe_compute_curtailment(instance, results_folder)
             print(f"Archivo base ejecutado exitosamente: {input_file}")
 
         except Exception as e:

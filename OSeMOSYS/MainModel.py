@@ -901,7 +901,7 @@ def define_model(file_path):
     #%%
     from OSeMOSYS.constraints.StorageEq import S1_RateOfStorageCharge, S2_RateOfStorageDischarge, S3_NetChargeWithinYear, \
         S4_NetChargeWithinDay, S5_and_S6_StorageLevelYearStart, S7_and_S8_StorageLevelYearFinish, S9_and_S10_StorageLevelSeasonStart, \
-        S11_and_S12_StorageLevelDayTypeStart, S13_and_S14_and_S15_StorageLevelDayTypeFinish, S16_StorageLevel
+        S11_and_S12_StorageLevelDayTypeStart, S13_and_S14_and_S15_StorageLevelDayTypeFinish#, S16_StorageLevel
     model.S1_RateOfStorageCharge = Constraint(
             model.REGION,
             model.STORAGE,
@@ -973,14 +973,14 @@ def define_model(file_path):
             model.YEAR,
             rule= S13_and_S14_and_S15_StorageLevelDayTypeFinish
             )
-    model.S16_StorageLevel = Constraint(
-        model.REGION, 
-        model.STORAGE, 
-        model.SEASON,
-        model.DAYTYPE, 
-        model.DAILYTIMEBRACKET, 
-        model.YEAR, 
-        rule=S16_StorageLevel)
+    # model.S16_StorageLevel = Constraint(
+    #     model.REGION, 
+    #     model.STORAGE, 
+    #     model.SEASON,
+    #     model.DAYTYPE, 
+    #     model.DAILYTIMEBRACKET, 
+    #     model.YEAR, 
+    #     rule=S16_StorageLevel)
     #%%
     from OSeMOSYS.constraints.StorageConst import (
         SC1_LowerLimit_BeginningOfDailyTimeBracketOfFirstInstanceOfDayTypeInFirstWeekConstraint,

@@ -104,9 +104,15 @@ def create_stacked_area_chart(data, title, COLOR_VARIATIONS,  area_opacity=0.8):
     full_years = range(int(df['YEAR'].min()), int(df['YEAR'].max()) + 1)
     technologies = df['TECHNOLOGY'].unique()
 
-    # Crear grid completo y fusionar
+    # Grid completo y merge
     full_index = pd.MultiIndex.from_product([full_years, technologies], names=['YEAR', 'TECHNOLOGY'])
     df_full = df.set_index(['YEAR', 'TECHNOLOGY']).reindex(full_index, fill_value=0).reset_index()
+
+    # Totales por año y participación
+    totals = df_full.groupby('YEAR', as_index=False)['value'].sum().rename(columns={'value': 'total'})
+    df_full = df_full.merge(totals, on='YEAR', how='left')
+    df_full['share_pct'] = (df_full['value'] / df_full['total']).replace([np.inf, -np.inf], np.nan).fillna(0) * 100.0
+
 
     # Colores
     tech_colors = assign_colors_to_technologies(df_full, 'TECHNOLOGY', COLOR_VARIATIONS)
@@ -132,6 +138,29 @@ def create_stacked_area_chart(data, title, COLOR_VARIATIONS,  area_opacity=0.8):
             col = f"rgba({r},{g},{b},{area_opacity})"
         tr.update(fillcolor=col, opacity=area_opacity, line=dict(width=0.6))
 
+    for tr in fig.data:
+        tech = tr.name
+        df_t = df_full[df_full['TECHNOLOGY'] == tech].sort_values('YEAR')
+        tr.customdata = np.stack([df_t['total'].values, df_t['share_pct'].values], axis=-1)
+        tr.hovertemplate = (
+            "Año: %{x}<br>"
+            f"Tecnología: {tech}<br>"
+            "Valor: %{y:.2f}<br>"
+            "Total año: %{customdata[0]:.2f}<br>"
+            "Participación: %{customdata[1]:.2f}%<extra></extra>"
+        )
+
+    fig.add_trace(go.Scatter(
+       x=totals['YEAR'],
+       y=totals['total'],
+      mode='lines',
+     name='Total',
+    line=dict(color='black', width=0),  # invisible
+    hoverinfo='skip',                   # no mostrar hover
+    showlegend=False                    # ocultar en la leyenda
+  ))
+
+
     fig.update_traces(line=dict(width=0.5), hovertemplate='%{x}<br>%{fullData.name}: %{y:.2f}<extra></extra>')
     fig.update_layout(
         xaxis_title="Año",
@@ -139,7 +168,9 @@ def create_stacked_area_chart(data, title, COLOR_VARIATIONS,  area_opacity=0.8):
         plot_bgcolor='white',
         legend=dict(font=dict(size=12)),
         margin=dict(t=50, b=50, l=50, r=50),
-        xaxis=dict(type='linear', dtick=5)  # Ajusta dtick según tus años
+        xaxis=dict(type='linear', dtick=5),  # Ajusta dtick según tus años
+        # hovermode='x unified',               # Mostrar valores de todas las tecnologías en una sola etiqueta al pasar por un año
+        # hoverlabel=dict(bgcolor='white', font_size=9, font_family='Arial')
     )
     return fig
 

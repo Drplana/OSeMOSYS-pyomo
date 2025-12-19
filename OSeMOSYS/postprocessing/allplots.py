@@ -506,6 +506,9 @@ def process_single_file(file_name, file_path, yearsplit, specified_demand_profil
         df = pd.read_csv(file_path)
         if df.empty:
             return f"El archivo {file_name} está vacío."
+        
+        if file_name == "Demand" and 'TECHNOLOGY' not in df.columns:
+            df['TECHNOLOGY'] = 'DEMAND'
 
         # Agregar columnas YearSplit y SpecifiedDemandProfile
         df['YearSplit'] = df['TIMESLICE'].map(yearsplit)
@@ -2895,12 +2898,24 @@ if __name__ == '__main__':
         # os.path.join(root_folder, 'results/08-BaseScenarioVOLL-NationalProgram55RC20%'),
         # os.path.join(root_folder, 'results/06-BaseScenarioVOLL-NationalProgram55RC50NOPWRFO'),
         # os.path.join(root_folder, 'results/09-BaseScenarioVOLL-NationalProgram55RC35%Real'),
-        # os.path.join(root_folder, 'results/11-BaseScenarioVOLL-NationalProgram55RC50%Real'),
-        # os.path.join(root_folder, 'results/10-BaseScenarioVOLL-NationalProgram55RC35%Real'),
-        # os.path.join(root_folder, 'results/09-BaseScenarioVOLL-NationalProgram55RC20%Real'), 
-        # os.path.join(root_folder, 'results/12-BaseScenarioVOLL-NationalProgram55RC15%Real'),
-        # os.path.join(root_folder, 'results/13-BaseScenarioVOLL-NationalProgram55RC10%Real'),
-        # os.path.join(root_folder, 'results/14-BaseScenarioVOLL-NationalProgram55RC20%Real'),
+
+        os.path.join(root_folder, 'results/11-BaseScenarioVOLL-NationalProgram55RC50%Real'),
+        os.path.join(root_folder, 'results/10-BaseScenarioVOLL-NationalProgram55RC35%Real'),
+        os.path.join(root_folder, 'results/09-BaseScenarioVOLL-NationalProgram55RC20%Real'), 
+        os.path.join(root_folder, 'results/12-BaseScenarioVOLL-NationalProgram55RC15%Real'),
+        os.path.join(root_folder, 'results/13-BaseScenarioVOLL-NationalProgram55RC10%Real'),
+        ##escenario con más importación de crudo.
+        os.path.join(root_folder, 'results/14-BaseScenarioVOLL-NationalProgram55RC20%Real'), 
+        os.path.join(root_folder, 'results/15-BaseScenarioVOLL-NationalProgram55RC35%Real'),
+        ### escenarios con discountrate 12%
+        os.path.join(root_folder, 'results/16-BaseScenarioVOLL-NationalProgram55RC10%Real'),
+        os.path.join(root_folder, 'results/17-BaseScenarioVOLL-NationalProgram55RC35%Real'),
+        os.path.join(root_folder, 'results/18-BaseScenarioVOLL-NationalProgram55RC20%Real'), 
+        os.path.join(root_folder, 'results/19-BaseScenarioVOLL-NationalProgram55RC15%Real'),
+        os.path.join(root_folder, 'results/20-BaseScenarioVOLL-NationalProgram55NEReal'),
+        os.path.join(root_folder, 'results/21-BaseScenarioVOLL-NationalProgram55RC20%Real'),
+        os.path.join(root_folder, 'results/22-BaseScenarioVOLL-NationalProgram55RC35%Real'),
+        os.path.join(root_folder, 'results/23-BaseScenarioVOLL-NationalProgram55RC50%Real'),
         # os.path.join(root_folder, 'results/13-BaseScenarioVOLL-NationalProgram55RC15%RealPositiv'),
            
 
@@ -2930,10 +2945,10 @@ if __name__ == '__main__':
     
         
 
-    print("Dependency files for App 1:", dependency_files_app1)
-    print("Dependency files for App 2:", dependency_files_app2)
-    print("Dependency files for App 4:", dependency_files_app4)
-    print("Dependency files for App 5:", dependency_files_app5)
+    # print("Dependency files for App 1:", dependency_files_app1)
+    # print("Dependency files for App 2:", dependency_files_app2)
+    # print("Dependency files for App 4:", dependency_files_app4)
+    # print("Dependency files for App 5:", dependency_files_app5)
     if create_hourly_files:
         process_and_save_hourly_data_parallel(
             dependency_files=dependency_files_app5,

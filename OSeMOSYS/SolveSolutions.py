@@ -568,6 +568,208 @@ def generate_dependency_dict(variable_dependencies):
 
     return formatted_dependencies
 
+# ...existing code...
+
+def compute_curtailment(instance, results_folder):
+    """
+    Calcula el curtailment por (REGION, TECHNOLOGY, TIMESLICE, YEAR) y anual por (REGION, TECHNOLOGY, YEAR).
+    Fórmula por timeslice:
+        Curtailment[r,t,l,y] = TotalCapacityAnnual[r,t,y] * CapacityFactor[r,t,l,y] * CapacityToActivityUnit[r,t]
+                               - RateOfTotalActivity[r,t,l,y]
+    Fórmula anual (convertida con YearSplit):
+        CurtailmentAnnual[r,t,y] = sum_l( TotalCapacityAnnual[r,t,y] * CapacityFactor[r,t,l,y] * YearSplit[l,y] * CapacityToActivityUnit[r,t] )
+                                   - sum_l( RateOfTotalActivity[r,t,l,y] * YearSplit[l,y] )
+    """
+    import os
+    import pandas as pd
+    from pyomo.environ import value
+
+    # Componentes necesarios
+    cap_var = getattr(instance, 'v_TotalCapacityAnnual', None)        # [r,t,y]
+    rate_var = getattr(instance, 'v_RateOfTotalActivity', None)       # [r,t,l,y]
+    cf_param = getattr(instance, 'p_CapacityFactor', None)            # [r,t,l,y]
+    c2a_param = getattr(instance, 'p_CapacityToActivityUnit', None)   # [r,t]
+    ys_param = getattr(instance, 'p_YearSplit', None)                 # [l,y]
+
+    if any(x is None for x in [cap_var, rate_var, cf_param, c2a_param, ys_param]):
+        print("[Curtailment] Faltan componentes requeridos (capacidad, actividad, CF, C2A, YearSplit).")
+        return None, None
+
+    def v(obj, idx):
+        try:
+            val = obj[idx]
+            return float(val) if not hasattr(val, 'value') else (float(val.value) if val.value is not None else 0.0)
+        except Exception:
+            return 0.0
+
+    rows_ts = []
+    rows_annual = []
+
+    # Precalcular TotalCapacityAnnual y CapacityToActivityUnit en dict para acceso rápido
+    cap_map = {(r, t, y): v(cap_var, (r, t, y)) for (r, t, y) in cap_var}
+    c2a_map = {(r, t): v(c2a_param, (r, t)) for (r, t) in c2a_param}
+
+    # Recorrer todas las combinaciones presentes en rate_var
+    # rate_var está indexado por [r,t,l,y]
+    annual_acc = {}  # (r,t,y) -> {'cap_part_sum': ..., 'rate_sum': ...}
+
+    for (r, t, l, y) in rate_var:
+        cap = cap_map.get((r, t, y), 0.0)
+        cf = v(cf_param, (r, t, l, y))
+        c2a = c2a_map.get((r, t), 0.0)
+        rate = v(rate_var, (r, t, l, y))
+
+        # Curtailment por TS (misma unidad que RateOfTotalActivity en TS)
+        cur_ts = cap * cf * c2a - rate
+        rows_ts.append({
+            'REGION': r, 'TECHNOLOGY': t, 'TIMESLICE': l, 'YEAR': y,
+            'TotalCapacityAnnual': cap, 'CapacityFactor': cf, 'CapacityToActivityUnit': c2a,
+            'RateOfTotalActivity': rate, 'Curtailment': cur_ts
+        })
+
+        # Para anual, ponderar por YearSplit
+        ys = v(ys_param, (l, y))
+        annual = annual_acc.setdefault((r, t, y), {'cap_part_sum': 0.0, 'rate_sum': 0.0})
+        annual['cap_part_sum'] += cap * cf * ys * c2a
+        annual['rate_sum'] += rate * ys
+
+    for (r, t, y), sums in annual_acc.items():
+        cur_an = sums['cap_part_sum'] - sums['rate_sum']
+        rows_annual.append({
+            'REGION': r, 'TECHNOLOGY': t, 'YEAR': y,
+            'Sum(TCA*CF*YearSplit*C2A)': sums['cap_part_sum'],
+            'Sum(Rate*YearSplit)': sums['rate_sum'],
+            'CurtailmentAnnual': cur_an
+        })
+
+    df_ts = pd.DataFrame(rows_ts)
+    df_an = pd.DataFrame(rows_annual)
+
+    os.makedirs(results_folder, exist_ok=True)
+    df_ts.to_csv(os.path.join(results_folder, 'Curtailment_ByTS.csv'), index=False)
+    df_an.to_csv(os.path.join(results_folder, 'Curtailment_Annual.csv'), index=False)
+    print("[Curtailment] Exportado: Curtailment_ByTS.csv y Curtailment_Annual.csv")
+    return df_ts, df_an
+def compute_curtailment_optimized(instance, results_folder):
+    """
+    Versión optimizada para calcular curtailment.
+    Mejoras:
+    1. Itera sobre CapacityFactor para capturar casos donde Producción=0.
+    2. Pre-carga datos a diccionarios para velocidad máxima.
+    3. Elimina ruido numérico negativo (max(0, ...)).
+    """
+    import os
+    import pandas as pd
+    from pyomo.environ import value
+
+    # 1. Obtener variables y parámetros para calcular el curtailment
+    try:
+        # Params
+        cf_param = getattr(instance, 'p_CapacityFactor')
+        c2a_param = getattr(instance, 'p_CapacityToActivityUnit')
+        ys_param = getattr(instance, 'p_YearSplit')
+        # Vars
+        cap_var = getattr(instance, 'v_TotalCapacityAnnual')
+        rate_var = getattr(instance, 'v_RateOfTotalActivity')
+    except AttributeError:
+        print("[Curtailment] Faltan componentes en la instancia.")
+        return None, None
+    
+    cf_map = {k: value(v) for k, v in cf_param.items()} 
+    c2a_map = {k: value(v) for k, v in c2a_param.items()}
+    ys_map = {k: value(v) for k, v in ys_param.items()}
+    
+    cap_map = {k: value(v) for k, v in cap_var.items()}
+    rate_map = {k: value(v) for k, v in rate_var.items()}
+
+    rows_ts = []
+    
+    # Acumulador anual: {(r, t, y): {'potential': 0.0, 'actual': 0.0}}
+    annual_acc = {}
+
+    # 3. Iteramos sobre CAPACITY FACTOR
+    # ¿Por qué? Porque el curtailment solo existe si hay un potencial de generación (CF > 0).
+    # Si iteramos sobre rate_var, perdemos los casos donde la planta se apagó totalmente.
+    
+    for (r, t, l, y), cf_val in cf_map.items():
+        # Si el CF es 0 (ej. solar de noche), no hay curtailment que calcular. Saltamos.
+        if cf_val <= 0:
+            continue
+
+        # Obtener capacidad instalada
+        cap_val = cap_map.get((r, t, y), 0.0)
+        
+        # Si no hay capacidad instalada, no hay curtailment.
+        if cap_val <= 0:
+            continue
+
+        # Obtener otros valores
+        c2a_val = c2a_map.get((r, t), 1.0) # Default a 1 si no existe
+        rate_val = rate_map.get((r, t, l, y), 0.0) # Si no está en vars, es 0
+        
+        # CÁLCULO
+        # Potencial = MW Instalados * Factor * Conversión
+        potential = cap_val * cf_val * c2a_val
+        
+        # Curtailment = Potencial - Real
+        # Usamos max(0, ...) para evitar -1e-10 por errores de redondeo del solver
+        curtailment = max(0.0, potential - rate_val)
+
+        # Solo guardamos si hay un curtailment significativo (opcional, ahorra espacio)
+        # o si quieres ver todo, quita el 'if curtailment > 1e-6:'
+        
+        rows_ts.append({
+            'REGION': r, 'TECHNOLOGY': t, 'TIMESLICE': l, 'YEAR': y,
+            'PotentialActivity': potential,
+            'RateOfTotalActivity': rate_val,
+            'Curtailment': curtailment
+        })
+
+        # ACUMULACIÓN ANUAL
+        ys_val = ys_map.get((l, y), 0.0)
+        
+        if (r, t, y) not in annual_acc:
+            annual_acc[(r, t, y)] = {'potential': 0.0, 'actual': 0.0}
+        
+        annual_acc[(r, t, y)]['potential'] += potential * ys_val
+        annual_acc[(r, t, y)]['actual'] += rate_val * ys_val
+
+    # 4. Construir filas anuales
+    rows_annual = []
+    for (r, t, y), vals in annual_acc.items():
+        curtailment_an = max(0.0, vals['potential'] - vals['actual'])
+        
+        # Opcional: Calcular % de Curtailment
+        pct = 0.0
+        if vals['potential'] > 0:
+            pct = (curtailment_an / vals['potential']) * 100
+
+        rows_annual.append({
+            'REGION': r, 'TECHNOLOGY': t, 'YEAR': y,
+            'AnnualPotential': vals['potential'],
+            'AnnualProduction': vals['actual'],
+            'CurtailmentAnnual': curtailment_an,
+            'CurtailmentPercent': pct
+        })
+
+    # 5. Exportar
+    df_ts = pd.DataFrame(rows_ts)
+    df_an = pd.DataFrame(rows_annual)
+
+    os.makedirs(results_folder, exist_ok=True)
+    
+    # Ordenar columnas para que se vea bonito
+    cols_order = ['REGION', 'TECHNOLOGY', 'YEAR', 'TIMESLICE', 'PotentialActivity', 'RateOfTotalActivity', 'Curtailment']
+    if not df_ts.empty:
+        df_ts = df_ts[cols_order]
+        df_ts.to_csv(os.path.join(results_folder, 'Curtailment_ByTS.csv'), index=False)
+    
+    if not df_an.empty:
+        df_an.to_csv(os.path.join(results_folder, 'Curtailment_Annual.csv'), index=False)
+
+    print(f"[Curtailment] Listo. TS: {len(df_ts)} filas, Anual: {len(df_an)} filas.")
+    return df_ts, df_an
+
 
 
 
