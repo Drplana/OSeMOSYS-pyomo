@@ -1447,11 +1447,17 @@ if __name__ == "__main__":
         # os.path.join(root_folder, 'data/07-BaseScenarioVOLL-NationalProgramNoBIO2030.xlsx')
         # os.path.join(root_folder, 'data/05-BaseScenarioVOLL-NationalProgram55NEReal.xlsx'),
     ]
+
+    BaseScenario = [
+
+        os.path.join(root_folder, 'data/20-BaseScenarioVOLL-NationalProgram55NEReal.xlsx'),
+        
+        ]
     Discount_rate_12_import_crudeoil_30PJ = [
         #########################################################################################
         ####Scenarios were imported crude oil can be 30 PJ, Hystorical imported value.####
         
-        # os.path.join(root_folder, 'data/20-BaseScenarioVOLL-NationalProgram55NEReal.xlsx'),
+        
         os.path.join(root_folder, 'data/17-BaseScenarioVOLL-NationalProgram55RC35%Real.xlsx'),
         os.path.join(root_folder, 'data/18-BaseScenarioVOLL-NationalProgram55RC20%Real.xlsx'),
         os.path.join(root_folder, 'data/19-BaseScenarioVOLL-NationalProgram55RC15%Real.xlsx'),
@@ -1477,7 +1483,8 @@ if __name__ == "__main__":
     ###############################################
     input_data = {
     "100PJ": Discount_rate_12_import_crudeoil_100PJ,
-    "30PJ":  Discount_rate_12_import_crudeoil_30PJ
+    "30PJ":  Discount_rate_12_import_crudeoil_30PJ,
+    "BS":BaseScenario,
     }
     
     # 2. Configurar el lector de argumentos
@@ -1485,9 +1492,9 @@ if __name__ == "__main__":
     parser.add_argument(
         "--scenario", 
         type=str, 
-        choices=["100PJ", "30PJ"], 
+        choices=["100PJ", "30PJ", "BS"], 
         required=True, 
-        help="Grupo de escenarios '100PJ' o '30PJ'"
+        help="Grupo de escenarios '100PJ', '30PJ', 'BS'"
     )
 
     args = parser.parse_args()
